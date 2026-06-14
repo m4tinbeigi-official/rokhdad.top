@@ -5,4 +5,5 @@
 - `ARCHITECTURE.md`: Monorepo structure, service map, data ownership, and deployment flow.
 - `ENVIRONMENT.md`: Environment variables and secret inventory.
 - `DEPLOYMENT.md`: DNS, server pull workflow, SSL plan, update, and rollback notes.
-
+- `DOCKER_INFRASTRUCTURE.md`: Docker Compose services, networks, and volumes.
+- `GITHUB_WORKFLOW.md`: GitHub repo, branch, commit, and PR workflow.

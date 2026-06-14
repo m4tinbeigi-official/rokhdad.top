@@ -92,10 +92,10 @@ The project is API-first, GitHub-first, and server-only at runtime. The local ma
 | P1-002 | 1 | Add branch, commit, and PR rules | BLOCKED | P1-001 | GitHub ruleset | Try protected branch flow | S | SHOULD |
 | P1-003 | 1 | Add repository documentation skeleton | DONE | P1-001 | README, docs index | Markdown review | XS | MUST |
 | P1-004 | 1 | Define server pull deployment workflow | DONE | P1-001, P0-004 | Deployment runbook | Dry-run commands reviewed | S | MUST |
-| P2-001 | 2 | Create Docker Compose service map | PENDING | P1-004 | Compose architecture doc | Service dependency review | M | MUST |
-| P2-002 | 2 | Define Nginx routing for `rokhdad.top` | PENDING | P2-001 | Nginx route plan | Route table review | S | MUST |
-| P2-003 | 2 | Define SSL certificate strategy | PENDING | P0-004, P2-002 | SSL renewal plan | Renewal checklist | S | MUST |
-| P2-004 | 2 | Define persistent volume layout | PENDING | P2-001 | Volume map | Backup path review | S | MUST |
+| P2-001 | 2 | Create Docker Compose service map | DONE | P1-004 | Compose architecture doc | Service dependency review | M | MUST |
+| P2-002 | 2 | Define Nginx routing for `rokhdad.top` | DONE | P2-001 | Nginx route plan | Route table review | S | MUST |
+| P2-003 | 2 | Define SSL certificate strategy | DONE | P0-004, P2-002 | SSL renewal plan | Renewal checklist | S | MUST |
+| P2-004 | 2 | Define persistent volume layout | DONE | P2-001 | Volume map | Backup path review | S | MUST |
 | P3-001 | 3 | Scaffold Laravel API app | PENDING | P2-001 | Backend app skeleton | `php artisan about` on server | M | MUST |
 | P3-002 | 3 | Configure Laravel API routing | PENDING | P3-001 | Versioned API routes | HTTP smoke test | S | MUST |
 | P3-003 | 3 | Add health and readiness endpoints | PENDING | P3-002 | `/api/health`, `/api/ready` | Curl endpoints | S | MUST |
@@ -468,6 +468,10 @@ Completed:
 - P1-001
 - P1-003
 - P1-004
+- P2-001
+- P2-002
+- P2-003
+- P2-004
 
 In Progress:
 
@@ -481,8 +485,8 @@ Blocked:
 
 Next Recommended Task:
 
-- P2-001, after accepting P1-002 as blocked or upgrading/changing repo visibility.
+- P3-001, after server SSH details are available.
 
 ## 15. Next Recommended Step
 
-Next implementation can start with P2-001 if the owner accepts P1-002 as blocked for now. Full server execution still requires Ubuntu SSH details.
+Next implementation can start with P3-001 after Ubuntu SSH details are available. P3-001 must scaffold the Laravel API on the server or through a server-run Docker build workflow.

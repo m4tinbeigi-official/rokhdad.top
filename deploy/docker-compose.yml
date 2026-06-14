@@ -1,0 +1,173 @@
+name: rokhdad
+
+services:
+  nginx:
+    image: nginx:1.27-alpine
+    container_name: rokhdad-nginx
+    restart: unless-stopped
+    depends_on:
+      - backend
+      - frontend
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - certbot_webroot:/var/www/certbot
+      - certbot_certs:/etc/letsencrypt:ro
+      - app_public_storage:/var/www/storage:ro
+    networks:
+      - public
+      - internal
+
+  backend:
+    image: rokhdad/backend:latest
+    container_name: rokhdad-backend
+    restart: unless-stopped
+    env_file:
+      - ../.env
+    expose:
+      - "8080"
+    depends_on:
+      mariadb:
+        condition: service_healthy
+      mongodb:
+        condition: service_started
+      redis:
+        condition: service_healthy
+    volumes:
+      - app_public_storage:/app/storage/app/public
+      - app_logs:/app/storage/logs
+    networks:
+      - internal
+
+  frontend:
+    image: rokhdad/frontend:latest
+    container_name: rokhdad-frontend
+    restart: unless-stopped
+    env_file:
+      - ../.env
+    expose:
+      - "3000"
+    networks:
+      - internal
+
+  worker-ingestion:
+    image: rokhdad/worker:latest
+    container_name: rokhdad-worker-ingestion
+    restart: unless-stopped
+    command: ["python", "-m", "rokhdad_workers.ingestion"]
+    env_file:
+      - ../.env
+    depends_on:
+      - mongodb
+      - redis
+    networks:
+      - internal
+
+  worker-normalization:
+    image: rokhdad/worker:latest
+    container_name: rokhdad-worker-normalization
+    restart: unless-stopped
+    command: ["python", "-m", "rokhdad_workers.normalization"]
+    env_file:
+      - ../.env
+    depends_on:
+      - mariadb
+      - mongodb
+      - redis
+    networks:
+      - internal
+
+  worker-images:
+    image: rokhdad/worker:latest
+    container_name: rokhdad-worker-images
+    restart: unless-stopped
+    command: ["python", "-m", "rokhdad_workers.images"]
+    env_file:
+      - ../.env
+    depends_on:
+      - mongodb
+      - redis
+    volumes:
+      - app_public_storage:/app/storage/app/public
+    networks:
+      - internal
+
+  mariadb:
+    image: mariadb:11.4
+    container_name: rokhdad-mariadb
+    restart: unless-stopped
+    environment:
+      MARIADB_DATABASE: ${MARIADB_DATABASE}
+      MARIADB_USER: ${MARIADB_USER}
+      MARIADB_PASSWORD: ${MARIADB_PASSWORD}
+      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    volumes:
+      - mariadb_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mariadb-admin ping -h 127.0.0.1 -u$${MARIADB_USER} -p$${MARIADB_PASSWORD} --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - internal
+
+  mongodb:
+    image: mongo:7
+    container_name: rokhdad-mongodb
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGODB_DATABASE}
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - internal
+
+  redis:
+    image: redis:7-alpine
+    container_name: rokhdad-redis
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes", "--requirepass", "${REDIS_PASSWORD}"]
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli -a \"$${REDIS_PASSWORD}\" ping | grep PONG"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - internal
+
+  certbot:
+    image: certbot/certbot:latest
+    container_name: rokhdad-certbot
+    profiles:
+      - ssl
+    volumes:
+      - certbot_webroot:/var/www/certbot
+      - certbot_certs:/etc/letsencrypt
+    networks:
+      - public
+
+networks:
+  public:
+    name: rokhdad-public
+  internal:
+    name: rokhdad-internal
+    internal: true
+
+volumes:
+  mariadb_data:
+  mongodb_data:
+  redis_data:
+  app_public_storage:
+  app_logs:
+  certbot_webroot:
+  certbot_certs:
+
