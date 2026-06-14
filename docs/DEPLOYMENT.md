@@ -12,7 +12,7 @@
 
 Deployment is blocked until these values are available:
 
-- Server IP address.
+- Server IP address: DNS currently resolves `rokhdad.top` to `45.94.215.10`.
 - SSH username.
 - SSH port.
 - GitHub repository URL: `https://github.com/m4tinbeigi-official/rokhdad.top.git`.
@@ -23,7 +23,7 @@ Deployment is blocked until these values are available:
 
 | Record | Value |
 |---|---|
-| `A rokhdad.top` | Ubuntu server IPv4 |
+| `A rokhdad.top` | `45.94.215.10` |
 | `A www.rokhdad.top` | Ubuntu server IPv4 |
 
 Optional:

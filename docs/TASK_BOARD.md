@@ -96,7 +96,7 @@ The project is API-first, GitHub-first, and server-only at runtime. The local ma
 | P2-002 | 2 | Define Nginx routing for `rokhdad.top` | DONE | P2-001 | Nginx route plan | Route table review | S | MUST |
 | P2-003 | 2 | Define SSL certificate strategy | DONE | P0-004, P2-002 | SSL renewal plan | Renewal checklist | S | MUST |
 | P2-004 | 2 | Define persistent volume layout | DONE | P2-001 | Volume map | Backup path review | S | MUST |
-| P3-001 | 3 | Scaffold Laravel API app | PENDING | P2-001 | Backend app skeleton | `php artisan about` on server | M | MUST |
+| P3-001 | 3 | Scaffold Laravel API app | BLOCKED | P2-001 | Backend app skeleton | `php artisan about` on server | M | MUST |
 | P3-002 | 3 | Configure Laravel API routing | PENDING | P3-001 | Versioned API routes | HTTP smoke test | S | MUST |
 | P3-003 | 3 | Add health and readiness endpoints | PENDING | P3-002 | `/api/health`, `/api/ready` | Curl endpoints | S | MUST |
 | P3-004 | 3 | Add API error response standard | PENDING | P3-002 | Error format contract | Feature tests | S | MUST |
@@ -482,6 +482,7 @@ Blocked:
 - Deployment is blocked until GitHub repository and Ubuntu server SSH details are confirmed.
 - Local Docker/build work is blocked by low free disk space on this Mac.
 - P1-002 is blocked by GitHub private repository branch-protection plan limits.
+- P3-001 is blocked until SSH username, SSH port, and key/password access for `45.94.215.10` are available.
 
 Next Recommended Task:
 
