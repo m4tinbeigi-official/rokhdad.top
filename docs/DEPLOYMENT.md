@@ -47,6 +47,19 @@ docker compose -f deploy/docker-compose.yml ps
 curl -fsS https://rokhdad.top/api/health
 ```
 
+## Fast Bootstrap Workflow
+
+Use this when the full Laravel/Vue images are not ready yet and the domain must show a valid initial page quickly.
+
+```bash
+cd /opt/rokhdad
+git pull --ff-only origin main
+docker compose -f deploy/bootstrap-compose.yml up -d
+curl -fsS http://127.0.0.1/api/health
+```
+
+This serves the static landing page from `public/landing` on port `80` and returns a JSON health response from `/api/health`.
+
 ## Update Workflow
 
 ```bash

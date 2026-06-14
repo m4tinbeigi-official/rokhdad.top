@@ -96,6 +96,7 @@ The project is API-first, GitHub-first, and server-only at runtime. The local ma
 | P2-002 | 2 | Define Nginx routing for `rokhdad.top` | DONE | P2-001 | Nginx route plan | Route table review | S | MUST |
 | P2-003 | 2 | Define SSL certificate strategy | DONE | P0-004, P2-002 | SSL renewal plan | Renewal checklist | S | MUST |
 | P2-004 | 2 | Define persistent volume layout | DONE | P2-001 | Volume map | Backup path review | S | MUST |
+| BOOTSTRAP-001 | 2 | Add fast static launch stack | DONE | P2-001 | Bootstrap Nginx landing and health endpoint | YAML and route review | S | MUST |
 | P3-001 | 3 | Scaffold Laravel API app | BLOCKED | P2-001 | Backend app skeleton | `php artisan about` on server | M | MUST |
 | P3-002 | 3 | Configure Laravel API routing | PENDING | P3-001 | Versioned API routes | HTTP smoke test | S | MUST |
 | P3-003 | 3 | Add health and readiness endpoints | PENDING | P3-002 | `/api/health`, `/api/ready` | Curl endpoints | S | MUST |
@@ -472,6 +473,7 @@ Completed:
 - P2-002
 - P2-003
 - P2-004
+- BOOTSTRAP-001
 
 In Progress:
 
