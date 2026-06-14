@@ -100,7 +100,7 @@ The project is API-first, GitHub-first, and server-only at runtime. The local ma
 | P3-001A | 3 | Prepare server-side Laravel scaffold tooling | DONE | P2-001 | Scaffold script and backend Dockerfile | Shell syntax and file review | S | MUST |
 | P3-001 | 3 | Scaffold Laravel API app | DONE | P2-001 | Laravel 12 backend skeleton | `php artisan about` on server | M | MUST |
 | P3-002 | 3 | Configure Laravel API routing | DONE | P3-001 | Versioned `/api/v1` route | Feature test and HTTP smoke test | S | MUST |
-| P3-003 | 3 | Add health and readiness endpoints | PENDING | P3-002 | `/api/health`, `/api/ready` | Curl endpoints | S | MUST |
+| P3-003 | 3 | Add health and readiness endpoints | DONE | P3-002 | Laravel `/api/health`, `/api/ready` endpoints | Feature test and internal curl smoke test | S | MUST |
 | P3-004 | 3 | Add API error response standard | PENDING | P3-002 | Error format contract | Feature tests | S | MUST |
 | P4-001 | 4 | Configure MariaDB connection | PENDING | P3-001, P2-001 | Laravel DB config | Migration connection test | S | MUST |
 | P4-002 | 4 | Configure MongoDB connection | PENDING | P3-001, P2-001 | Mongo client config | Insert/read test | M | MUST |
@@ -479,6 +479,7 @@ Completed:
 - P3-001A
 - P3-001
 - P3-002
+- P3-003
 
 In Progress:
 
@@ -491,8 +492,8 @@ Blocked:
 
 Next Recommended Task:
 
-- P3-003
+- P3-004
 
 ## 15. Next Recommended Step
 
-Next implementation can start with P3-003 to add explicit API health and readiness endpoints.
+Next implementation can start with P3-004 to add the standard JSON API error response format.
