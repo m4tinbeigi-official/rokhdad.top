@@ -88,10 +88,10 @@ The project is API-first, GitHub-first, and server-only at runtime. The local ma
 | P0-002 | 0 | Define monorepo structure and ownership | DONE | P0-001 | Folder/module map | Architecture review | S | MUST |
 | P0-003 | 0 | Define environment and secret inventory | DONE | P0-001 | Env matrix | Validate required variables | S | MUST |
 | P0-004 | 0 | Define domain and DNS deployment plan | DONE | P0-001 | DNS/SSL plan for `rokhdad.top` | DNS checklist | S | MUST |
-| P1-001 | 1 | Create GitHub repository | PENDING | P0-002 | Empty private/public repo | Git remote works | XS | MUST |
-| P1-002 | 1 | Add branch, commit, and PR rules | PENDING | P1-001 | GitHub ruleset | Try protected branch flow | S | SHOULD |
+| P1-001 | 1 | Create GitHub repository | DONE | P0-002 | Empty private/public repo | Git remote works | XS | MUST |
+| P1-002 | 1 | Add branch, commit, and PR rules | BLOCKED | P1-001 | GitHub ruleset | Try protected branch flow | S | SHOULD |
 | P1-003 | 1 | Add repository documentation skeleton | DONE | P1-001 | README, docs index | Markdown review | XS | MUST |
-| P1-004 | 1 | Define server pull deployment workflow | PENDING | P1-001, P0-004 | Deployment runbook | Dry-run commands reviewed | S | MUST |
+| P1-004 | 1 | Define server pull deployment workflow | DONE | P1-001, P0-004 | Deployment runbook | Dry-run commands reviewed | S | MUST |
 | P2-001 | 2 | Create Docker Compose service map | PENDING | P1-004 | Compose architecture doc | Service dependency review | M | MUST |
 | P2-002 | 2 | Define Nginx routing for `rokhdad.top` | PENDING | P2-001 | Nginx route plan | Route table review | S | MUST |
 | P2-003 | 2 | Define SSL certificate strategy | PENDING | P0-004, P2-002 | SSL renewal plan | Renewal checklist | S | MUST |
@@ -283,7 +283,7 @@ Notes: Completed in `docs/DEPLOYMENT.md`; execution still needs server IP and SS
 Task ID: P1-001
 Phase: 1
 Title: Create GitHub repository
-Status: PENDING
+Status: DONE
 Goal: Create the canonical GitHub repo for Rokhdad.
 Why it matters: Deployment is GitHub-first.
 Dependencies: P0-002
@@ -298,12 +298,12 @@ Security considerations: Decide private/public and collaborator access.
 Test method: Clone repo and push initial planning files.
 Acceptance criteria: Repo exists, remote is configured, first commit is pushed.
 Estimated complexity: XS
-Notes: Requires GitHub owner/account decision.
+Notes: Completed at `https://github.com/m4tinbeigi-official/rokhdad.top`.
 
 Task ID: P1-002
 Phase: 1
 Title: Add branch, commit, and PR rules
-Status: PENDING
+Status: BLOCKED
 Goal: Protect the main branch and define review flow.
 Why it matters: Prevents accidental production-breaking commits.
 Dependencies: P1-001
@@ -318,7 +318,7 @@ Security considerations: Restrict production secrets to server only.
 Test method: Attempt direct push to protected branch.
 Acceptance criteria: Main branch requires PR or explicit owner approval.
 Estimated complexity: S
-Notes: Can be skipped for solo early prototype if owner accepts risk.
+Notes: GitHub returned HTTP 403 because branch protection for a private repo requires an upgraded plan or a public repo. Workflow rules are documented in `docs/GITHUB_WORKFLOW.md`.
 
 Task ID: P1-003
 Phase: 1
@@ -343,7 +343,7 @@ Notes: Completed with `README.md`, `docs/INDEX.md`, and planning docs.
 Task ID: P1-004
 Phase: 1
 Title: Define server pull deployment workflow
-Status: PENDING
+Status: DONE
 Goal: Document how the Ubuntu server pulls from GitHub and restarts Docker Compose.
 Why it matters: The server, not the local machine, runs the app.
 Dependencies: P1-001, P0-004
@@ -358,7 +358,7 @@ Security considerations: Deploy key should be read-only where possible.
 Test method: Dry-run deployment commands on server.
 Acceptance criteria: Deployment commands include clone, pull, env placement, compose up, health check, and rollback.
 Estimated complexity: S
-Notes: Requires SSH access later.
+Notes: Completed in `docs/DEPLOYMENT.md`. Actual execution still requires server SSH details.
 
 ### Phases 2-32 Detail Policy
 
@@ -465,6 +465,9 @@ Completed:
 - P0-002
 - P0-003
 - P0-004
+- P1-001
+- P1-003
+- P1-004
 
 In Progress:
 
@@ -474,11 +477,12 @@ Blocked:
 
 - Deployment is blocked until GitHub repository and Ubuntu server SSH details are confirmed.
 - Local Docker/build work is blocked by low free disk space on this Mac.
+- P1-002 is blocked by GitHub private repository branch-protection plan limits.
 
 Next Recommended Task:
 
-- P1-001
+- P2-001, after accepting P1-002 as blocked or upgrading/changing repo visibility.
 
 ## 15. Next Recommended Step
 
-Next implementation should start with P1-001, but it requires the GitHub repository owner/name or permission to create/configure a repository.
+Next implementation can start with P2-001 if the owner accepts P1-002 as blocked for now. Full server execution still requires Ubuntu SSH details.

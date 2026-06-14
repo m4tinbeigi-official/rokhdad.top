@@ -15,7 +15,7 @@ Deployment is blocked until these values are available:
 - Server IP address.
 - SSH username.
 - SSH port.
-- GitHub repository URL.
+- GitHub repository URL: `https://github.com/m4tinbeigi-official/rokhdad.top.git`.
 - Deployment directory on server, recommended: `/opt/rokhdad`.
 - Email address for Let's Encrypt.
 
@@ -39,7 +39,7 @@ Optional:
 sudo mkdir -p /opt/rokhdad
 sudo chown "$USER":"$USER" /opt/rokhdad
 cd /opt/rokhdad
-git clone <GITHUB_REPO_URL> .
+git clone https://github.com/m4tinbeigi-official/rokhdad.top.git .
 cp .env.example .env
 # edit production env values on server only
 docker compose -f deploy/docker-compose.yml up -d --build
@@ -84,4 +84,3 @@ Use an Nginx-compatible certificate strategy in Docker Compose. The final implem
 - `https://rokhdad.top/api/health` returns backend health.
 - `https://rokhdad.top/admin` reaches Filament login after backend implementation.
 - SSL certificate is valid and renewable.
-
