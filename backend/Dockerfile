@@ -1,4 +1,4 @@
-FROM php:8.3-cli-alpine AS runtime
+FROM php:8.4-cli-alpine AS runtime
 
 WORKDIR /app
 
@@ -27,4 +27,3 @@ RUN if [ -f composer.json ]; then composer install --no-dev --no-interaction --p
 EXPOSE 8080
 
 CMD ["sh", "-c", "php artisan serve --host=0.0.0.0 --port=8080"]
-

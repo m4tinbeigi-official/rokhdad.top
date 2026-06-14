@@ -42,7 +42,7 @@ docker run --rm \
   -u "$(id -u):$(id -g)" \
   -v "$APP_DIR:/app" \
   -w /app \
-  php:8.3-cli \
+  php:8.4-cli \
   php artisan about
 
 echo "P3-001 Laravel API scaffold completed."
