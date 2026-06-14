@@ -102,7 +102,7 @@ The project is API-first, GitHub-first, and server-only at runtime. The local ma
 | P3-002 | 3 | Configure Laravel API routing | DONE | P3-001 | Versioned `/api/v1` route | Feature test and HTTP smoke test | S | MUST |
 | P3-003 | 3 | Add health and readiness endpoints | DONE | P3-002 | Laravel `/api/health`, `/api/ready` endpoints | Feature test and internal curl smoke test | S | MUST |
 | P3-004 | 3 | Add API error response standard | DONE | P3-002 | Standard JSON error payload for `/api/*` | Feature test on server | S | MUST |
-| P4-001 | 4 | Configure MariaDB connection | PENDING | P3-001, P2-001 | Laravel DB config | Migration connection test | S | MUST |
+| P4-001 | 4 | Configure MariaDB connection | DONE | P3-001, P2-001 | MariaDB env, service, backend image, migrations | Server migration and migrate status test | S | MUST |
 | P4-002 | 4 | Configure MongoDB connection | PENDING | P3-001, P2-001 | Mongo client config | Insert/read test | M | MUST |
 | P4-003 | 4 | Configure Redis queues and cache | PENDING | P3-001, P2-001 | Queue/cache config | Queue smoke test | S | MUST |
 | P4-004 | 4 | Define migration and seed policy | PENDING | P4-001 | Migration runbook | Review rollback path | S | MUST |
@@ -481,6 +481,7 @@ Completed:
 - P3-002
 - P3-003
 - P3-004
+- P4-001
 
 In Progress:
 
@@ -492,8 +493,8 @@ Blocked:
 
 Next Recommended Task:
 
-- P4-001
+- P4-002
 
 ## 15. Next Recommended Step
 
-Next implementation can start with P4-001 to configure and verify the MariaDB connection.
+Next implementation can start with P4-002 to configure and verify MongoDB connectivity.
