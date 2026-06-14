@@ -36,7 +36,7 @@ Last checked from local machine:
 - SSH port `22` is reachable on `45.94.215.10`.
 - SSH login as `root` works with the server credentials provided by the owner.
 
-The current public site is a fast bootstrap landing page. The Laravel API scaffold exists on the server and `/api/v1` has passed an internal HTTP smoke test through a temporary PHP container.
+The current public site is a fast bootstrap landing page. The Laravel API scaffold exists on the server. `/api/v1`, `/api/health`, and `/api/ready` have passed internal HTTP smoke tests through a temporary PHP container.
 
 Optional:
 
