@@ -51,6 +51,14 @@ curl -fsS https://rokhdad.top/api/health
 
 Use this when the full Laravel/Vue images are not ready yet and the domain must show a valid initial page quickly.
 
+One-command install on a fresh Ubuntu server:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/m4tinbeigi-official/rokhdad.top/main/deploy/scripts/ubuntu-bootstrap-install.sh | sudo sh
+```
+
+Manual flow:
+
 ```bash
 cd /opt/rokhdad
 git pull --ff-only origin main
