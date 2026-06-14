@@ -54,7 +54,7 @@ Use this when the full Laravel/Vue images are not ready yet and the domain must 
 One-command install on a fresh Ubuntu server:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/m4tinbeigi-official/rokhdad.top/main/deploy/scripts/ubuntu-bootstrap-install.sh | sudo sh
+curl -fsSL https://raw.githubusercontent.com/m4tinbeigi-official/rokhdad.top/refs/heads/main/deploy/scripts/ubuntu-bootstrap-install.sh | sudo sh
 ```
 
 Manual flow:

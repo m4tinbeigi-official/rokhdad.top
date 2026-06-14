@@ -89,7 +89,7 @@ The project is API-first, GitHub-first, and server-only at runtime. The local ma
 | P0-003 | 0 | Define environment and secret inventory | DONE | P0-001 | Env matrix | Validate required variables | S | MUST |
 | P0-004 | 0 | Define domain and DNS deployment plan | DONE | P0-001 | DNS/SSL plan for `rokhdad.top` | DNS checklist | S | MUST |
 | P1-001 | 1 | Create GitHub repository | DONE | P0-002 | Empty private/public repo | Git remote works | XS | MUST |
-| P1-002 | 1 | Add branch, commit, and PR rules | BLOCKED | P1-001 | GitHub ruleset | Try protected branch flow | S | SHOULD |
+| P1-002 | 1 | Add branch, commit, and PR rules | DONE | P1-001 | GitHub ruleset | Try protected branch flow | S | SHOULD |
 | P1-003 | 1 | Add repository documentation skeleton | DONE | P1-001 | README, docs index | Markdown review | XS | MUST |
 | P1-004 | 1 | Define server pull deployment workflow | DONE | P1-001, P0-004 | Deployment runbook | Dry-run commands reviewed | S | MUST |
 | P2-001 | 2 | Create Docker Compose service map | DONE | P1-004 | Compose architecture doc | Service dependency review | M | MUST |
@@ -304,7 +304,7 @@ Notes: Completed at `https://github.com/m4tinbeigi-official/rokhdad.top`.
 Task ID: P1-002
 Phase: 1
 Title: Add branch, commit, and PR rules
-Status: BLOCKED
+Status: DONE
 Goal: Protect the main branch and define review flow.
 Why it matters: Prevents accidental production-breaking commits.
 Dependencies: P1-001
@@ -319,7 +319,7 @@ Security considerations: Restrict production secrets to server only.
 Test method: Attempt direct push to protected branch.
 Acceptance criteria: Main branch requires PR or explicit owner approval.
 Estimated complexity: S
-Notes: GitHub returned HTTP 403 because branch protection for a private repo requires an upgraded plan or a public repo. Workflow rules are documented in `docs/GITHUB_WORKFLOW.md`.
+Notes: Completed after making the repository public and enabling branch protection on `main`.
 
 Task ID: P1-003
 Phase: 1
@@ -467,6 +467,7 @@ Completed:
 - P0-003
 - P0-004
 - P1-001
+- P1-002
 - P1-003
 - P1-004
 - P2-001
@@ -483,7 +484,6 @@ Blocked:
 
 - Deployment is blocked until GitHub repository and Ubuntu server SSH details are confirmed.
 - Local Docker/build work is blocked by low free disk space on this Mac.
-- P1-002 is blocked by GitHub private repository branch-protection plan limits.
 - P3-001 is blocked until SSH username, SSH port, and key/password access for `45.94.215.10` are available.
 
 Next Recommended Task:

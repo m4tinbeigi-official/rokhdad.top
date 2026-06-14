@@ -14,7 +14,7 @@ Use this only to bring up the first public landing page quickly before the full 
 Run on the Ubuntu server:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/m4tinbeigi-official/rokhdad.top/main/deploy/scripts/ubuntu-bootstrap-install.sh | sudo sh
+curl -fsSL https://raw.githubusercontent.com/m4tinbeigi-official/rokhdad.top/refs/heads/main/deploy/scripts/ubuntu-bootstrap-install.sh | sudo sh
 ```
 
 Expected result:
@@ -39,4 +39,3 @@ curl -fsS http://127.0.0.1/api/health
 ## Current Blocker
 
 Codex cannot run these commands directly until SSH username, SSH port, and key/password access for `45.94.215.10` are available.
-

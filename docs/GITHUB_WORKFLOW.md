@@ -4,7 +4,7 @@
 
 - URL: `https://github.com/m4tinbeigi-official/rokhdad.top`
 - Default branch: `main`
-- Visibility: private
+- Visibility: public
 
 ## Commit Rules
 
@@ -34,18 +34,11 @@ git push -u origin task/PX-000-short-title
 
 ## Branch Protection Status
 
-Automatic branch protection could not be enabled while the repository is private on the current GitHub plan. GitHub returned HTTP 403 with a plan limitation message.
-
-Until branch protection is available:
-
-- Treat `main` as protected by convention.
-- Prefer task branches and pull requests.
-- Do not force-push `main`.
-- Do not commit directly to `main` except planning/bootstrap commits approved by the owner.
+Branch protection is enabled on `main`.
 
 ## Future Branch Protection Settings
 
-When available, enable:
+Enabled settings:
 
 - Require pull request before merge.
 - Require one approving review.
@@ -53,4 +46,3 @@ When available, enable:
 - Require linear history.
 - Block force pushes.
 - Block branch deletion.
-
