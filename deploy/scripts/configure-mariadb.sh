@@ -107,7 +107,12 @@ write_env(root_env, root)
 write_env(backend_env, backend)
 PY
 
-docker compose -f deploy/docker-compose.yml up -d mariadb
+docker rm -f rokhdad-mariadb >/dev/null 2>&1 || true
+if [ "$(docker volume ls -q --filter name=rokhdad_mariadb_data)" = "rokhdad_mariadb_data" ]; then
+  docker volume rm rokhdad_mariadb_data >/dev/null 2>&1 || true
+fi
+
+docker compose --env-file "$ROOT_ENV" -f deploy/docker-compose.yml up -d mariadb
 
 echo "Waiting for MariaDB healthcheck..."
 for _ in $(seq 1 60); do
@@ -139,4 +144,3 @@ docker run --rm \
   php artisan migrate:status
 
 echo "P4-001 MariaDB connection configured and migrations passed."
-
