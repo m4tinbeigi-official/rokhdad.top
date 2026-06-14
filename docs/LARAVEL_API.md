@@ -21,8 +21,8 @@ sh deploy/scripts/scaffold-laravel-api.sh
 - `backend/composer.json` exists.
 - `php artisan about` runs inside a Docker container.
 - The backend Dockerfile can later build the `rokhdad/backend:latest` image.
+- Default scaffold version is Laravel `^12.0`.
 
 ## Current Status
 
 The server-side scaffold script is committed, but the actual Laravel scaffold still requires SSH access to `45.94.215.10`.
-

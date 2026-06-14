@@ -3,7 +3,7 @@ set -eu
 
 DEPLOY_DIR="${ROKHDAD_DEPLOY_DIR:-/opt/rokhdad}"
 APP_DIR="${DEPLOY_DIR}/backend"
-LARAVEL_VERSION="${LARAVEL_VERSION:-^11.0}"
+LARAVEL_VERSION="${LARAVEL_VERSION:-^12.0}"
 
 if ! command -v docker >/dev/null 2>&1; then
   echo "Docker is required on the Ubuntu server." >&2
