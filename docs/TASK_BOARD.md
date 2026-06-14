@@ -98,7 +98,7 @@ The project is API-first, GitHub-first, and server-only at runtime. The local ma
 | P2-004 | 2 | Define persistent volume layout | DONE | P2-001 | Volume map | Backup path review | S | MUST |
 | BOOTSTRAP-001 | 2 | Add fast static launch stack | DONE | P2-001 | Bootstrap Nginx landing and health endpoint | YAML and route review | S | MUST |
 | P3-001A | 3 | Prepare server-side Laravel scaffold tooling | DONE | P2-001 | Scaffold script and backend Dockerfile | Shell syntax and file review | S | MUST |
-| P3-001 | 3 | Scaffold Laravel API app | BLOCKED | P2-001 | Backend scaffold script and pending server-generated app | `php artisan about` on server | M | MUST |
+| P3-001 | 3 | Scaffold Laravel API app | DONE | P2-001 | Laravel 12 backend skeleton | `php artisan about` on server | M | MUST |
 | P3-002 | 3 | Configure Laravel API routing | PENDING | P3-001 | Versioned API routes | HTTP smoke test | S | MUST |
 | P3-003 | 3 | Add health and readiness endpoints | PENDING | P3-002 | `/api/health`, `/api/ready` | Curl endpoints | S | MUST |
 | P3-004 | 3 | Add API error response standard | PENDING | P3-002 | Error format contract | Feature tests | S | MUST |
@@ -477,6 +477,7 @@ Completed:
 - P2-004
 - BOOTSTRAP-001
 - P3-001A
+- P3-001
 
 In Progress:
 
@@ -486,12 +487,11 @@ Blocked:
 
 - Deployment is blocked until GitHub repository and Ubuntu server SSH details are confirmed.
 - Local Docker/build work is blocked by low free disk space on this Mac.
-- P3-001 is blocked until SSH username, SSH port, and key/password access for `45.94.215.10` are available.
 
 Next Recommended Task:
 
-- P3-001, after server SSH details are available.
+- P3-002
 
 ## 15. Next Recommended Step
 
-Next implementation can start with P3-001 after Ubuntu SSH details are available. P3-001 must scaffold the Laravel API on the server or through a server-run Docker build workflow.
+Next implementation can start with P3-002 to configure versioned Laravel API routing and the first application health route.

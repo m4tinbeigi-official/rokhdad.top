@@ -25,4 +25,4 @@ sh deploy/scripts/scaffold-laravel-api.sh
 
 ## Current Status
 
-The server-side scaffold script is committed, but the actual Laravel scaffold still requires SSH access to `45.94.215.10`.
+Laravel 12.62.0 was scaffolded on the Ubuntu server and synced back into `backend/` without `vendor`, `.env`, or the SQLite runtime database. `php artisan about` passed on the server with PHP 8.4.22.
