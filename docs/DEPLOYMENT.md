@@ -30,12 +30,13 @@ Deployment is blocked until these values are available:
 
 Last checked from local machine:
 
-- `http://rokhdad.top` returns `200 OK` through Caddy and a Next.js response.
-- `https://rokhdad.top` fails TLS negotiation with `tlsv1 alert internal error`.
+- `http://rokhdad.top` redirects to `https://rokhdad.top`.
+- `https://rokhdad.top` returns `200 OK` and serves the Rokhdad bootstrap landing page.
+- `https://rokhdad.top/api/health` returns `{"status":"ok","service":"rokhdad-bootstrap"}`.
 - SSH port `22` is reachable on `45.94.215.10`.
-- SSH login attempts for `root`, `ubuntu`, `admin`, `matin`, `m4tinbeigi`, and `ricksabchez` were denied.
+- SSH login as `root` works with the server credentials provided by the owner.
 
-This means the server is online, but Codex cannot deploy Docker or fix HTTPS until valid SSH access is available.
+The current public site is a fast bootstrap landing page. The Laravel API scaffold exists on the server and `/api/v1` has passed an internal HTTP smoke test through a temporary PHP container.
 
 Optional:
 
