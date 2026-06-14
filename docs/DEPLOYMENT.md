@@ -26,6 +26,17 @@ Deployment is blocked until these values are available:
 | `A rokhdad.top` | `45.94.215.10` |
 | `A www.rokhdad.top` | Ubuntu server IPv4 |
 
+## Observed Server Status
+
+Last checked from local machine:
+
+- `http://rokhdad.top` returns `200 OK` through Caddy and a Next.js response.
+- `https://rokhdad.top` fails TLS negotiation with `tlsv1 alert internal error`.
+- SSH port `22` is reachable on `45.94.215.10`.
+- SSH login attempts for `root`, `ubuntu`, `admin`, `matin`, `m4tinbeigi`, and `ricksabchez` were denied.
+
+This means the server is online, but Codex cannot deploy Docker or fix HTTPS until valid SSH access is available.
+
 Optional:
 
 | Record | Value |
