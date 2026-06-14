@@ -97,7 +97,8 @@ The project is API-first, GitHub-first, and server-only at runtime. The local ma
 | P2-003 | 2 | Define SSL certificate strategy | DONE | P0-004, P2-002 | SSL renewal plan | Renewal checklist | S | MUST |
 | P2-004 | 2 | Define persistent volume layout | DONE | P2-001 | Volume map | Backup path review | S | MUST |
 | BOOTSTRAP-001 | 2 | Add fast static launch stack | DONE | P2-001 | Bootstrap Nginx landing and health endpoint | YAML and route review | S | MUST |
-| P3-001 | 3 | Scaffold Laravel API app | BLOCKED | P2-001 | Backend app skeleton | `php artisan about` on server | M | MUST |
+| P3-001A | 3 | Prepare server-side Laravel scaffold tooling | DONE | P2-001 | Scaffold script and backend Dockerfile | Shell syntax and file review | S | MUST |
+| P3-001 | 3 | Scaffold Laravel API app | BLOCKED | P2-001 | Backend scaffold script and pending server-generated app | `php artisan about` on server | M | MUST |
 | P3-002 | 3 | Configure Laravel API routing | PENDING | P3-001 | Versioned API routes | HTTP smoke test | S | MUST |
 | P3-003 | 3 | Add health and readiness endpoints | PENDING | P3-002 | `/api/health`, `/api/ready` | Curl endpoints | S | MUST |
 | P3-004 | 3 | Add API error response standard | PENDING | P3-002 | Error format contract | Feature tests | S | MUST |
@@ -475,6 +476,7 @@ Completed:
 - P2-003
 - P2-004
 - BOOTSTRAP-001
+- P3-001A
 
 In Progress:
 
