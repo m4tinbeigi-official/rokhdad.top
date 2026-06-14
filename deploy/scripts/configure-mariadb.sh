@@ -129,7 +129,7 @@ if [ "$(docker inspect -f '{{.State.Health.Status}}' rokhdad-mariadb)" != "healt
   exit 1
 fi
 
-docker build -t rokhdad/backend:latest backend
+docker build -f deploy/backend.Dockerfile -t rokhdad/backend:latest backend
 
 docker run --rm \
   --env-file "$BACKEND_ENV" \
