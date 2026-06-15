@@ -88,7 +88,7 @@ git fetch origin
 git checkout main
 git pull --ff-only origin main
 docker compose -f deploy/docker-compose.yml up -d --build
-docker compose -f deploy/docker-compose.yml exec backend php artisan migrate --force
+deploy/scripts/laravel-db.sh migrate
 curl -fsS https://rokhdad.top/api/health
 ```
 
@@ -102,7 +102,7 @@ docker compose -f deploy/docker-compose.yml up -d --build
 curl -fsS https://rokhdad.top/api/health
 ```
 
-Database rollback must be task-specific. Do not blindly rollback production migrations without a reviewed rollback note.
+Database rollback must be task-specific. Review `docs/MIGRATIONS_AND_SEEDS.md` and use `ROLLBACK_STEPS=N deploy/scripts/laravel-db.sh rollback-plan` before running a real rollback.
 
 ## SSL Plan
 
