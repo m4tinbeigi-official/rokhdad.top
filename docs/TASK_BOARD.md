@@ -110,7 +110,7 @@ The project is API-first, GitHub-first, and server-only at runtime. The local ma
 | P5-002 | 5 | Implement email/password auth | DONE | P5-001 | Sanctum token auth with register/login/me/logout APIs | Auth feature tests and server migration/test | M | MUST |
 | P5-003 | 5 | Implement phone OTP verification | BLOCKED | P5-001, P24-001 | OTP APIs | OTP happy/error tests | M | MUST |
 | P5-004 | 5 | Implement roles and permissions | DONE | P5-001 | RBAC tables, models, and user permission helpers | RBAC migration/model tests and server migration/test | M | MUST |
-| P6-001 | 6 | Install Filament admin foundation | PENDING | P3-001, P5-004 | Admin panel shell | Admin login smoke test | M | MUST |
+| P6-001 | 6 | Install Filament admin foundation | DONE | P3-001, P5-004 | Filament admin panel, assets, provider, and admin-role access gate | Admin login/access feature tests and server smoke test | M | MUST |
 | P6-002 | 6 | Add admin user management | PENDING | P6-001, P5-004 | User resource | CRUD tests | M | MUST |
 | P6-003 | 6 | Add audit log viewer | PENDING | P6-001, P31-004 | Audit resource | Admin review | S | SHOULD |
 | P7-001 | 7 | Create categories and cities model | PENDING | P4-001 | Migrations and API contract | Migration tests | M | MUST |
@@ -488,6 +488,7 @@ Completed:
 - P5-001
 - P5-002
 - P5-004
+- P6-001
 
 In Progress:
 
@@ -500,8 +501,8 @@ Blocked:
 
 Next Recommended Task:
 
-- P6-001
+- P6-002
 
 ## 15. Next Recommended Step
 
-Next implementation can start with P6-001 to install the Filament admin foundation. P5-003 remains blocked until P24-001 is complete.
+Next implementation can start with P6-002 to add admin user management. P5-003 remains blocked until P24-001 is complete.
