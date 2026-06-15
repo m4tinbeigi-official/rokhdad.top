@@ -97,3 +97,11 @@ python -m rokhdad_workers.deduplication --fixture workers/tests/fixtures/normali
 ```
 
 P11-004 scores normalized event pairs using title similarity, start datetime, city, organizer, and canonical URL signals. Scores at or above 80 are treated as duplicates; scores at or above 65 are possible duplicates for review.
+
+Field history dry-run command:
+
+```bash
+python -m rokhdad_workers.field_history --input-json '[{"source_key":"evand","external_id":"101","title":"AI Product Management"}]' --dry-run
+```
+
+P12-001 builds field-level source history documents from normalized events and upserts them into MongoDB collection `event_field_history`. Each document stores canonical key, source provenance, field path, observed value, value hash, observed timestamp, schema version, and optional raw snapshot id.
