@@ -104,7 +104,7 @@ The project is API-first, GitHub-first, and server-only at runtime. The local ma
 | P3-004 | 3 | Add API error response standard | DONE | P3-002 | Standard JSON error payload for `/api/*` | Feature test on server | S | MUST |
 | P4-001 | 4 | Configure MariaDB connection | DONE | P3-001, P2-001 | MariaDB env, service, backend image, migrations | Server migration and migrate status test | S | MUST |
 | P4-002 | 4 | Configure MongoDB connection | DONE | P3-001, P2-001 | MongoDB env, service, and connection smoke script | Server insert/read test | M | MUST |
-| P4-003 | 4 | Configure Redis queues and cache | PENDING | P3-001, P2-001 | Queue/cache config | Queue smoke test | S | MUST |
+| P4-003 | 4 | Configure Redis queues and cache | DONE | P3-001, P2-001 | Redis env, service healthcheck, Laravel cache/queue config | Redis ping and Laravel cache/queue smoke test | S | MUST |
 | P4-004 | 4 | Define migration and seed policy | PENDING | P4-001 | Migration runbook | Review rollback path | S | MUST |
 | P5-001 | 5 | Implement user identity model | PENDING | P4-001 | User tables and API contract | Migration and model tests | M | MUST |
 | P5-002 | 5 | Implement email/password auth | PENDING | P5-001 | Register/login/logout APIs | Auth feature tests | M | MUST |
@@ -483,6 +483,7 @@ Completed:
 - P3-004
 - P4-001
 - P4-002
+- P4-003
 
 In Progress:
 
@@ -494,8 +495,8 @@ Blocked:
 
 Next Recommended Task:
 
-- P4-003
+- P4-004
 
 ## 15. Next Recommended Step
 
-Next implementation can start with P4-003 to configure and verify Redis queues and cache.
+Next implementation can start with P4-004 to define the migration and seed policy.
