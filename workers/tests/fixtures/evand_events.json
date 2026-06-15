@@ -1,0 +1,26 @@
+{
+  "data": [
+    {
+      "id": 101,
+      "title": "AI Product Management",
+      "starts_at": "2026-07-01T09:00:00+03:30",
+      "ends_at": "2026-07-01T12:00:00+03:30",
+      "city": "Tehran",
+      "organizer": {
+        "name": "Evand Test Organizer"
+      },
+      "url": "https://evand.com/events/101"
+    },
+    {
+      "id": 102,
+      "title": "Startup Finance Workshop",
+      "starts_at": "2026-07-05T16:00:00+03:30",
+      "ends_at": "2026-07-05T18:00:00+03:30",
+      "city": "Online",
+      "organizer": {
+        "name": "Finance Academy"
+      },
+      "url": "https://evand.com/events/102"
+    }
+  ]
+}

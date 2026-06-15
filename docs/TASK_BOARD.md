@@ -123,7 +123,7 @@ The project is API-first, GitHub-first, and server-only at runtime. The local ma
 | P9-001 | 9 | Create event source registry | DONE | P7-004 | Event source migration, model, Filament resource, and API contract | Model/relation tests and Filament CRUD tests | M | MUST |
 | P9-002 | 9 | Add API key rotation model | DONE | P9-001 | Event source API key migration, encrypted model, issue/rotate/revoke helpers | Key storage and rotation feature tests | M | MUST |
 | P9-003 | 9 | Add source health tracking | DONE | P9-001 | Event source health fields, model health helpers, and admin visibility | Simulated success/failure tests | S | SHOULD |
-| P10-001 | 10 | Implement Evand raw ingestion | PENDING | P8-002, P9-001 | Raw payload collection | Worker test with fixture | L | MUST |
+| P10-001 | 10 | Implement Evand raw ingestion | DONE | P8-002, P9-001 | Evand raw collector, payload envelope, fixture, and CLI smoke command | Worker fixture tests and server container fixture smoke test | L | MUST |
 | P10-002 | 10 | Implement Eseminar raw ingestion | PENDING | P8-002, P9-001 | Raw payload collection | Worker test with fixture | L | MUST |
 | P10-003 | 10 | Store ingestion snapshots in MongoDB | PENDING | P10-001, P10-002, P4-002 | Snapshot documents | Mongo readback test | M | MUST |
 | P10-004 | 10 | Add ingestion retry and lock rules | PENDING | P4-003, P10-001 | Retry policy | Failure simulation | M | MUST |
@@ -499,6 +499,7 @@ Completed:
 - P9-001
 - P9-002
 - P9-003
+- P10-001
 
 In Progress:
 
@@ -513,8 +514,8 @@ Blocked:
 
 Next Recommended Task:
 
-- P10-001
+- P10-002
 
 ## 15. Next Recommended Step
 
-Next implementation can start with P10-001 to implement Evand raw ingestion. P5-003, P6-003, and P8-003 remain blocked by their upstream dependencies.
+Next implementation can start with P10-002 to implement Eseminar raw ingestion. P5-003, P6-003, and P8-003 remain blocked by their upstream dependencies.

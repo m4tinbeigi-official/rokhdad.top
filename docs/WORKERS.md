@@ -34,3 +34,11 @@ Queue messages are JSON objects:
 ```
 
 The P8-002 consumer contract validates and consumes Redis list messages with `BLPOP`. It currently acknowledges valid messages by consuming them and reporting `processed`; task-specific handlers will be added by ingestion, normalization, and image tasks.
+
+Evand raw collection smoke command:
+
+```bash
+python -m rokhdad_workers.sources.evand --fixture workers/tests/fixtures/evand_events.json --limit 1
+```
+
+P10-001 collects raw Evand event payloads into a source-keyed envelope. MongoDB persistence is intentionally left for P10-003.
