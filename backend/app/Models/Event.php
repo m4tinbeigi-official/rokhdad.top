@@ -73,4 +73,30 @@ class Event extends Model
     {
         return $this->hasMany(EventSourceAttribution::class);
     }
+
+    public function fieldOverrides(): HasMany
+    {
+        return $this->hasMany(EventFieldOverride::class);
+    }
+
+    public function fieldLocks(): HasMany
+    {
+        return $this->hasMany(EventFieldLock::class);
+    }
+
+    public function isFieldLocked(string $fieldPath): bool
+    {
+        return $this->fieldLocks()->where('field_path', $fieldPath)->exists();
+    }
+
+    public function applyFieldOverride(
+        string $fieldPath,
+        mixed $value,
+        ?User $user = null,
+        ?string $sourceKey = null,
+        bool $lockField = true,
+        ?string $reason = null,
+    ): EventFieldOverride {
+        return EventFieldOverride::apply($this, $fieldPath, $value, $user, $sourceKey, $lockField, $reason);
+    }
 }
