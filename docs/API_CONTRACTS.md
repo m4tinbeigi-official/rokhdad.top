@@ -192,6 +192,13 @@ Events are canonical public records after manual creation or future source norma
 
 Events can be linked to speakers, hosts, or instructors through `event_person.role_title` and `event_person.sort_order`.
 
+Public listing endpoint:
+
+- `GET /api/v1/events`
+- Returns only `published` events.
+- Supports `per_page` from 1 to 50.
+- Response shape: `data[]` with event summary fields and nested `category`, `city`, `organizer`; `meta` with pagination fields.
+
 ## Event Source Attributions
 
 Source attributions link canonical events to external records without depending on the future source registry table.
