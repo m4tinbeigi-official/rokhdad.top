@@ -12,3 +12,4 @@
 - `GITHUB_WORKFLOW.md`: GitHub repo, branch, commit, and PR workflow.
 - `QUICK_LAUNCH.md`: Fast server bootstrap commands for the temporary landing page.
 - `LARAVEL_API.md`: Laravel API scaffold command and P3-001 status.
+- `FRONTEND.md`: Vue frontend scaffold and image build notes.

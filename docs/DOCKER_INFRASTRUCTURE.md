@@ -36,11 +36,11 @@ deploy/docker-compose.yml
 - `certbot_webroot`: ACME challenge files.
 - `certbot_certs`: Let's Encrypt certificates.
 
-## Current Limitation
+## Application Images
 
-The compose map references future images:
+The compose map references application images built by task-specific implementation work:
 
 - `rokhdad/backend:latest`
 - `rokhdad/frontend:latest`
 
-The worker image is built from `deploy/worker.Dockerfile`; backend and frontend images are produced by later implementation tasks. P2 validates service boundaries, routing, networks, volumes, and server commands.
+The worker image is built from `deploy/worker.Dockerfile`. The frontend image is built from `deploy/frontend.Dockerfile` and exposes port `3000` for Nginx proxying.
