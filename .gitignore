@@ -15,6 +15,8 @@ logs/
 # Runtime dependencies and build outputs
 node_modules/
 vendor/
+__pycache__/
+*.py[cod]
 dist/
 build/
 .next/
@@ -24,4 +26,3 @@ coverage/
 *.pid
 tmp/
 storage/app/private/
-

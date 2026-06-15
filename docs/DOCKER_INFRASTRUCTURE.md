@@ -42,7 +42,5 @@ The compose map references future images:
 
 - `rokhdad/backend:latest`
 - `rokhdad/frontend:latest`
-- `rokhdad/worker:latest`
 
-Those images are produced by later implementation tasks. P2 validates service boundaries, routing, networks, volumes, and server commands.
-
+The worker image is built from `deploy/worker.Dockerfile`; backend and frontend images are produced by later implementation tasks. P2 validates service boundaries, routing, networks, volumes, and server commands.

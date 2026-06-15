@@ -117,7 +117,7 @@ The project is API-first, GitHub-first, and server-only at runtime. The local ma
 | P7-002 | 7 | Create organizer and person model | DONE | P7-001 | Organizer/person migrations, models, factories, relationships, and API contract | Relation/model tests and server migration/test | M | MUST |
 | P7-003 | 7 | Create canonical event model | DONE | P7-001, P7-002 | Event migration, model, factory, relationships, and API contract | Migration/relation tests and server migration/test | L | MUST |
 | P7-004 | 7 | Create source attribution model | DONE | P7-003 | Event source attribution migration, model, factory, relationships, and API contract | Relation/model tests and server migration/test | M | MUST |
-| P8-001 | 8 | Scaffold Python worker package | PENDING | P2-001 | Worker service skeleton | Container command smoke test | M | MUST |
+| P8-001 | 8 | Scaffold Python worker package | DONE | P2-001 | Python package, worker entrypoints, worker Dockerfile, and worker runbook | Unit smoke tests and server container smoke test | M | MUST |
 | P8-002 | 8 | Add worker queue consumer contract | PENDING | P8-001, P4-003 | Queue worker loop | Queue job test | M | MUST |
 | P8-003 | 8 | Add worker logging standard | PENDING | P8-001, P31-001 | Structured logs | Log sample review | S | MUST |
 | P9-001 | 9 | Create event source registry | PENDING | P7-004 | Source tables/admin UI | CRUD tests | M | MUST |
@@ -494,6 +494,7 @@ Completed:
 - P7-002
 - P7-003
 - P7-004
+- P8-001
 
 In Progress:
 
@@ -507,8 +508,8 @@ Blocked:
 
 Next Recommended Task:
 
-- P8-001
+- P8-002
 
 ## 15. Next Recommended Step
 
-Next implementation can start with P8-001 to scaffold the Python worker package. P5-003 and P6-003 remain blocked by their upstream dependencies.
+Next implementation can start with P8-002 to add the worker queue consumer contract. P5-003 and P6-003 remain blocked by their upstream dependencies.
