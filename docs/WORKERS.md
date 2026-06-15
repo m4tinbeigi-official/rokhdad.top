@@ -42,3 +42,11 @@ python -m rokhdad_workers.sources.evand --fixture workers/tests/fixtures/evand_e
 ```
 
 P10-001 collects raw Evand event payloads into a source-keyed envelope. MongoDB persistence is intentionally left for P10-003.
+
+Eseminar raw collection smoke command:
+
+```bash
+python -m rokhdad_workers.sources.eseminar --fixture workers/tests/fixtures/eseminar_events.json --limit 1
+```
+
+P10-002 collects raw Eseminar webinar payloads into the same source-keyed envelope. MongoDB persistence is intentionally left for P10-003.

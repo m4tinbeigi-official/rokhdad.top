@@ -1,0 +1,20 @@
+{
+  "webinars": [
+    {
+      "webinar_id": "web-201",
+      "title": "Marketing Analytics Webinar",
+      "start_date": "2026-07-10T10:00:00+03:30",
+      "duration_minutes": 90,
+      "teacher": "Eseminar Instructor",
+      "url": "https://eseminar.tv/webinar/web-201"
+    },
+    {
+      "webinar_id": "web-202",
+      "title": "Remote Team Leadership",
+      "start_date": "2026-07-12T14:00:00+03:30",
+      "duration_minutes": 120,
+      "teacher": "Leadership Coach",
+      "url": "https://eseminar.tv/webinar/web-202"
+    }
+  ]
+}
