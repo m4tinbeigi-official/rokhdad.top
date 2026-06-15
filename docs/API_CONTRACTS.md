@@ -205,6 +205,12 @@ Public detail endpoint:
 - Returns only `published` events.
 - Response shape: `data` with event summary fields plus `description`, venue coordinates/address, `metadata`, `people`, and `source_attributions`.
 
+Public lookup endpoints:
+
+- `GET /api/v1/categories`
+- `GET /api/v1/cities`
+- Return only active records ordered by `sort_order`, then name.
+
 ## Event Source Attributions
 
 Source attributions link canonical events to external records without depending on the future source registry table.
