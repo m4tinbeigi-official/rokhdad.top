@@ -5,6 +5,7 @@ namespace App\Models;
 use Database\Factories\CityFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class City extends Model
 {
@@ -36,5 +37,13 @@ class City extends Model
             'is_active' => 'boolean',
             'sort_order' => 'integer',
         ];
+    }
+
+    /**
+     * @return HasMany<Event, $this>
+     */
+    public function events(): HasMany
+    {
+        return $this->hasMany(Event::class);
     }
 }

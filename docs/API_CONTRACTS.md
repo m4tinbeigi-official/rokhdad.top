@@ -161,3 +161,33 @@ People represent speakers, hosts, instructors, and organizer team members.
 | `is_active` | boolean | Yes | Hidden from public UI when false |
 
 People can be linked to organizers through `organizer_person.role_title`.
+
+## Events
+
+Events are canonical public records after manual creation or future source normalization.
+
+| Field | Type | Required | Notes |
+|---|---|---:|---|
+| `id` | integer | Yes | Stable internal ID |
+| `category_id` | integer | No | Optional primary public taxonomy |
+| `city_id` | integer | No | Optional location filter |
+| `organizer_id` | integer | No | Optional owning/publishing organizer |
+| `title` | string | Yes | Public event title |
+| `slug` | string | Yes | Unique public URL key |
+| `summary` | string | No | Short listing text |
+| `description` | string | No | Long detail content |
+| `starts_at` | datetime | No | Canonical start time |
+| `ends_at` | datetime | No | Canonical end time |
+| `timezone` | string | Yes | Defaults to `Asia/Tehran` |
+| `event_type` | string | Yes | `in_person`, `online`, or `hybrid` |
+| `status` | string | Yes | `draft`, `published`, `cancelled`, or future moderation states |
+| `venue_name` | string | No | Physical venue name |
+| `venue_address` | string | No | Physical venue address |
+| `latitude` | decimal | No | Optional map coordinate |
+| `longitude` | decimal | No | Optional map coordinate |
+| `online_url` | string | No | Public online join or landing URL |
+| `canonical_url` | string | No | Preferred canonical public URL |
+| `metadata` | object | No | Non-authoritative extra event attributes |
+| `is_featured` | boolean | Yes | Manual promotion flag |
+
+Events can be linked to speakers, hosts, or instructors through `event_person.role_title` and `event_person.sort_order`.

@@ -115,7 +115,7 @@ The project is API-first, GitHub-first, and server-only at runtime. The local ma
 | P6-003 | 6 | Add audit log viewer | BLOCKED | P6-001, P31-004 | Audit resource | Admin review | S | SHOULD |
 | P7-001 | 7 | Create categories and cities model | DONE | P4-001 | Category/city migrations, models, factories, and API contract | Migration/model tests and server migration/test | M | MUST |
 | P7-002 | 7 | Create organizer and person model | DONE | P7-001 | Organizer/person migrations, models, factories, relationships, and API contract | Relation/model tests and server migration/test | M | MUST |
-| P7-003 | 7 | Create canonical event model | PENDING | P7-001, P7-002 | Event schema | Migration and relation tests | L | MUST |
+| P7-003 | 7 | Create canonical event model | DONE | P7-001, P7-002 | Event migration, model, factory, relationships, and API contract | Migration/relation tests and server migration/test | L | MUST |
 | P7-004 | 7 | Create source attribution model | PENDING | P7-003 | Source linkage schema | Relation tests | M | MUST |
 | P8-001 | 8 | Scaffold Python worker package | PENDING | P2-001 | Worker service skeleton | Container command smoke test | M | MUST |
 | P8-002 | 8 | Add worker queue consumer contract | PENDING | P8-001, P4-003 | Queue worker loop | Queue job test | M | MUST |
@@ -492,6 +492,7 @@ Completed:
 - P6-002
 - P7-001
 - P7-002
+- P7-003
 
 In Progress:
 
@@ -505,8 +506,8 @@ Blocked:
 
 Next Recommended Task:
 
-- P7-003
+- P7-004
 
 ## 15. Next Recommended Step
 
-Next implementation can start with P7-003 to create the canonical event model. P5-003 and P6-003 remain blocked by their upstream dependencies.
+Next implementation can start with P7-004 to create the source attribution model. P5-003 and P6-003 remain blocked by their upstream dependencies.

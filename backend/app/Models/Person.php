@@ -36,4 +36,9 @@ class Person extends Model
     {
         return $this->belongsToMany(Organizer::class)->withPivot('role_title');
     }
+
+    public function events(): BelongsToMany
+    {
+        return $this->belongsToMany(Event::class)->withPivot(['role_title', 'sort_order']);
+    }
 }

@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Organizer extends Model
 {
@@ -41,5 +42,10 @@ class Organizer extends Model
     public function people(): BelongsToMany
     {
         return $this->belongsToMany(Person::class)->withPivot('role_title');
+    }
+
+    public function events(): HasMany
+    {
+        return $this->hasMany(Event::class);
     }
 }
