@@ -14,4 +14,23 @@ python -m rokhdad_workers.normalization --smoke
 python -m rokhdad_workers.images --smoke
 ```
 
-Runtime modules currently expose placeholder loops. P8-002 will replace the idle loop with the Redis queue consumer contract.
+Queue smoke command:
+
+```bash
+python -m rokhdad_workers.ingestion --once --queue rokhdad:jobs:ingestion --require-redis
+```
+
+Queue messages are JSON objects:
+
+```json
+{
+  "id": "job-1",
+  "type": "ingest.source",
+  "payload": {
+    "source": "evand"
+  },
+  "attempts": 0
+}
+```
+
+The P8-002 consumer contract validates and consumes Redis list messages with `BLPOP`. It currently acknowledges valid messages by consuming them and reporting `processed`; task-specific handlers will be added by ingestion, normalization, and image tasks.

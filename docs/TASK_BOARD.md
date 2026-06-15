@@ -118,8 +118,8 @@ The project is API-first, GitHub-first, and server-only at runtime. The local ma
 | P7-003 | 7 | Create canonical event model | DONE | P7-001, P7-002 | Event migration, model, factory, relationships, and API contract | Migration/relation tests and server migration/test | L | MUST |
 | P7-004 | 7 | Create source attribution model | DONE | P7-003 | Event source attribution migration, model, factory, relationships, and API contract | Relation/model tests and server migration/test | M | MUST |
 | P8-001 | 8 | Scaffold Python worker package | DONE | P2-001 | Python package, worker entrypoints, worker Dockerfile, and worker runbook | Unit smoke tests and server container smoke test | M | MUST |
-| P8-002 | 8 | Add worker queue consumer contract | PENDING | P8-001, P4-003 | Queue worker loop | Queue job test | M | MUST |
-| P8-003 | 8 | Add worker logging standard | PENDING | P8-001, P31-001 | Structured logs | Log sample review | S | MUST |
+| P8-002 | 8 | Add worker queue consumer contract | DONE | P8-001, P4-003 | Redis queue message contract, consumer loop, and CLI queue flags | Unit queue tests and server Redis job smoke test | M | MUST |
+| P8-003 | 8 | Add worker logging standard | BLOCKED | P8-001, P31-001 | Structured logs | Log sample review | S | MUST |
 | P9-001 | 9 | Create event source registry | PENDING | P7-004 | Source tables/admin UI | CRUD tests | M | MUST |
 | P9-002 | 9 | Add API key rotation model | PENDING | P9-001 | Key storage and rotation rules | Unit tests | M | MUST |
 | P9-003 | 9 | Add source health tracking | PENDING | P9-001 | Health status fields | Simulated failure test | S | SHOULD |
@@ -495,6 +495,7 @@ Completed:
 - P7-003
 - P7-004
 - P8-001
+- P8-002
 
 In Progress:
 
@@ -505,11 +506,12 @@ Blocked:
 - Local Docker/build work is blocked by low free disk space on this Mac.
 - P5-003 is blocked until P24-001 provides the sms.ir OTP provider integration.
 - P6-003 is blocked until P31-004 provides the audit log data source.
+- P8-003 is blocked until P31-001 provides the structured logging standard.
 
 Next Recommended Task:
 
-- P8-002
+- P9-001
 
 ## 15. Next Recommended Step
 
-Next implementation can start with P8-002 to add the worker queue consumer contract. P5-003 and P6-003 remain blocked by their upstream dependencies.
+Next implementation can start with P9-001 to create the event source registry. P5-003, P6-003, and P8-003 remain blocked by their upstream dependencies.

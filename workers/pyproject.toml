@@ -7,6 +7,9 @@ name = "rokhdad-workers"
 version = "0.1.0"
 description = "Python worker skeleton for Rokhdad ingestion, normalization, and image jobs."
 requires-python = ">=3.12"
+dependencies = [
+    "redis>=5,<7",
+]
 
 [tool.setuptools.packages.find]
 include = ["rokhdad_workers*"]
