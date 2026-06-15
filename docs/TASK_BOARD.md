@@ -111,8 +111,8 @@ The project is API-first, GitHub-first, and server-only at runtime. The local ma
 | P5-003 | 5 | Implement phone OTP verification | BLOCKED | P5-001, P24-001 | OTP APIs | OTP happy/error tests | M | MUST |
 | P5-004 | 5 | Implement roles and permissions | DONE | P5-001 | RBAC tables, models, and user permission helpers | RBAC migration/model tests and server migration/test | M | MUST |
 | P6-001 | 6 | Install Filament admin foundation | DONE | P3-001, P5-004 | Filament admin panel, assets, provider, and admin-role access gate | Admin login/access feature tests and server smoke test | M | MUST |
-| P6-002 | 6 | Add admin user management | PENDING | P6-001, P5-004 | User resource | CRUD tests | M | MUST |
-| P6-003 | 6 | Add audit log viewer | PENDING | P6-001, P31-004 | Audit resource | Admin review | S | SHOULD |
+| P6-002 | 6 | Add admin user management | DONE | P6-001, P5-004 | Filament User resource with role assignment and guarded password edits | User resource route and CRUD feature tests | M | MUST |
+| P6-003 | 6 | Add audit log viewer | BLOCKED | P6-001, P31-004 | Audit resource | Admin review | S | SHOULD |
 | P7-001 | 7 | Create categories and cities model | PENDING | P4-001 | Migrations and API contract | Migration tests | M | MUST |
 | P7-002 | 7 | Create organizer and person model | PENDING | P7-001 | Organizer/person schema | Model tests | M | MUST |
 | P7-003 | 7 | Create canonical event model | PENDING | P7-001, P7-002 | Event schema | Migration and relation tests | L | MUST |
@@ -489,6 +489,7 @@ Completed:
 - P5-002
 - P5-004
 - P6-001
+- P6-002
 
 In Progress:
 
@@ -498,11 +499,12 @@ Blocked:
 
 - Local Docker/build work is blocked by low free disk space on this Mac.
 - P5-003 is blocked until P24-001 provides the sms.ir OTP provider integration.
+- P6-003 is blocked until P31-004 provides the audit log data source.
 
 Next Recommended Task:
 
-- P6-002
+- P7-001
 
 ## 15. Next Recommended Step
 
-Next implementation can start with P6-002 to add admin user management. P5-003 remains blocked until P24-001 is complete.
+Next implementation can start with P7-001 to create the categories and cities model. P5-003 and P6-003 remain blocked by their upstream dependencies.
