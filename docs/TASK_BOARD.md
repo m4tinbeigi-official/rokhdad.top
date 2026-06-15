@@ -140,7 +140,7 @@ The project is API-first, GitHub-first, and server-only at runtime. The local ma
 | P14-001 | 14 | Add public events listing API | DONE | P7-003 | Public `/api/v1/events` endpoint with published filtering, eager-loaded summary relations, and pagination metadata | API feature tests and server HTTP/API tests | M | MUST |
 | P14-002 | 14 | Add event detail API | DONE | P14-001 | Public `/api/v1/events/{slug}` endpoint with detail fields, people, source attribution, and published-only visibility | API feature tests and server route/API tests | M | MUST |
 | P14-003 | 14 | Add categories and cities API | DONE | P7-001 | Public `/api/v1/categories` and `/api/v1/cities` active lookup endpoints | API feature tests and server route/API tests | S | MUST |
-| P14-004 | 14 | Add people and organizers API | PENDING | P7-002 | Public profile APIs | API tests | M | MUST |
+| P14-004 | 14 | Add people and organizers API | DONE | P7-002 | Public `/api/v1/organizers` and `/api/v1/people` profile list/detail APIs | API feature tests and server route/API tests | M | MUST |
 | P15-001 | 15 | Scaffold Vue frontend app | PENDING | P2-001 | Frontend skeleton | Server build smoke test | M | MUST |
 | P15-002 | 15 | Add Tailwind design foundation | PENDING | P15-001 | Theme tokens and base layout | Visual review | S | MUST |
 | P15-003 | 15 | Add API client and error handling | PENDING | P15-001, P14-001 | API client module | Mock API test | M | MUST |
@@ -516,6 +516,7 @@ Completed:
 - P14-001
 - P14-002
 - P14-003
+- P14-004
 
 In Progress:
 
@@ -530,8 +531,8 @@ Blocked:
 
 Next Recommended Task:
 
-- P14-004
+- P15-001
 
 ## 15. Next Recommended Step
 
-Next implementation can start with P14-004 to add people and organizers APIs. P5-003, P6-003, and P8-003 remain blocked by their upstream dependencies.
+Next implementation can start with P15-001 to scaffold the Vue frontend app. P5-003, P6-003, and P8-003 remain blocked by their upstream dependencies.
