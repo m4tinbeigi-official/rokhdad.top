@@ -3,6 +3,8 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\LookupController;
+use App\Http\Controllers\OrganizerController;
+use App\Http\Controllers\PersonController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/health', function () {
@@ -42,4 +44,8 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
     Route::get('/events/{slug}', [EventController::class, 'show'])->name('events.show');
     Route::get('/categories', [LookupController::class, 'categories'])->name('categories.index');
     Route::get('/cities', [LookupController::class, 'cities'])->name('cities.index');
+    Route::get('/organizers', [OrganizerController::class, 'index'])->name('organizers.index');
+    Route::get('/organizers/{slug}', [OrganizerController::class, 'show'])->name('organizers.show');
+    Route::get('/people', [PersonController::class, 'index'])->name('people.index');
+    Route::get('/people/{slug}', [PersonController::class, 'show'])->name('people.show');
 });
