@@ -121,7 +121,7 @@ The project is API-first, GitHub-first, and server-only at runtime. The local ma
 | P8-002 | 8 | Add worker queue consumer contract | DONE | P8-001, P4-003 | Redis queue message contract, consumer loop, and CLI queue flags | Unit queue tests and server Redis job smoke test | M | MUST |
 | P8-003 | 8 | Add worker logging standard | BLOCKED | P8-001, P31-001 | Structured logs | Log sample review | S | MUST |
 | P9-001 | 9 | Create event source registry | DONE | P7-004 | Event source migration, model, Filament resource, and API contract | Model/relation tests and Filament CRUD tests | M | MUST |
-| P9-002 | 9 | Add API key rotation model | PENDING | P9-001 | Key storage and rotation rules | Unit tests | M | MUST |
+| P9-002 | 9 | Add API key rotation model | DONE | P9-001 | Event source API key migration, encrypted model, issue/rotate/revoke helpers | Key storage and rotation feature tests | M | MUST |
 | P9-003 | 9 | Add source health tracking | PENDING | P9-001 | Health status fields | Simulated failure test | S | SHOULD |
 | P10-001 | 10 | Implement Evand raw ingestion | PENDING | P8-002, P9-001 | Raw payload collection | Worker test with fixture | L | MUST |
 | P10-002 | 10 | Implement Eseminar raw ingestion | PENDING | P8-002, P9-001 | Raw payload collection | Worker test with fixture | L | MUST |
@@ -497,6 +497,7 @@ Completed:
 - P8-001
 - P8-002
 - P9-001
+- P9-002
 
 In Progress:
 
@@ -511,8 +512,8 @@ Blocked:
 
 Next Recommended Task:
 
-- P9-002
+- P9-003
 
 ## 15. Next Recommended Step
 
-Next implementation can start with P9-002 to add the API key rotation model. P5-003, P6-003, and P8-003 remain blocked by their upstream dependencies.
+Next implementation can start with P9-003 to add source health tracking. P5-003, P6-003, and P8-003 remain blocked by their upstream dependencies.

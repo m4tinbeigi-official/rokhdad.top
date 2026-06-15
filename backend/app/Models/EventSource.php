@@ -39,4 +39,14 @@ class EventSource extends Model
     {
         return $this->hasMany(EventSourceAttribution::class, 'source_key', 'source_key');
     }
+
+    public function apiKeys(): HasMany
+    {
+        return $this->hasMany(EventSourceApiKey::class);
+    }
+
+    public function activeApiKeys(): HasMany
+    {
+        return $this->apiKeys()->where('status', 'active');
+    }
 }

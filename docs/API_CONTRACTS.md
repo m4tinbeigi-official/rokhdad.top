@@ -233,3 +233,23 @@ Event sources are admin-managed registry records for ingestion providers.
 | `last_checked_at` | datetime | No | Last health or sync probe time |
 
 `event_sources.source_key` is the registry key used by `event_source_attributions.source_key`.
+
+## Event Source API Keys
+
+API keys store source credentials separately from non-secret source configuration.
+
+| Field | Type | Required | Notes |
+|---|---|---:|---|
+| `id` | integer | Yes | Stable internal ID |
+| `event_source_id` | integer | Yes | Owning event source |
+| `name` | string | Yes | Admin label, for example `Primary` |
+| `key_hash` | string | Yes | SHA-256 hash for secret matching |
+| `encrypted_secret` | encrypted string | Yes | Encrypted at rest and hidden from array/API serialization |
+| `status` | string | Yes | `active`, `revoked`, or future rotation states |
+| `active_from` | datetime | No | First valid time |
+| `expires_at` | datetime | No | Expiration time |
+| `last_used_at` | datetime | No | Last successful usage time |
+| `rotated_at` | datetime | No | Last rotation time |
+| `metadata` | object | No | Non-secret operational attributes |
+
+Use `EventSourceApiKey::issue()` to create keys, `rotate()` to replace the secret, and `revoke()` to disable a key. Plaintext secrets must not be serialized.
