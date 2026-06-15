@@ -213,3 +213,23 @@ Source attributions link canonical events to external records without depending 
 | `metadata` | object | No | Non-authoritative ingestion/debug attributes |
 
 The pair `source_key` + `external_id` is unique.
+
+## Event Sources
+
+Event sources are admin-managed registry records for ingestion providers.
+
+| Field | Type | Required | Notes |
+|---|---|---:|---|
+| `id` | integer | Yes | Stable internal ID |
+| `source_key` | string | Yes | Unique stable key used by source attributions |
+| `name` | string | Yes | Admin/public display label |
+| `base_url` | string | No | Public website root |
+| `api_base_url` | string | No | API root if available |
+| `auth_type` | string | Yes | `none`, `api_key`, `oauth`, or `session` |
+| `status` | string | Yes | `active`, `paused`, `disabled`, or `failing` |
+| `is_enabled` | boolean | Yes | Whether workers may ingest from this source |
+| `rate_limit_per_minute` | integer | No | Worker throttle hint |
+| `config` | object | No | Non-secret source options; secrets belong in P9-002 |
+| `last_checked_at` | datetime | No | Last health or sync probe time |
+
+`event_sources.source_key` is the registry key used by `event_source_attributions.source_key`.

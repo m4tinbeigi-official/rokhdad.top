@@ -42,4 +42,9 @@ class EventSourceAttribution extends Model
     {
         return $this->belongsTo(Event::class);
     }
+
+    public function source(): BelongsTo
+    {
+        return $this->belongsTo(EventSource::class, 'source_key', 'source_key');
+    }
 }
