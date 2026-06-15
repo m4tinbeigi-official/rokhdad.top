@@ -23,6 +23,8 @@ class EventSourceFactory extends Factory
             'api_base_url' => fake()->url(),
             'auth_type' => 'api_key',
             'status' => 'active',
+            'health_status' => 'unknown',
+            'consecutive_failures' => 0,
             'is_enabled' => true,
             'rate_limit_per_minute' => 60,
             'config' => ['supports_api' => true],

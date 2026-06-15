@@ -22,6 +22,12 @@ class EventSourcesTable
                 TextColumn::make('status')
                     ->badge()
                     ->searchable(),
+                TextColumn::make('health_status')
+                    ->badge()
+                    ->searchable(),
+                TextColumn::make('consecutive_failures')
+                    ->numeric()
+                    ->sortable(),
                 IconColumn::make('is_enabled')
                     ->boolean(),
                 TextColumn::make('auth_type')
@@ -31,6 +37,10 @@ class EventSourcesTable
                 TextColumn::make('last_checked_at')
                     ->dateTime()
                     ->sortable(),
+                TextColumn::make('last_failure_at')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()

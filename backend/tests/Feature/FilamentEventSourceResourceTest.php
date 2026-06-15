@@ -37,6 +37,8 @@ class FilamentEventSourceResourceTest extends TestCase
                 'api_base_url' => 'https://api.evand.com',
                 'auth_type' => 'api_key',
                 'status' => 'active',
+                'health_status' => 'unknown',
+                'consecutive_failures' => 0,
                 'is_enabled' => true,
                 'rate_limit_per_minute' => 60,
                 'config' => ['supports_api' => true],
@@ -68,6 +70,8 @@ class FilamentEventSourceResourceTest extends TestCase
                 'api_base_url' => 'https://api.eseminar.tv',
                 'auth_type' => 'api_key',
                 'status' => 'paused',
+                'health_status' => 'degraded',
+                'consecutive_failures' => 1,
                 'is_enabled' => false,
                 'rate_limit_per_minute' => 30,
                 'config' => ['supports_api' => false],
@@ -79,6 +83,7 @@ class FilamentEventSourceResourceTest extends TestCase
 
         $this->assertSame('Eseminar Updated', $source->name);
         $this->assertSame('paused', $source->status);
+        $this->assertSame('degraded', $source->health_status);
         $this->assertFalse($source->is_enabled);
     }
 

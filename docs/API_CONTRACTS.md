@@ -227,10 +227,15 @@ Event sources are admin-managed registry records for ingestion providers.
 | `api_base_url` | string | No | API root if available |
 | `auth_type` | string | Yes | `none`, `api_key`, `oauth`, or `session` |
 | `status` | string | Yes | `active`, `paused`, `disabled`, or `failing` |
+| `health_status` | string | Yes | `unknown`, `healthy`, `degraded`, or `failing` |
+| `consecutive_failures` | integer | Yes | Consecutive failed health checks |
 | `is_enabled` | boolean | Yes | Whether workers may ingest from this source |
 | `rate_limit_per_minute` | integer | No | Worker throttle hint |
 | `config` | object | No | Non-secret source options; secrets belong in P9-002 |
 | `last_checked_at` | datetime | No | Last health or sync probe time |
+| `last_success_at` | datetime | No | Last successful source health check |
+| `last_failure_at` | datetime | No | Last failed source health check |
+| `last_error_message` | string | No | Most recent failure summary, truncated to 1000 chars |
 
 `event_sources.source_key` is the registry key used by `event_source_attributions.source_key`.
 

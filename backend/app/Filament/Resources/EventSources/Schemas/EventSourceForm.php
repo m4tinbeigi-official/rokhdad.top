@@ -42,6 +42,19 @@ class EventSourceForm
                     ])
                     ->required()
                     ->default('active'),
+                Select::make('health_status')
+                    ->options([
+                        'unknown' => 'Unknown',
+                        'healthy' => 'Healthy',
+                        'degraded' => 'Degraded',
+                        'failing' => 'Failing',
+                    ])
+                    ->required()
+                    ->default('unknown'),
+                TextInput::make('consecutive_failures')
+                    ->numeric()
+                    ->minValue(0)
+                    ->default(0),
                 Toggle::make('is_enabled')
                     ->default(true),
                 TextInput::make('rate_limit_per_minute')
@@ -49,6 +62,9 @@ class EventSourceForm
                     ->minValue(1),
                 KeyValue::make('config'),
                 DateTimePicker::make('last_checked_at'),
+                DateTimePicker::make('last_success_at'),
+                DateTimePicker::make('last_failure_at'),
+                TextInput::make('last_error_message'),
             ]);
     }
 }
