@@ -85,3 +85,13 @@ Requires `Authorization: Bearer <token>`.
 `POST /api/v1/auth/logout`
 
 Deletes all active API tokens for the current user.
+
+## Roles And Permissions
+
+RBAC is role-based:
+
+- `roles.name` is the stable role key, for example `admin`.
+- `permissions.name` is the stable permission key, for example `users.manage`.
+- Users receive roles through `role_user`.
+- Roles receive permissions through `permission_role`.
+- Permission checks should use `User::hasPermissionTo($permission)` so later admin policies can share one path.

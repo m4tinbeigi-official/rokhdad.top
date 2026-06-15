@@ -108,8 +108,8 @@ The project is API-first, GitHub-first, and server-only at runtime. The local ma
 | P4-004 | 4 | Define migration and seed policy | DONE | P4-001 | Migration/seed runbook and guarded Laravel DB script | Server status and rollback-plan checks | S | MUST |
 | P5-001 | 5 | Implement user identity model | DONE | P4-001 | User identity migration, model fields, factory, and API contract | Migration/model feature tests and server migration status | M | MUST |
 | P5-002 | 5 | Implement email/password auth | DONE | P5-001 | Sanctum token auth with register/login/me/logout APIs | Auth feature tests and server migration/test | M | MUST |
-| P5-003 | 5 | Implement phone OTP verification | PENDING | P5-001, P24-001 | OTP APIs | OTP happy/error tests | M | MUST |
-| P5-004 | 5 | Implement roles and permissions | PENDING | P5-001 | RBAC rules | Permission tests | M | MUST |
+| P5-003 | 5 | Implement phone OTP verification | BLOCKED | P5-001, P24-001 | OTP APIs | OTP happy/error tests | M | MUST |
+| P5-004 | 5 | Implement roles and permissions | DONE | P5-001 | RBAC tables, models, and user permission helpers | RBAC migration/model tests and server migration/test | M | MUST |
 | P6-001 | 6 | Install Filament admin foundation | PENDING | P3-001, P5-004 | Admin panel shell | Admin login smoke test | M | MUST |
 | P6-002 | 6 | Add admin user management | PENDING | P6-001, P5-004 | User resource | CRUD tests | M | MUST |
 | P6-003 | 6 | Add audit log viewer | PENDING | P6-001, P31-004 | Audit resource | Admin review | S | SHOULD |
@@ -487,6 +487,7 @@ Completed:
 - P4-004
 - P5-001
 - P5-002
+- P5-004
 
 In Progress:
 
@@ -495,11 +496,12 @@ In Progress:
 Blocked:
 
 - Local Docker/build work is blocked by low free disk space on this Mac.
+- P5-003 is blocked until P24-001 provides the sms.ir OTP provider integration.
 
 Next Recommended Task:
 
-- P5-003
+- P6-001
 
 ## 15. Next Recommended Step
 
-Next implementation can start with P5-003 to implement phone OTP verification.
+Next implementation can start with P6-001 to install the Filament admin foundation. P5-003 remains blocked until P24-001 is complete.

@@ -5,6 +5,7 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -54,5 +55,34 @@ class User extends Authenticatable
             'last_login_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    /**
+     * @return BelongsToMany<Role, $this>
+     */
+    public function roles(): BelongsToMany
+    {
+        return $this->belongsToMany(Role::class);
+    }
+
+    public function assignRole(Role|string $role): void
+    {
+        $roleModel = $role instanceof Role
+            ? $role
+            : Role::query()->where('name', $role)->firstOrFail();
+
+        $this->roles()->syncWithoutDetaching([$roleModel->id]);
+    }
+
+    public function hasRole(string $role): bool
+    {
+        return $this->roles()->where('name', $role)->exists();
+    }
+
+    public function hasPermissionTo(string $permission): bool
+    {
+        return $this->roles()
+            ->whereHas('permissions', fn ($query) => $query->where('name', $permission))
+            ->exists();
     }
 }
