@@ -6,7 +6,7 @@ ARG VITE_API_BASE_URL=/api/v1
 ENV VITE_API_BASE_URL=${VITE_API_BASE_URL}
 
 COPY package*.json ./
-RUN npm ci
+RUN npm install --no-audit --no-fund
 
 COPY . .
 RUN npm run build
@@ -18,7 +18,7 @@ WORKDIR /app
 ENV NODE_ENV=production
 
 COPY package*.json ./
-RUN npm ci --omit=dev
+RUN npm install --omit=dev --no-audit --no-fund
 
 COPY --from=build /app/dist ./dist
 COPY vite.config.js ./
