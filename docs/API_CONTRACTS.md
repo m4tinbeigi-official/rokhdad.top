@@ -37,3 +37,51 @@ User identity is the base record for authentication, phone verification, roles, 
 ```
 
 Passwords, remember tokens, OTP codes, and internal security metadata must never be serialized in public API responses.
+
+## Email And Password Auth
+
+Authentication uses Laravel Sanctum bearer tokens for API clients.
+
+### Register
+
+`POST /api/v1/auth/register`
+
+Request:
+
+```json
+{
+  "name": "Rokhdad User",
+  "email": "user@example.com",
+  "phone_e164": "+989121234567",
+  "password": "password123",
+  "password_confirmation": "password123"
+}
+```
+
+Response `201`:
+
+```json
+{
+  "user": {},
+  "token": "1|plain-text-token",
+  "token_type": "Bearer"
+}
+```
+
+### Login
+
+`POST /api/v1/auth/login`
+
+Response `200` returns the same token shape as registration.
+
+### Current User
+
+`GET /api/v1/auth/me`
+
+Requires `Authorization: Bearer <token>`.
+
+### Logout
+
+`POST /api/v1/auth/logout`
+
+Deletes all active API tokens for the current user.
