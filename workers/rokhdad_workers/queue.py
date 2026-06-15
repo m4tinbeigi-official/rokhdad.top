@@ -3,13 +3,22 @@ from __future__ import annotations
 import json
 import uuid
 from dataclasses import asdict, dataclass
-from typing import Any, Protocol
+from typing import Any, Callable, Protocol
 
 from rokhdad_workers.settings import redis_url_from_env
 
 
 class QueueClient(Protocol):
     def blpop(self, keys: list[str], timeout: int = 0) -> tuple[bytes | str, bytes | str] | None:
+        pass
+
+    def set(self, name: str, value: str, nx: bool = False, ex: int | None = None) -> bool | None:
+        pass
+
+    def delete(self, name: str) -> int:
+        pass
+
+    def rpush(self, name: str, value: str) -> int:
         pass
 
 
@@ -39,6 +48,9 @@ class QueueJob:
             attempts=int(raw.get("attempts") or 0),
         )
 
+    def to_json(self) -> str:
+        return json.dumps(asdict(self), sort_keys=True)
+
 
 @dataclass(frozen=True)
 class QueueResult:
@@ -53,9 +65,19 @@ class QueueResult:
 
 
 class QueueConsumer:
-    def __init__(self, client: QueueClient, queue_name: str) -> None:
+    def __init__(
+        self,
+        client: QueueClient,
+        queue_name: str,
+        handler: Callable[[QueueJob], None] | None = None,
+        lock_ttl: int = 300,
+        max_attempts: int = 3,
+    ) -> None:
         self.client = client
         self.queue_name = queue_name
+        self.handler = handler
+        self.lock_ttl = lock_ttl
+        self.max_attempts = max_attempts
 
     def consume_once(self, timeout: int = 5) -> QueueResult:
         item = self.client.blpop([self.queue_name], timeout=timeout)
@@ -69,12 +91,45 @@ class QueueConsumer:
         except (TypeError, ValueError, json.JSONDecodeError) as exc:
             return QueueResult(status="failed", queue=self.queue_name, error=str(exc))
 
-        return QueueResult(
-            status="processed",
-            queue=self.queue_name,
-            job_id=job.id,
-            job_type=job.type,
-        )
+        lock_key = f"lock:{self.queue_name}:{job.id}"
+        if not self.client.set(lock_key, "1", nx=True, ex=self.lock_ttl):
+            return QueueResult(status="locked", queue=self.queue_name, job_id=job.id, job_type=job.type)
+
+        try:
+            if self.handler is not None:
+                self.handler(job)
+        except Exception as exc:
+            next_attempt = job.attempts + 1
+            if next_attempt < self.max_attempts:
+                self.client.rpush(
+                    self.queue_name,
+                    QueueJob(
+                        id=job.id,
+                        type=job.type,
+                        payload=job.payload,
+                        attempts=next_attempt,
+                    ).to_json(),
+                )
+
+                return QueueResult(
+                    status="retrying",
+                    queue=self.queue_name,
+                    job_id=job.id,
+                    job_type=job.type,
+                    error=str(exc),
+                )
+
+            return QueueResult(
+                status="failed",
+                queue=self.queue_name,
+                job_id=job.id,
+                job_type=job.type,
+                error=str(exc),
+            )
+        finally:
+            self.client.delete(lock_key)
+
+        return QueueResult(status="processed", queue=self.queue_name, job_id=job.id, job_type=job.type)
 
 
 def connect_redis() -> QueueClient | None:

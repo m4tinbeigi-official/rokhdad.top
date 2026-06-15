@@ -11,7 +11,7 @@ from datetime import UTC, datetime
 from typing import Any, Iterable
 
 from rokhdad_workers import __version__
-from rokhdad_workers.queue import QueueConsumer, connect_redis
+from rokhdad_workers.queue import QueueConsumer, QueueJob, connect_redis
 
 
 @dataclass(frozen=True)
@@ -51,6 +51,7 @@ def run_worker(service: str, argv: Iterable[str] | None = None) -> int:
     parser.add_argument("--queue", default=None, help="Redis list name to consume.")
     parser.add_argument("--timeout", type=int, default=5, help="Queue pop timeout in seconds.")
     parser.add_argument("--require-redis", action="store_true", help="Fail when Redis is not configured.")
+    parser.add_argument("--simulate-failure", action="store_true", help="Raise a handler error after locking a job.")
     args = parser.parse_args(list(argv) if argv is not None else None)
 
     if args.smoke:
@@ -64,9 +65,9 @@ def run_worker(service: str, argv: Iterable[str] | None = None) -> int:
                 emit_status(service, "redis_unconfigured", {"queue": args.queue})
                 return 2 if args.require_redis else 0
 
-            result = QueueConsumer(redis_client, args.queue).consume_once(timeout=max(args.timeout, 1))
+            result = QueueConsumer(redis_client, args.queue, handler=build_handler(args.simulate_failure)).consume_once(timeout=max(args.timeout, 1))
             emit_status(service, result.status, result.to_dict())
-            return 0 if result.status in {"processed", "empty"} else 1
+            return 0 if result.status in {"processed", "empty", "retrying"} else 1
 
         emit_status(service, "idle")
         return 0
@@ -89,7 +90,7 @@ def run_worker(service: str, argv: Iterable[str] | None = None) -> int:
                 emit_status(service, "redis_unconfigured", {"queue": args.queue})
                 return 2 if args.require_redis else 0
 
-            result = QueueConsumer(redis_client, args.queue).consume_once(timeout=max(args.timeout, 1))
+            result = QueueConsumer(redis_client, args.queue, handler=build_handler(args.simulate_failure)).consume_once(timeout=max(args.timeout, 1))
             emit_status(service, result.status, result.to_dict())
             continue
 
@@ -101,6 +102,16 @@ def run_worker(service: str, argv: Iterable[str] | None = None) -> int:
 
 def main(argv: Iterable[str] | None = None) -> int:
     return run_worker("worker", argv)
+
+
+def build_handler(simulate_failure: bool):
+    if not simulate_failure:
+        return None
+
+    def fail(job: QueueJob) -> None:
+        raise RuntimeError(f"simulated failure for {job.id}")
+
+    return fail
 
 
 if __name__ == "__main__":

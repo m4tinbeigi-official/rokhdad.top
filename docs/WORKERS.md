@@ -35,6 +35,13 @@ Queue messages are JSON objects:
 
 The P8-002 consumer contract validates and consumes Redis list messages with `BLPOP`. It currently acknowledges valid messages by consuming them and reporting `processed`; task-specific handlers will be added by ingestion, normalization, and image tasks.
 
+Retry and lock behavior:
+
+- A job gets a Redis lock key `lock:<queue>:<job-id>` before handling.
+- Handler failures requeue the same job with `attempts + 1` until `max_attempts`.
+- After the final attempt, the worker reports `failed` and does not requeue.
+- `--simulate-failure` exercises retry behavior for smoke tests.
+
 Evand raw collection smoke command:
 
 ```bash
