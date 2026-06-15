@@ -129,3 +129,11 @@ python -m rokhdad_workers.images --fixture workers/tests/fixtures/image_download
 ```
 
 P13-002 adds WebP resize variants that preserve aspect ratio and report variant name, dimensions, content type, byte size, SHA-256 hash, and storage path.
+
+Image moderation metadata smoke command:
+
+```bash
+python -m rokhdad_workers.images --fixture workers/tests/fixtures/image_download_job.json --output-dir /tmp/rokhdad-images --moderation-metadata
+```
+
+P13-003 records moderation-oriented image metadata: dimensions, detected content type, byte size, SHA-256 hash, review flags, and `needs_review`. Current automatic flags include unsupported content type and too-small dimensions.

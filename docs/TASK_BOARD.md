@@ -136,7 +136,7 @@ The project is API-first, GitHub-first, and server-only at runtime. The local ma
 | P12-003 | 12 | Add enrichment job contract | DONE | P8-002, P12-001 | Enrichment queue job DTO, fixture, queue conversion, validation, and CLI smoke command | Fixture contract tests and server container CLI smoke test | M | SHOULD |
 | P13-001 | 13 | Add image download worker | DONE | P8-002, P10-003 | Image download job contract, downloader, fixture image job, and CLI smoke command | Fixture image tests and server container CLI smoke test | M | MUST |
 | P13-002 | 13 | Add image resize variants | DONE | P13-001 | WebP variant generator, Pillow dependency, CLI variant flag, and dimension tests | Image dimension tests and server container variant smoke test | M | MUST |
-| P13-003 | 13 | Add image moderation metadata | PENDING | P13-001 | Metadata fields | Metadata review | S | SHOULD |
+| P13-003 | 13 | Add image moderation metadata | DONE | P13-001 | Image moderation metadata analyzer, CLI flag, and review flags | Metadata tests and server container metadata smoke test | S | SHOULD |
 | P14-001 | 14 | Add public events listing API | PENDING | P7-003 | Paginated API | API feature tests | M | MUST |
 | P14-002 | 14 | Add event detail API | PENDING | P14-001 | Event detail endpoint | API feature tests | M | MUST |
 | P14-003 | 14 | Add categories and cities API | PENDING | P7-001 | Lookup APIs | API tests | S | MUST |
@@ -512,6 +512,7 @@ Completed:
 - P12-003
 - P13-001
 - P13-002
+- P13-003
 
 In Progress:
 
@@ -526,8 +527,8 @@ Blocked:
 
 Next Recommended Task:
 
-- P13-003
+- P14-001
 
 ## 15. Next Recommended Step
 
-Next implementation can start with P13-003 to add image moderation metadata. P5-003, P6-003, and P8-003 remain blocked by their upstream dependencies.
+Next implementation can start with P14-001 to add the public events listing API. P5-003, P6-003, and P8-003 remain blocked by their upstream dependencies.

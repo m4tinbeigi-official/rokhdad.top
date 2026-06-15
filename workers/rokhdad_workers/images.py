@@ -70,6 +70,25 @@ class ImageVariantResult:
         return asdict(self)
 
 
+@dataclass(frozen=True)
+class ImageModerationMetadata:
+    storage_path: str
+    content_type: str
+    width: int
+    height: int
+    byte_size: int
+    sha256: str
+    flags: tuple[str, ...]
+    reviewed_at: str = field(default_factory=lambda: datetime.now(UTC).isoformat())
+
+    @property
+    def needs_review(self) -> bool:
+        return bool(self.flags)
+
+    def to_dict(self) -> dict[str, Any]:
+        return {**asdict(self), "needs_review": self.needs_review}
+
+
 def download_image(job: ImageDownloadJob, storage_root: Path) -> ImageDownloadResult:
     content, content_type = fetch_image(job.image_url)
     extension = extension_for_content_type(content_type) or extension_from_url(job.image_url) or ".bin"
@@ -125,6 +144,38 @@ def create_image_variants(original_path: Path, widths: Iterable[int], output_dir
     return variants
 
 
+def analyze_image_metadata(
+    image_path: Path,
+    min_width: int = 320,
+    min_height: int = 180,
+    allowed_content_types: Iterable[str] = ("image/jpeg", "image/png", "image/webp"),
+) -> ImageModerationMetadata:
+    from PIL import Image
+
+    with Image.open(image_path) as image:
+        width, height = image.size
+        content_type = Image.MIME.get(image.format or "", "application/octet-stream")
+
+    content = image_path.read_bytes()
+    flags: list[str] = []
+    allowed = set(allowed_content_types)
+
+    if content_type not in allowed:
+        flags.append("unsupported_content_type")
+    if width < min_width or height < min_height:
+        flags.append("too_small")
+
+    return ImageModerationMetadata(
+        storage_path=str(image_path),
+        content_type=content_type,
+        width=width,
+        height=height,
+        byte_size=len(content),
+        sha256=hashlib.sha256(content).hexdigest(),
+        flags=tuple(flags),
+    )
+
+
 def fetch_image(url: str) -> tuple[bytes, str]:
     if url.startswith("data:"):
         return fetch_data_url(url)
@@ -177,6 +228,7 @@ def main(argv: Iterable[str] | None = None) -> int:
     parser.add_argument("--fixture", type=Path, required=True)
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument("--variants", help="Comma-separated variant widths, for example 320,640.")
+    parser.add_argument("--moderation-metadata", action="store_true")
     parsed = parser.parse_args(args)
 
     result = download_image(load_image_job_fixture(parsed.fixture), parsed.output_dir)
@@ -185,7 +237,18 @@ def main(argv: Iterable[str] | None = None) -> int:
         widths = [int(width.strip()) for width in parsed.variants.split(",") if width.strip()]
         variants = [variant.to_dict() for variant in create_image_variants(Path(result.storage_path), widths)]
 
-    print(json.dumps({**result.to_dict(), "variants": variants}, ensure_ascii=False, sort_keys=True), flush=True)
+    moderation_metadata = None
+    if parsed.moderation_metadata:
+        moderation_metadata = analyze_image_metadata(Path(result.storage_path)).to_dict()
+
+    print(
+        json.dumps(
+            {**result.to_dict(), "variants": variants, "moderation_metadata": moderation_metadata},
+            ensure_ascii=False,
+            sort_keys=True,
+        ),
+        flush=True,
+    )
     return 0
 
 
