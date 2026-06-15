@@ -9,8 +9,19 @@ The public frontend is a Vue 3 app built with Vite.
 ```sh
 cd frontend
 npm install
+npm test
 npm run build
 ```
+
+## API Client
+
+The frontend API client lives in:
+
+```text
+frontend/src/api/client.js
+```
+
+It provides public endpoint helpers for events, categories, cities, organizers, and people. Tests use mocked `fetch` through Node's built-in test runner.
 
 ## Docker Image
 
