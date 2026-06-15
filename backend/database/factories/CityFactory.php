@@ -1,0 +1,32 @@
+<?php
+
+namespace Database\Factories;
+
+use App\Models\City;
+use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
+
+/**
+ * @extends Factory<City>
+ */
+class CityFactory extends Factory
+{
+    /**
+     * @return array<string, mixed>
+     */
+    public function definition(): array
+    {
+        $name = fake()->unique()->city();
+
+        return [
+            'name' => $name,
+            'slug' => Str::slug($name).'-'.fake()->unique()->numberBetween(1000, 9999),
+            'province' => fake()->state(),
+            'country_code' => 'IR',
+            'latitude' => fake()->latitude(),
+            'longitude' => fake()->longitude(),
+            'is_active' => true,
+            'sort_order' => 0,
+        ];
+    }
+}

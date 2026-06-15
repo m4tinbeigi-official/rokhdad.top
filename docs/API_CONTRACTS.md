@@ -95,3 +95,33 @@ RBAC is role-based:
 - Users receive roles through `role_user`.
 - Roles receive permissions through `permission_role`.
 - Permission checks should use `User::hasPermissionTo($permission)` so later admin policies can share one path.
+
+## Categories
+
+Categories provide the public event taxonomy.
+
+| Field | Type | Required | Notes |
+|---|---|---:|---|
+| `id` | integer | Yes | Stable internal ID |
+| `parent_id` | integer | No | Optional parent category |
+| `name` | string | Yes | Display label |
+| `slug` | string | Yes | Unique public URL key |
+| `description` | string | No | Optional SEO/admin description |
+| `is_active` | boolean | Yes | Hidden from public UI when false |
+| `sort_order` | integer | Yes | Manual ordering |
+
+## Cities
+
+Cities provide location filtering for public events.
+
+| Field | Type | Required | Notes |
+|---|---|---:|---|
+| `id` | integer | Yes | Stable internal ID |
+| `name` | string | Yes | Display label |
+| `slug` | string | Yes | Unique public URL key |
+| `province` | string | No | Province/state |
+| `country_code` | string | Yes | ISO-3166 alpha-2, defaults to `IR` |
+| `latitude` | decimal | No | Optional map coordinate |
+| `longitude` | decimal | No | Optional map coordinate |
+| `is_active` | boolean | Yes | Hidden from public UI when false |
+| `sort_order` | integer | Yes | Manual ordering |
