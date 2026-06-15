@@ -1,0 +1,39 @@
+<?php
+
+namespace App\Models;
+
+use Database\Factories\PersonFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+
+class Person extends Model
+{
+    /** @use HasFactory<PersonFactory> */
+    use HasFactory;
+
+    protected $fillable = [
+        'full_name',
+        'slug',
+        'title',
+        'bio',
+        'website_url',
+        'email',
+        'phone_e164',
+        'social_links',
+        'is_active',
+    ];
+
+    protected function casts(): array
+    {
+        return [
+            'social_links' => 'array',
+            'is_active' => 'boolean',
+        ];
+    }
+
+    public function organizers(): BelongsToMany
+    {
+        return $this->belongsToMany(Organizer::class)->withPivot('role_title');
+    }
+}

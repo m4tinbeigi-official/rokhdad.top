@@ -125,3 +125,39 @@ Cities provide location filtering for public events.
 | `longitude` | decimal | No | Optional map coordinate |
 | `is_active` | boolean | Yes | Hidden from public UI when false |
 | `sort_order` | integer | Yes | Manual ordering |
+
+## Organizers
+
+Organizers own or publish events.
+
+| Field | Type | Required | Notes |
+|---|---|---:|---|
+| `id` | integer | Yes | Stable internal ID |
+| `city_id` | integer | No | Optional home city |
+| `name` | string | Yes | Display label |
+| `slug` | string | Yes | Unique public URL key |
+| `description` | string | No | Public/admin description |
+| `website_url` | string | No | Official URL |
+| `email` | string | No | Contact email |
+| `phone_e164` | string | No | Contact phone |
+| `social_links` | object | No | Provider keyed social URLs |
+| `is_active` | boolean | Yes | Hidden from public UI when false |
+
+## People
+
+People represent speakers, hosts, instructors, and organizer team members.
+
+| Field | Type | Required | Notes |
+|---|---|---:|---|
+| `id` | integer | Yes | Stable internal ID |
+| `full_name` | string | Yes | Display name |
+| `slug` | string | Yes | Unique public URL key |
+| `title` | string | No | Short professional title |
+| `bio` | string | No | Public biography |
+| `website_url` | string | No | Official URL |
+| `email` | string | No | Contact email |
+| `phone_e164` | string | No | Contact phone |
+| `social_links` | object | No | Provider keyed social URLs |
+| `is_active` | boolean | Yes | Hidden from public UI when false |
+
+People can be linked to organizers through `organizer_person.role_title`.

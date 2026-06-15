@@ -114,7 +114,7 @@ The project is API-first, GitHub-first, and server-only at runtime. The local ma
 | P6-002 | 6 | Add admin user management | DONE | P6-001, P5-004 | Filament User resource with role assignment and guarded password edits | User resource route and CRUD feature tests | M | MUST |
 | P6-003 | 6 | Add audit log viewer | BLOCKED | P6-001, P31-004 | Audit resource | Admin review | S | SHOULD |
 | P7-001 | 7 | Create categories and cities model | DONE | P4-001 | Category/city migrations, models, factories, and API contract | Migration/model tests and server migration/test | M | MUST |
-| P7-002 | 7 | Create organizer and person model | PENDING | P7-001 | Organizer/person schema | Model tests | M | MUST |
+| P7-002 | 7 | Create organizer and person model | DONE | P7-001 | Organizer/person migrations, models, factories, relationships, and API contract | Relation/model tests and server migration/test | M | MUST |
 | P7-003 | 7 | Create canonical event model | PENDING | P7-001, P7-002 | Event schema | Migration and relation tests | L | MUST |
 | P7-004 | 7 | Create source attribution model | PENDING | P7-003 | Source linkage schema | Relation tests | M | MUST |
 | P8-001 | 8 | Scaffold Python worker package | PENDING | P2-001 | Worker service skeleton | Container command smoke test | M | MUST |
@@ -491,6 +491,7 @@ Completed:
 - P6-001
 - P6-002
 - P7-001
+- P7-002
 
 In Progress:
 
@@ -504,8 +505,8 @@ Blocked:
 
 Next Recommended Task:
 
-- P7-002
+- P7-003
 
 ## 15. Next Recommended Step
 
-Next implementation can start with P7-002 to create the organizer and person model. P5-003 and P6-003 remain blocked by their upstream dependencies.
+Next implementation can start with P7-003 to create the canonical event model. P5-003 and P6-003 remain blocked by their upstream dependencies.
