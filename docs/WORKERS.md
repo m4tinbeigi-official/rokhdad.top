@@ -65,3 +65,11 @@ python -m rokhdad_workers.snapshots --input-json '[{"source_key":"evand","extern
 ```
 
 P10-003 stores raw event envelopes in MongoDB collection `raw_event_snapshots` with `snapshot_type=raw_event`.
+
+Normalization schema command:
+
+```bash
+python -m rokhdad_workers.normalization --schema
+```
+
+P11-001 defines the normalized event DTO contract used by source-specific mappers before canonical database writes. The schema keeps source provenance (`source_key`, `external_id`, `raw_snapshot_id`), canonical event fields, location, organizer, people, and metadata.
