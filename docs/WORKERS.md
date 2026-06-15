@@ -89,3 +89,11 @@ python -m rokhdad_workers.normalizers.eseminar --fixture workers/tests/fixtures/
 ```
 
 P11-003 maps Eseminar raw webinar envelopes into the normalized event DTO as online events, deriving `ends_at` from `start_date + duration_minutes` when needed and preserving teacher metadata as people references.
+
+Deduplication scoring smoke command:
+
+```bash
+python -m rokhdad_workers.deduplication --fixture workers/tests/fixtures/normalized_duplicates.json
+```
+
+P11-004 scores normalized event pairs using title similarity, start datetime, city, organizer, and canonical URL signals. Scores at or above 80 are treated as duplicates; scores at or above 65 are possible duplicates for review.

@@ -1,0 +1,39 @@
+{
+  "events": [
+    {
+      "source_key": "evand",
+      "external_id": "101",
+      "title": "AI Product Management",
+      "starts_at": "2026-07-01T09:00:00+03:30",
+      "event_type": "in_person",
+      "canonical_url": "https://evand.com/events/101",
+      "location": {
+        "city_name": "Tehran"
+      },
+      "organizer": {
+        "name": "Evand Test Organizer"
+      }
+    },
+    {
+      "source_key": "manual",
+      "external_id": "dup-101",
+      "title": "AI Product Management Workshop",
+      "starts_at": "2026-07-01T09:00:00+03:30",
+      "event_type": "in_person",
+      "location": {
+        "city_name": "Tehran"
+      },
+      "organizer": {
+        "name": "Evand Test Organizer"
+      }
+    },
+    {
+      "source_key": "eseminar",
+      "external_id": "web-202",
+      "title": "Remote Team Leadership",
+      "starts_at": "2026-07-12T14:00:00+03:30",
+      "event_type": "online",
+      "online_url": "https://eseminar.tv/webinar/web-202"
+    }
+  ]
+}
