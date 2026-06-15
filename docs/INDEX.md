@@ -3,6 +3,7 @@
 - `TASK_BOARD.md`: Master phases, tasks, statuses, dependencies, test methods, and progress tracker.
 - `MVP.md`: MVP scope, acceptance criteria, and test checklist.
 - `ARCHITECTURE.md`: Monorepo structure, service map, data ownership, and deployment flow.
+- `API_CONTRACTS.md`: Backend API data contracts.
 - `ENVIRONMENT.md`: Environment variables and secret inventory.
 - `DEPLOYMENT.md`: DNS, server pull workflow, SSL plan, update, and rollback notes.
 - `DOCKER_INFRASTRUCTURE.md`: Docker Compose services, networks, and volumes.

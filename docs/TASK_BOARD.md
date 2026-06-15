@@ -106,7 +106,7 @@ The project is API-first, GitHub-first, and server-only at runtime. The local ma
 | P4-002 | 4 | Configure MongoDB connection | DONE | P3-001, P2-001 | MongoDB env, service, and connection smoke script | Server insert/read test | M | MUST |
 | P4-003 | 4 | Configure Redis queues and cache | DONE | P3-001, P2-001 | Redis env, service healthcheck, Laravel cache/queue config | Redis ping and Laravel cache/queue smoke test | S | MUST |
 | P4-004 | 4 | Define migration and seed policy | DONE | P4-001 | Migration/seed runbook and guarded Laravel DB script | Server status and rollback-plan checks | S | MUST |
-| P5-001 | 5 | Implement user identity model | PENDING | P4-001 | User tables and API contract | Migration and model tests | M | MUST |
+| P5-001 | 5 | Implement user identity model | DONE | P4-001 | User identity migration, model fields, factory, and API contract | Migration/model feature tests and server migration status | M | MUST |
 | P5-002 | 5 | Implement email/password auth | PENDING | P5-001 | Register/login/logout APIs | Auth feature tests | M | MUST |
 | P5-003 | 5 | Implement phone OTP verification | PENDING | P5-001, P24-001 | OTP APIs | OTP happy/error tests | M | MUST |
 | P5-004 | 5 | Implement roles and permissions | PENDING | P5-001 | RBAC rules | Permission tests | M | MUST |
@@ -485,6 +485,7 @@ Completed:
 - P4-002
 - P4-003
 - P4-004
+- P5-001
 
 In Progress:
 
@@ -496,8 +497,8 @@ Blocked:
 
 Next Recommended Task:
 
-- P5-001
+- P5-002
 
 ## 15. Next Recommended Step
 
-Next implementation can start with P5-001 to implement the user identity model.
+Next implementation can start with P5-002 to implement email/password authentication.

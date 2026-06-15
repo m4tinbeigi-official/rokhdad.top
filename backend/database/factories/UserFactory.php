@@ -28,7 +28,13 @@ class UserFactory extends Factory
             'name' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
+            'phone_e164' => fake()->unique()->numerify('+98912#######'),
+            'phone_verified_at' => null,
             'password' => static::$password ??= Hash::make('password'),
+            'status' => 'active',
+            'locale' => 'fa',
+            'timezone' => 'Asia/Tehran',
+            'last_login_at' => null,
             'remember_token' => Str::random(10),
         ];
     }
@@ -40,6 +46,17 @@ class UserFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'email_verified_at' => null,
+            'phone_verified_at' => null,
+        ]);
+    }
+
+    /**
+     * Indicate that the model's phone number should be verified.
+     */
+    public function phoneVerified(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'phone_verified_at' => now(),
         ]);
     }
 }
