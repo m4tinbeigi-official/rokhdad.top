@@ -1,0 +1,27 @@
+{
+  "canonical_key": "evand:101",
+  "targets": [
+    "seo",
+    "summary",
+    "category"
+  ],
+  "normalized_event": {
+    "canonical_key": "evand:101",
+    "source_key": "evand",
+    "external_id": "101",
+    "title": "AI Product Management",
+    "starts_at": "2026-07-01T09:00:00+03:30",
+    "event_type": "in_person",
+    "location": {
+      "city_name": "Tehran"
+    }
+  },
+  "source_keys": [
+    "evand"
+  ],
+  "priority": 5,
+  "context": {
+    "reason": "new_normalized_event"
+  },
+  "job_id": "enrich-fixture-101"
+}

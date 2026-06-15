@@ -105,3 +105,11 @@ python -m rokhdad_workers.field_history --input-json '[{"source_key":"evand","ex
 ```
 
 P12-001 builds field-level source history documents from normalized events and upserts them into MongoDB collection `event_field_history`. Each document stores canonical key, source provenance, field path, observed value, value hash, observed timestamp, schema version, and optional raw snapshot id.
+
+Enrichment job contract smoke command:
+
+```bash
+python -m rokhdad_workers.enrichment --fixture workers/tests/fixtures/enrichment_job.json
+```
+
+P12-003 defines queue job type `enrich.event` for enrichment work. The payload carries the canonical key, requested enrichment targets, normalized event snapshot, source keys, priority, requested timestamp, and optional context. Default queue: `rokhdad:jobs:enrichment`.
