@@ -81,3 +81,11 @@ python -m rokhdad_workers.normalizers.evand --fixture workers/tests/fixtures/eva
 ```
 
 P11-002 maps Evand raw event envelopes into the normalized event DTO, including canonical key, start/end datetimes, event type, location, organizer, source URL, and source metadata.
+
+Eseminar normalization smoke command:
+
+```bash
+python -m rokhdad_workers.normalizers.eseminar --fixture workers/tests/fixtures/eseminar_events.json --limit 1
+```
+
+P11-003 maps Eseminar raw webinar envelopes into the normalized event DTO as online events, deriving `ends_at` from `start_date + duration_minutes` when needed and preserving teacher metadata as people references.

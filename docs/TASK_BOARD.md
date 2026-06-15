@@ -129,7 +129,7 @@ The project is API-first, GitHub-first, and server-only at runtime. The local ma
 | P10-004 | 10 | Add ingestion retry and lock rules | DONE | P4-003, P10-001 | Redis job lock, retry counter, max-attempt failure handling, and failure simulation flag | Unit retry tests and server Redis failure simulation | M | MUST |
 | P11-001 | 11 | Define normalization schema | DONE | P7-003, P10-003 | Normalized event DTO, nested organizer/location/person refs, schema CLI, and validation rules | DTO serialization and schema CLI tests | M | MUST |
 | P11-002 | 11 | Normalize Evand events | DONE | P11-001, P10-001 | Evand raw envelope to normalized event mapper and fixture CLI | Evand fixture mapper tests and server container fixture smoke test | M | MUST |
-| P11-003 | 11 | Normalize Eseminar events | PENDING | P11-001, P10-002 | Eseminar mapper | Fixture tests | M | MUST |
+| P11-003 | 11 | Normalize Eseminar events | DONE | P11-001, P10-002 | Eseminar webinar envelope to normalized event mapper and fixture CLI | Eseminar fixture mapper tests and server container fixture smoke test | M | MUST |
 | P11-004 | 11 | Add deduplication scoring | PENDING | P11-002, P11-003 | Dedup rules | Duplicate fixture tests | L | MUST |
 | P12-001 | 12 | Add field-level source history | PENDING | P11-004, P4-002 | Field history documents | History tests | L | MUST |
 | P12-002 | 12 | Add admin override and field locks | PENDING | P12-001, P6-001 | Override workflow | Admin tests | L | MUST |
@@ -505,6 +505,7 @@ Completed:
 - P10-004
 - P11-001
 - P11-002
+- P11-003
 
 In Progress:
 
@@ -519,8 +520,8 @@ Blocked:
 
 Next Recommended Task:
 
-- P11-003
+- P11-004
 
 ## 15. Next Recommended Step
 
-Next implementation can start with P11-003 to normalize Eseminar events. P5-003, P6-003, and P8-003 remain blocked by their upstream dependencies.
+Next implementation can start with P11-004 to add deduplication scoring. P5-003, P6-003, and P8-003 remain blocked by their upstream dependencies.
