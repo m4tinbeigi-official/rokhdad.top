@@ -191,3 +191,25 @@ Events are canonical public records after manual creation or future source norma
 | `is_featured` | boolean | Yes | Manual promotion flag |
 
 Events can be linked to speakers, hosts, or instructors through `event_person.role_title` and `event_person.sort_order`.
+
+## Event Source Attributions
+
+Source attributions link canonical events to external records without depending on the future source registry table.
+
+| Field | Type | Required | Notes |
+|---|---|---:|---|
+| `id` | integer | Yes | Stable internal ID |
+| `event_id` | integer | Yes | Canonical event ID |
+| `source_key` | string | Yes | Stable source key, for example `evand` or `eseminar` |
+| `external_id` | string | Yes | Source-native event identifier |
+| `external_url` | string | No | Public outbound source URL |
+| `payload_hash` | string | No | Hash of the latest normalized/raw payload used for change detection |
+| `snapshot_ref` | string | No | MongoDB or object-storage reference for raw payload snapshot |
+| `first_seen_at` | datetime | No | First time ingestion saw this external record |
+| `last_seen_at` | datetime | No | Most recent successful source sighting |
+| `last_synced_at` | datetime | No | Most recent canonical sync attempt |
+| `sync_status` | string | Yes | `pending`, `synced`, `stale`, or `failed` |
+| `confidence_score` | decimal | No | Deduplication/match confidence from `0.0000` to `1.0000` |
+| `metadata` | object | No | Non-authoritative ingestion/debug attributes |
+
+The pair `source_key` + `external_id` is unique.
