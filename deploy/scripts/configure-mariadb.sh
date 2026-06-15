@@ -83,6 +83,17 @@ common = {
     "SESSION_DRIVER": "database",
 }
 
+mongo_password = root.get("MONGO_INITDB_ROOT_PASSWORD")
+if not mongo_password or mongo_password == "change-me":
+    mongo_password = secret()
+
+redis_password = root.get("REDIS_PASSWORD")
+if not redis_password or redis_password == "change-me":
+    redis_password = secret()
+
+mongodb_database = root.get("MONGODB_DATABASE") or "rokhdad_raw"
+mongodb_username = root.get("MONGO_INITDB_ROOT_USERNAME") or "rokhdad"
+
 root.update(
     {
         **common,
@@ -94,14 +105,24 @@ root.update(
         "MARIADB_PASSWORD": mariadb_password,
         "MARIADB_ROOT_PASSWORD": mariadb_root_password,
         "DATABASE_URL": f"mysql://rokhdad:{mariadb_password}@mariadb:3306/rokhdad",
-        "MONGO_INITDB_ROOT_USERNAME": root.get("MONGO_INITDB_ROOT_USERNAME", "rokhdad"),
-        "MONGO_INITDB_ROOT_PASSWORD": root.get("MONGO_INITDB_ROOT_PASSWORD") or secret(),
-        "MONGODB_DATABASE": root.get("MONGODB_DATABASE", "rokhdad_raw"),
-        "REDIS_PASSWORD": root.get("REDIS_PASSWORD") or secret(),
+        "MONGO_INITDB_ROOT_USERNAME": mongodb_username,
+        "MONGO_INITDB_ROOT_PASSWORD": mongo_password,
+        "MONGODB_DATABASE": mongodb_database,
+        "MONGODB_URI": f"mongodb://{mongodb_username}:{mongo_password}@mongodb:27017/{mongodb_database}?authSource=admin",
+        "REDIS_PASSWORD": redis_password,
+        "REDIS_URL": f"redis://:{redis_password}@redis:6379/0",
     }
 )
 
-backend.update(common)
+backend.update(
+    {
+        **common,
+        "MONGODB_URI": root["MONGODB_URI"],
+        "REDIS_HOST": "redis",
+        "REDIS_PASSWORD": redis_password,
+        "REDIS_PORT": "6379",
+    }
+)
 
 write_env(root_env, root)
 write_env(backend_env, backend)
