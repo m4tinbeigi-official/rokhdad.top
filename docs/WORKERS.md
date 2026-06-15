@@ -113,3 +113,11 @@ python -m rokhdad_workers.enrichment --fixture workers/tests/fixtures/enrichment
 ```
 
 P12-003 defines queue job type `enrich.event` for enrichment work. The payload carries the canonical key, requested enrichment targets, normalized event snapshot, source keys, priority, requested timestamp, and optional context. Default queue: `rokhdad:jobs:enrichment`.
+
+Image download smoke command:
+
+```bash
+python -m rokhdad_workers.images --fixture workers/tests/fixtures/image_download_job.json --output-dir /tmp/rokhdad-images
+```
+
+P13-001 defines an image download worker contract and downloader. It fetches an image URL, writes it under an event-keyed storage path, and reports content type, byte size, SHA-256 hash, and downloaded path.
