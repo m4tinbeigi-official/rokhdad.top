@@ -33,12 +33,25 @@ class EventController extends Controller
         ]);
     }
 
+    public function show(string $slug): JsonResponse
+    {
+        $event = Event::query()
+            ->with(['category', 'city', 'organizer', 'people', 'sourceAttributions'])
+            ->where('slug', $slug)
+            ->where('status', 'published')
+            ->firstOrFail();
+
+        return response()->json([
+            'data' => $this->serializeEvent($event, detailed: true),
+        ]);
+    }
+
     /**
      * @return array<string, mixed>
      */
-    private function serializeEvent(Event $event): array
+    private function serializeEvent(Event $event, bool $detailed = false): array
     {
-        return [
+        $payload = [
             'id' => $event->id,
             'title' => $event->title,
             'slug' => $event->slug,
@@ -67,6 +80,32 @@ class EventController extends Controller
                 'name' => $event->organizer->name,
                 'slug' => $event->organizer->slug,
             ] : null,
+        ];
+
+        if (! $detailed) {
+            return $payload;
+        }
+
+        return [
+            ...$payload,
+            'description' => $event->description,
+            'venue_address' => $event->venue_address,
+            'latitude' => $event->latitude,
+            'longitude' => $event->longitude,
+            'metadata' => $event->metadata,
+            'people' => $event->people->map(fn ($person) => [
+                'id' => $person->id,
+                'full_name' => $person->full_name,
+                'slug' => $person->slug,
+                'role_title' => $person->pivot->role_title,
+                'sort_order' => $person->pivot->sort_order,
+            ])->values(),
+            'source_attributions' => $event->sourceAttributions->map(fn ($source) => [
+                'source_key' => $source->source_key,
+                'external_id' => $source->external_id,
+                'external_url' => $source->external_url,
+                'sync_status' => $source->sync_status,
+            ])->values(),
         ];
     }
 }
