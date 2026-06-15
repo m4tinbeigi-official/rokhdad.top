@@ -50,3 +50,11 @@ python -m rokhdad_workers.sources.eseminar --fixture workers/tests/fixtures/esem
 ```
 
 P10-002 collects raw Eseminar webinar payloads into the same source-keyed envelope. MongoDB persistence is intentionally left for P10-003.
+
+Snapshot storage command:
+
+```bash
+python -m rokhdad_workers.snapshots --input-json '[{"source_key":"evand","external_id":"101","fetched_at":"2026-06-15T00:00:00+00:00","payload":{}}]'
+```
+
+P10-003 stores raw event envelopes in MongoDB collection `raw_event_snapshots` with `snapshot_type=raw_event`.
