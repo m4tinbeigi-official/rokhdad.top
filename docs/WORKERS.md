@@ -73,3 +73,11 @@ python -m rokhdad_workers.normalization --schema
 ```
 
 P11-001 defines the normalized event DTO contract used by source-specific mappers before canonical database writes. The schema keeps source provenance (`source_key`, `external_id`, `raw_snapshot_id`), canonical event fields, location, organizer, people, and metadata.
+
+Evand normalization smoke command:
+
+```bash
+python -m rokhdad_workers.normalizers.evand --fixture workers/tests/fixtures/evand_events.json --limit 1
+```
+
+P11-002 maps Evand raw event envelopes into the normalized event DTO, including canonical key, start/end datetimes, event type, location, organizer, source URL, and source metadata.
