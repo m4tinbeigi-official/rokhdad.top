@@ -121,3 +121,11 @@ python -m rokhdad_workers.images --fixture workers/tests/fixtures/image_download
 ```
 
 P13-001 defines an image download worker contract and downloader. It fetches an image URL, writes it under an event-keyed storage path, and reports content type, byte size, SHA-256 hash, and downloaded path.
+
+Image variant smoke command:
+
+```bash
+python -m rokhdad_workers.images --fixture workers/tests/fixtures/image_download_job.json --output-dir /tmp/rokhdad-images --variants 320,640
+```
+
+P13-002 adds WebP resize variants that preserve aspect ratio and report variant name, dimensions, content type, byte size, SHA-256 hash, and storage path.

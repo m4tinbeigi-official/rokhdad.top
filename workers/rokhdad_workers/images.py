@@ -56,6 +56,20 @@ class ImageDownloadResult:
         return asdict(self)
 
 
+@dataclass(frozen=True)
+class ImageVariantResult:
+    variant: str
+    storage_path: str
+    width: int
+    height: int
+    content_type: str
+    byte_size: int
+    sha256: str
+
+    def to_dict(self) -> dict[str, Any]:
+        return asdict(self)
+
+
 def download_image(job: ImageDownloadJob, storage_root: Path) -> ImageDownloadResult:
     content, content_type = fetch_image(job.image_url)
     extension = extension_for_content_type(content_type) or extension_from_url(job.image_url) or ".bin"
@@ -73,6 +87,42 @@ def download_image(job: ImageDownloadJob, storage_root: Path) -> ImageDownloadRe
         byte_size=len(content),
         sha256=hashlib.sha256(content).hexdigest(),
     )
+
+
+def create_image_variants(original_path: Path, widths: Iterable[int], output_dir: Path | None = None) -> list[ImageVariantResult]:
+    from PIL import Image
+
+    target_dir = output_dir or original_path.parent / "variants"
+    target_dir.mkdir(parents=True, exist_ok=True)
+    variants: list[ImageVariantResult] = []
+
+    with Image.open(original_path) as image:
+        source_width, source_height = image.size
+        for requested_width in widths:
+            if requested_width <= 0:
+                raise ValueError("variant widths must be positive integers")
+
+            width = min(requested_width, source_width)
+            height = max(1, round(source_height * (width / source_width)))
+            variant = image.copy()
+            if (width, height) != image.size:
+                variant = variant.resize((width, height), Image.Resampling.LANCZOS)
+
+            variant_name = f"w{width}"
+            target_path = target_dir / f"{original_path.stem}-{variant_name}.webp"
+            variant.save(target_path, format="WEBP", quality=85)
+            content = target_path.read_bytes()
+            variants.append(ImageVariantResult(
+                variant=variant_name,
+                storage_path=str(target_path),
+                width=width,
+                height=height,
+                content_type="image/webp",
+                byte_size=len(content),
+                sha256=hashlib.sha256(content).hexdigest(),
+            ))
+
+    return variants
 
 
 def fetch_image(url: str) -> tuple[bytes, str]:
@@ -126,10 +176,16 @@ def main(argv: Iterable[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="rokhdad-image-worker")
     parser.add_argument("--fixture", type=Path, required=True)
     parser.add_argument("--output-dir", type=Path, required=True)
+    parser.add_argument("--variants", help="Comma-separated variant widths, for example 320,640.")
     parsed = parser.parse_args(args)
 
     result = download_image(load_image_job_fixture(parsed.fixture), parsed.output_dir)
-    print(json.dumps(result.to_dict(), ensure_ascii=False, sort_keys=True), flush=True)
+    variants = []
+    if parsed.variants:
+        widths = [int(width.strip()) for width in parsed.variants.split(",") if width.strip()]
+        variants = [variant.to_dict() for variant in create_image_variants(Path(result.storage_path), widths)]
+
+    print(json.dumps({**result.to_dict(), "variants": variants}, ensure_ascii=False, sort_keys=True), flush=True)
     return 0
 
 
