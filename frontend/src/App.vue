@@ -2,17 +2,44 @@
 import { computed, onMounted, ref } from 'vue'
 import { ApiError, NetworkError, createRokhdadApi, getApiBaseUrl } from './api/client.js'
 import { loadHomepageEvents } from './events/homepage.js'
+import { loadCategoryDirectory, loadCityDirectory } from './lookups/directory.js'
 
 const apiBaseUrl = getApiBaseUrl()
 const api = createRokhdadApi()
+const currentPath = window.location.pathname
 const events = ref([])
 const meta = ref(null)
 const isLoading = ref(true)
 const error = ref(null)
 const hasEvents = computed(() => events.value.length > 0)
+const directoryItems = ref([])
+const directoryLoading = ref(false)
+const directoryError = ref(null)
+const pageKind = computed(() => {
+  if (currentPath === '/categories') {
+    return 'categories'
+  }
+
+  if (currentPath === '/cities') {
+    return 'cities'
+  }
+
+  return 'home'
+})
+const directoryTitle = computed(() => pageKind.value === 'cities' ? 'شهرها' : 'دسته بندی ها')
+const directoryDescription = computed(() => (
+  pageKind.value === 'cities'
+    ? 'شهرهای فعال برای مرور و فیلتر رویدادهای آینده.'
+    : 'دسته بندی های فعال برای کشف سریع تر رویدادها.'
+))
 
 onMounted(() => {
-  fetchEvents()
+  if (pageKind.value === 'home') {
+    fetchEvents()
+    return
+  }
+
+  fetchDirectory()
 })
 
 async function fetchEvents() {
@@ -32,6 +59,22 @@ async function fetchEvents() {
   }
 }
 
+async function fetchDirectory() {
+  directoryLoading.value = true
+  directoryError.value = null
+
+  try {
+    directoryItems.value = pageKind.value === 'cities'
+      ? await loadCityDirectory(api)
+      : await loadCategoryDirectory(api)
+  } catch (caught) {
+    directoryError.value = getErrorMessage(caught)
+    directoryItems.value = []
+  } finally {
+    directoryLoading.value = false
+  }
+}
+
 function getErrorMessage(caught) {
   if (caught instanceof NetworkError) {
     return 'ارتباط با سرور برقرار نشد. چند لحظه بعد دوباره تلاش کنید.'
@@ -39,7 +82,7 @@ function getErrorMessage(caught) {
 
   if (caught instanceof ApiError) {
     if (caught.status === 404) {
-      return 'مسیر دریافت رویدادها در دسترس نیست.'
+      return 'مسیر دریافت داده در دسترس نیست.'
     }
 
     if (caught.status >= 500) {
@@ -61,14 +104,14 @@ function getErrorMessage(caught) {
           رخداد
         </a>
         <nav class="hidden items-center gap-2 text-sm font-bold text-muted md:flex" aria-label="ناوبری اصلی">
-          <a class="rounded-md px-3 py-2 text-brand-800 hover:bg-brand-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-500" href="#">
+          <a class="rounded-md px-3 py-2 text-brand-800 hover:bg-brand-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-500" href="/">
             رویدادها
           </a>
-          <a class="rounded-md px-3 py-2 hover:bg-brand-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-500" href="#">
+          <a class="rounded-md px-3 py-2 hover:bg-brand-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-500" href="/categories">
             دسته بندی ها
           </a>
-          <a class="rounded-md px-3 py-2 hover:bg-brand-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-500" href="#">
-            برگزارکننده ها
+          <a class="rounded-md px-3 py-2 hover:bg-brand-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-500" href="/cities">
+            شهرها
           </a>
         </nav>
         <button class="rounded-md bg-brand-700 px-4 py-2 text-sm font-bold text-white shadow-sm hover:bg-brand-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600">
@@ -77,7 +120,7 @@ function getErrorMessage(caught) {
       </div>
     </header>
 
-    <main class="mx-auto grid max-w-7xl gap-8 px-4 py-6 sm:px-6 lg:px-8">
+    <main v-if="pageKind === 'home'" class="mx-auto grid max-w-7xl gap-8 px-4 py-6 sm:px-6 lg:px-8">
       <section class="grid gap-5 rounded-lg border border-line bg-surface p-5 shadow-soft lg:grid-cols-[1fr_360px] lg:items-end lg:p-7">
         <div>
           <p class="mb-2 text-sm font-bold text-brand-700">کشف رویداد</p>
@@ -190,6 +233,56 @@ function getErrorMessage(caught) {
             </dl>
           </article>
         </div>
+      </section>
+    </main>
+
+    <main v-else class="mx-auto grid max-w-7xl gap-6 px-4 py-6 sm:px-6 lg:px-8">
+      <section class="rounded-lg border border-line bg-surface p-5 shadow-soft lg:p-7">
+        <p class="mb-2 text-sm font-bold text-brand-700">مرور سریع</p>
+        <h1 class="text-3xl font-black leading-tight text-ink sm:text-4xl">{{ directoryTitle }}</h1>
+        <p class="mt-4 max-w-2xl text-base leading-8 text-muted">{{ directoryDescription }}</p>
+      </section>
+
+      <section v-if="directoryLoading" class="grid gap-3 md:grid-cols-3" aria-live="polite" aria-label="در حال بارگذاری فهرست">
+        <article v-for="index in 6" :key="index" class="min-h-36 animate-pulse rounded-lg border border-line bg-surface p-4 shadow-soft">
+          <div class="h-6 w-2/3 rounded-md bg-line"></div>
+          <div class="mt-4 h-4 w-full rounded-md bg-line"></div>
+          <div class="mt-2 h-4 w-1/2 rounded-md bg-line"></div>
+        </article>
+      </section>
+
+      <section v-else-if="directoryError" class="rounded-lg border border-line bg-surface p-5 shadow-soft" role="alert">
+        <h2 class="text-base font-black text-ink">دریافت فهرست ناموفق بود</h2>
+        <p class="mt-2 text-sm leading-7 text-muted">{{ directoryError }}</p>
+        <button
+          class="mt-4 rounded-md bg-brand-700 px-4 py-2 text-sm font-bold text-white hover:bg-brand-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600"
+          type="button"
+          @click="fetchDirectory"
+        >
+          تلاش دوباره
+        </button>
+      </section>
+
+      <section v-else-if="directoryItems.length === 0" class="rounded-lg border border-dashed border-line bg-surface p-5 text-sm leading-7 text-muted">
+        هنوز آیتم فعالی برای نمایش وجود ندارد.
+      </section>
+
+      <section v-else class="grid gap-3 md:grid-cols-3">
+        <article
+          v-for="item in directoryItems"
+          :key="item.id || item.slug || item.title"
+          class="rounded-lg border border-line bg-surface p-4 shadow-soft"
+        >
+          <div class="mb-4 flex items-center justify-between gap-3">
+            <span class="rounded-md bg-brand-50 px-2.5 py-1 text-xs font-black text-brand-800">{{ item.meta }}</span>
+          </div>
+          <h2 class="text-lg font-black leading-8 text-ink">
+            <a class="hover:text-brand-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-600" :href="item.href">
+              {{ item.title }}
+            </a>
+          </h2>
+          <p class="mt-2 text-sm leading-7 text-muted">{{ item.description }}</p>
+        </article>
       </section>
     </main>
   </div>
