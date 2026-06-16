@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\City;
 use App\Models\Event;
+use App\Models\EventSourceAttribution;
 use App\Models\Organizer;
 use App\Models\Person;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -63,11 +64,17 @@ class PublicProfilesApiTest extends TestCase
         $inactivePerson = Person::factory()->create(['is_active' => false]);
         $organizer->people()->attach($person, ['role_title' => 'Host']);
         $organizer->people()->attach($inactivePerson, ['role_title' => 'Hidden']);
-        Event::factory()->create([
+        $published = Event::factory()->create([
             'organizer_id' => $organizer->id,
             'title' => 'Published Event',
             'slug' => 'published-event',
             'status' => 'published',
+        ]);
+        EventSourceAttribution::factory()->create([
+            'event_id' => $published->id,
+            'source_key' => 'evand',
+            'external_id' => '501',
+            'external_url' => 'https://evand.com/events/501',
         ]);
         Event::factory()->create([
             'organizer_id' => $organizer->id,
@@ -86,7 +93,8 @@ class PublicProfilesApiTest extends TestCase
             ->assertJsonPath('data.people.0.full_name', 'Rokhdad Speaker')
             ->assertJsonPath('data.people.0.role_title', 'Host')
             ->assertJsonCount(1, 'data.events')
-            ->assertJsonPath('data.events.0.slug', 'published-event');
+            ->assertJsonPath('data.events.0.slug', 'published-event')
+            ->assertJsonPath('data.events.0.source_attributions.0.source_key', 'evand');
     }
 
     public function test_people_endpoint_returns_active_people_with_published_event_counts(): void
@@ -140,6 +148,12 @@ class PublicProfilesApiTest extends TestCase
             'slug' => 'visible-talk',
             'status' => 'published',
         ]);
+        EventSourceAttribution::factory()->create([
+            'event_id' => $published->id,
+            'source_key' => 'eseminar',
+            'external_id' => '601',
+            'external_url' => 'https://eseminar.tv/webinar/601',
+        ]);
         $draft = Event::factory()->create([
             'title' => 'Hidden Talk',
             'slug' => 'hidden-talk',
@@ -159,7 +173,8 @@ class PublicProfilesApiTest extends TestCase
             ->assertJsonCount(1, 'data.events')
             ->assertJsonPath('data.events.0.slug', 'visible-talk')
             ->assertJsonPath('data.events.0.role_title', 'Speaker')
-            ->assertJsonPath('data.events.0.organizer.slug', 'person-org');
+            ->assertJsonPath('data.events.0.organizer.slug', 'person-org')
+            ->assertJsonPath('data.events.0.source_attributions.0.source_key', 'eseminar');
     }
 
     public function test_inactive_profiles_are_not_publicly_accessible(): void

@@ -4,6 +4,44 @@ const eventTypeLabels = {
   hybrid: 'ترکیبی',
 }
 
+const eventFilterKeys = [
+  'q',
+  'category',
+  'city',
+  'event_type',
+  'source',
+  'start_date',
+  'end_date',
+]
+
+export function createDefaultEventFilters() {
+  return Object.fromEntries(eventFilterKeys.map((key) => [key, '']))
+}
+
+export function readEventFiltersFromSearch(search = '') {
+  const params = new URLSearchParams(search)
+  const filters = createDefaultEventFilters()
+
+  for (const key of eventFilterKeys) {
+    filters[key] = params.get(key) || ''
+  }
+
+  return filters
+}
+
+export function buildEventFilterSearch(filters) {
+  const params = new URLSearchParams()
+
+  for (const key of eventFilterKeys) {
+    const value = filters?.[key]
+    if (value !== undefined && value !== null && String(value).trim() !== '') {
+      params.set(key, String(value).trim())
+    }
+  }
+
+  return params.toString()
+}
+
 export async function loadHomepageEvents(api, query = {}) {
   const payload = await api.listEvents({
     per_page: 6,
@@ -19,6 +57,13 @@ export async function loadHomepageEvents(api, query = {}) {
 }
 
 export function normalizeHomepageEvent(event) {
+  const source = event.source_attributions?.[0] || null
+  const sourceLabels = {
+    evand: 'ایوند',
+    eseminar: 'ایسمینار',
+    bilitmaster: 'بلیط‌مستر',
+  }
+
   return {
     id: event.id,
     title: event.title || 'رویداد بدون عنوان',
@@ -30,6 +75,12 @@ export function normalizeHomepageEvent(event) {
     category: event.category?.name || 'عمومی',
     badge: eventTypeLabels[event.event_type] || 'رویداد',
     href: event.slug ? `/events/${event.slug}` : '#',
+    role_title: event.role_title,
+    source: source ? {
+      key: source.source_key,
+      label: sourceLabels[source.source_key] || source.source_key,
+      url: source.external_url || '#',
+    } : null,
   }
 }
 

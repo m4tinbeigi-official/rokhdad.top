@@ -2,9 +2,11 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\EventController;
+use App\Http\Controllers\EventRegistrationController;
 use App\Http\Controllers\LookupController;
 use App\Http\Controllers\OrganizerController;
 use App\Http\Controllers\PersonController;
+use App\Http\Controllers\TicketValidationController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/health', function () {
@@ -41,7 +43,9 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
     });
 
     Route::get('/events', [EventController::class, 'index'])->name('events.index');
+    Route::middleware('auth:sanctum')->post('/events/{slug}/registrations', [EventRegistrationController::class, 'store'])->name('events.registrations.store');
     Route::get('/events/{slug}', [EventController::class, 'show'])->name('events.show');
+    Route::middleware('auth:sanctum')->get('/tickets/validate/{token}', [TicketValidationController::class, 'show'])->name('tickets.validate');
     Route::get('/categories', [LookupController::class, 'categories'])->name('categories.index');
     Route::get('/cities', [LookupController::class, 'cities'])->name('cities.index');
     Route::get('/organizers', [OrganizerController::class, 'index'])->name('organizers.index');

@@ -1,209 +1,894 @@
 <!doctype html>
 <html lang="fa" dir="rtl">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>رخداد | پلتفرم رویدادهای ایران</title>
-    <meta
-      name="description"
-      content="رخداد، پلتفرم فارسی کشف، تجمیع و ثبت‌نام رویدادها در ایران."
-    />
-    <style>
-      :root {
-        color-scheme: light;
-        --bg: #f8fafc;
-        --fg: #0f172a;
-        --muted: #475569;
-        --primary: #2563eb;
-        --border: #dbe3ef;
-        --card: #ffffff;
-      }
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>رخداد | رویدادهای ایران</title>
+  <meta name="description" content="رخداد، پلتفرم فارسی کشف و تجمیع رویدادها در ایران." />
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap');
 
-      * {
-        box-sizing: border-box;
-      }
+    :root {
+      --bg: #0d0f14;
+      --bg2: #13161d;
+      --bg3: #1a1e28;
+      --border: #252a36;
+      --border2: #2e3546;
+      --primary: #6366f1;
+      --primary-glow: rgba(99,102,241,0.15);
+      --green: #22c55e;
+      --amber: #f59e0b;
+      --red: #ef4444;
+      --muted: #6b7280;
+      --muted2: #9ca3af;
+      --fg: #f1f5f9;
+      --fg2: #cbd5e1;
+      --card: #161a24;
+      --card-hover: #1e2330;
+      --radius: 14px;
+      --radius-sm: 8px;
+      --shadow: 0 4px 24px rgba(0,0,0,0.4);
+    }
 
-      body {
-        margin: 0;
-        min-height: 100vh;
-        font-family: Tahoma, Arial, sans-serif;
-        background: var(--bg);
-        color: var(--fg);
-      }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-      main {
-        width: min(1040px, calc(100% - 32px));
-        min-height: 100vh;
-        margin: 0 auto;
-        display: grid;
-        align-content: center;
-        gap: 32px;
-        padding: 48px 0;
-      }
+    body {
+      font-family: 'Vazirmatn', Tahoma, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--fg);
+      min-height: 100vh;
+      line-height: 1.6;
+    }
 
-      header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 16px;
-      }
+    a { color: inherit; text-decoration: none; }
 
-      .brand {
-        font-size: 22px;
-        font-weight: 800;
-      }
+    /* ── NAV ── */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(13,15,20,0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      display: flex; align-items: center; gap: 20px;
+      height: 60px;
+    }
+    .nav-brand {
+      font-size: 20px; font-weight: 800; color: var(--fg);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .nav-brand .dot { width: 8px; height: 8px; background: var(--primary); border-radius: 50%; display: inline-block; }
+    .nav-tabs { display: flex; gap: 4px; flex: 1; }
+    .nav-tab {
+      padding: 6px 14px; border-radius: 6px; font-size: 14px; font-weight: 500;
+      color: var(--muted2); cursor: pointer; transition: all .2s; border: none;
+      background: transparent;
+    }
+    .nav-tab:hover { color: var(--fg); background: var(--bg3); }
+    .nav-tab.active { color: var(--fg); background: var(--bg3); }
+    .nav-search {
+      background: var(--bg3); border: 1px solid var(--border2);
+      border-radius: 8px; padding: 7px 14px;
+      color: var(--fg); font-size: 14px; font-family: inherit;
+      outline: none; width: 220px;
+    }
+    .nav-search:focus { border-color: var(--primary); }
+    .nav-search::placeholder { color: var(--muted); }
 
-      .badge {
-        border: 1px solid var(--border);
-        border-radius: 999px;
-        padding: 8px 14px;
-        color: var(--muted);
-        background: var(--card);
-        font-size: 14px;
-      }
+    /* ── HERO ── */
+    .hero {
+      background: linear-gradient(135deg, var(--bg) 0%, #10131c 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 56px 24px 40px;
+      text-align: center;
+      position: relative; overflow: hidden;
+    }
+    .hero::before {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(ellipse 60% 50% at 50% 0%, rgba(99,102,241,0.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero h1 { font-size: clamp(28px, 5vw, 48px); font-weight: 800; margin-bottom: 12px; position: relative; }
+    .hero h1 span { color: var(--primary); }
+    .hero p { font-size: 16px; color: var(--muted2); max-width: 520px; margin: 0 auto 24px; position: relative; }
+    .stats-row {
+      display: flex; gap: 32px; justify-content: center; flex-wrap: wrap;
+      position: relative;
+    }
+    .stat { text-align: center; }
+    .stat-num { font-size: 24px; font-weight: 800; color: var(--primary); }
+    .stat-label { font-size: 12px; color: var(--muted); margin-top: 2px; }
 
-      .hero {
-        display: grid;
-        grid-template-columns: minmax(0, 1.1fr) minmax(280px, 0.9fr);
-        gap: 28px;
-        align-items: stretch;
-      }
+    /* ── FILTERS ── */
+    .filters-bar {
+      padding: 16px 24px;
+      display: flex; gap: 10px; flex-wrap: wrap; align-items: center;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg2);
+    }
+    .filter-chip {
+      padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 500;
+      border: 1px solid var(--border2); background: transparent;
+      color: var(--muted2); cursor: pointer; transition: all .2s;
+      font-family: inherit;
+    }
+    .filter-chip:hover { border-color: var(--primary); color: var(--fg); }
+    .filter-chip.active { background: var(--primary); border-color: var(--primary); color: white; }
+    .filter-sep { width: 1px; height: 24px; background: var(--border); }
+    .filter-label { font-size: 12px; color: var(--muted); }
 
-      .copy,
-      .panel {
-        background: var(--card);
-        border: 1px solid var(--border);
-        border-radius: 8px;
-        padding: 32px;
-      }
+    /* ── MAIN LAYOUT ── */
+    .container {
+      max-width: 1280px; margin: 0 auto;
+      padding: 28px 24px;
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      gap: 28px;
+    }
 
-      h1 {
-        margin: 0 0 18px;
-        font-size: clamp(36px, 6vw, 64px);
-        line-height: 1.15;
-      }
+    /* ── SIDEBAR ── */
+    .sidebar { display: flex; flex-direction: column; gap: 20px; }
+    .sidebar-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 20px;
+    }
+    .sidebar-card h3 { font-size: 14px; font-weight: 700; color: var(--muted2); margin-bottom: 14px; text-transform: uppercase; letter-spacing: .05em; }
 
-      p {
-        margin: 0;
-        color: var(--muted);
-        font-size: 18px;
-        line-height: 1.9;
-      }
+    .source-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px 10px; border-radius: 8px; cursor: pointer;
+      transition: background .15s; border: none; width: 100%;
+      background: transparent; font-family: inherit; text-align: right;
+    }
+    .source-item:hover { background: var(--bg3); }
+    .source-item.active { background: var(--primary-glow); }
+    .source-logo {
+      width: 32px; height: 32px; border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 800; color: white; flex-shrink: 0;
+    }
+    .source-name { font-size: 14px; font-weight: 600; color: var(--fg2); }
+    .source-count { font-size: 12px; color: var(--muted); margin-top: 1px; }
+    .source-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      margin-right: auto; flex-shrink: 0;
+    }
 
-      .actions {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 12px;
-        margin-top: 28px;
-      }
+    /* ── EVENTS GRID ── */
+    .events-section { min-width: 0; }
+    .section-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .section-title { font-size: 18px; font-weight: 700; }
+    .section-meta { font-size: 13px; color: var(--muted); }
 
-      a {
-        color: inherit;
-        text-decoration: none;
-      }
+    .events-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+      gap: 16px;
+    }
 
-      .button {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        min-height: 44px;
-        border-radius: 8px;
-        padding: 0 18px;
-        font-weight: 700;
-      }
+    /* ── EVENT CARD ── */
+    .event-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--radius); overflow: hidden;
+      transition: all .22s; cursor: pointer;
+      display: flex; flex-direction: column;
+    }
+    .event-card:hover {
+      border-color: var(--border2);
+      background: var(--card-hover);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow);
+    }
+    .card-img {
+      width: 100%; aspect-ratio: 16/9;
+      object-fit: cover; display: block;
+      background: var(--bg3);
+    }
+    .card-img-placeholder {
+      width: 100%; aspect-ratio: 16/9;
+      background: linear-gradient(135deg, var(--bg3), var(--bg2));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 32px;
+    }
+    .card-body { padding: 16px; flex: 1; display: flex; flex-direction: column; gap: 10px; }
+    .card-source-badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: 700;
+      width: fit-content;
+    }
+    .card-title {
+      font-size: 15px; font-weight: 700; color: var(--fg);
+      line-height: 1.5; display: -webkit-box;
+      -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+    }
+    .card-meta { display: flex; flex-direction: column; gap: 5px; margin-top: auto; }
+    .card-meta-row {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 12px; color: var(--muted2);
+    }
+    .card-meta-row svg { flex-shrink: 0; opacity: .7; }
+    .card-footer {
+      padding: 12px 16px;
+      border-top: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .card-price { font-size: 13px; font-weight: 700; }
+    .card-price.free { color: var(--green); }
+    .card-price.paid { color: var(--amber); }
+    .card-btn {
+      padding: 6px 14px; border-radius: 6px; font-size: 12px; font-weight: 700;
+      background: var(--primary); color: white; border: none; cursor: pointer;
+      font-family: inherit; transition: opacity .15s;
+    }
+    .card-btn:hover { opacity: .85; }
 
-      .button.primary {
-        background: var(--primary);
-        color: white;
-      }
+    /* ── SKELETON ── */
+    @keyframes shimmer {
+      0% { background-position: -400px 0; }
+      100% { background-position: 400px 0; }
+    }
+    .skeleton {
+      background: linear-gradient(90deg, var(--bg3) 25%, var(--bg2) 50%, var(--bg3) 75%);
+      background-size: 800px 100%;
+      animation: shimmer 1.4s infinite;
+      border-radius: 6px;
+    }
+    .skeleton-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--radius); overflow: hidden;
+    }
+    .skeleton-img { width: 100%; aspect-ratio: 16/9; }
+    .skeleton-body { padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+    .skeleton-line { height: 12px; }
+    .skeleton-line.w-full { width: 100%; }
+    .skeleton-line.w-3q { width: 75%; }
+    .skeleton-line.w-half { width: 50%; }
 
-      .button.secondary {
-        border: 1px solid var(--border);
-        background: white;
-      }
+    /* ── EMPTY / ERROR ── */
+    .empty-state {
+      grid-column: 1 / -1; text-align: center; padding: 60px 20px;
+      color: var(--muted);
+    }
+    .empty-state .icon { font-size: 48px; margin-bottom: 16px; }
+    .empty-state h3 { font-size: 18px; color: var(--fg2); margin-bottom: 8px; }
 
-      .panel h2 {
-        margin: 0 0 16px;
-        font-size: 22px;
-      }
+    /* ── LOAD MORE ── */
+    .load-more-wrap { margin-top: 28px; text-align: center; }
+    .load-more-btn {
+      padding: 12px 36px; border-radius: 8px; font-size: 14px; font-weight: 700;
+      border: 1px solid var(--border2); background: var(--card);
+      color: var(--fg2); cursor: pointer; font-family: inherit; transition: all .2s;
+    }
+    .load-more-btn:hover { background: var(--bg3); border-color: var(--primary); color: var(--fg); }
+    .load-more-btn:disabled { opacity: .4; cursor: not-allowed; }
 
-      ul {
-        margin: 0;
-        padding: 0;
-        list-style: none;
-        display: grid;
-        gap: 14px;
-      }
+    /* ── MODAL ── */
+    .modal-overlay {
+      position: fixed; inset: 0; z-index: 200;
+      background: rgba(0,0,0,0.75); backdrop-filter: blur(6px);
+      display: flex; align-items: center; justify-content: center; padding: 20px;
+      opacity: 0; pointer-events: none; transition: opacity .2s;
+    }
+    .modal-overlay.open { opacity: 1; pointer-events: all; }
+    .modal {
+      background: var(--card); border: 1px solid var(--border2);
+      border-radius: var(--radius); width: 100%; max-width: 620px;
+      max-height: 85vh; overflow-y: auto;
+      transform: translateY(16px); transition: transform .2s;
+    }
+    .modal-overlay.open .modal { transform: translateY(0); }
+    .modal-header { padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; gap: 12px; justify-content: space-between; align-items: flex-start; }
+    .modal-close { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 20px; padding: 4px; }
+    .modal-body { padding: 24px; display: flex; flex-direction: column; gap: 16px; }
+    .modal-img { width: 100%; border-radius: 10px; object-fit: cover; max-height: 240px; }
+    .modal-title { font-size: 20px; font-weight: 800; }
+    .modal-detail-row { display: flex; gap: 8px; align-items: flex-start; font-size: 14px; color: var(--fg2); }
+    .modal-detail-label { color: var(--muted); width: 80px; flex-shrink: 0; }
+    .modal-actions { display: flex; gap: 10px; padding: 20px 24px; border-top: 1px solid var(--border); }
+    .modal-btn-primary {
+      flex: 1; padding: 12px; border-radius: 8px; font-weight: 700;
+      background: var(--primary); color: white; border: none; cursor: pointer;
+      font-family: inherit; font-size: 15px;
+    }
+    .modal-btn-secondary {
+      padding: 12px 20px; border-radius: 8px; font-weight: 700;
+      border: 1px solid var(--border2); background: transparent;
+      color: var(--fg2); cursor: pointer; font-family: inherit;
+    }
 
-      li {
-        border-bottom: 1px solid var(--border);
-        padding-bottom: 14px;
-        color: var(--muted);
-        line-height: 1.7;
-      }
+    /* ── TOAST ── */
+    .toast-wrap { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); z-index: 300; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
+    .toast {
+      background: var(--bg3); border: 1px solid var(--border2);
+      border-radius: 8px; padding: 10px 18px; font-size: 14px;
+      color: var(--fg); box-shadow: var(--shadow);
+      animation: toastIn .25s ease; pointer-events: none;
+    }
+    @keyframes toastIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 
-      li:last-child {
-        border-bottom: 0;
-        padding-bottom: 0;
-      }
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      .container { grid-template-columns: 1fr; }
+      .sidebar { display: none; }
+    }
+    @media (max-width: 600px) {
+      nav { padding: 0 16px; }
+      .nav-search { width: 120px; }
+      .hero { padding: 36px 16px 28px; }
+      .container { padding: 16px; }
+      .events-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
 
-      footer {
-        color: var(--muted);
-        font-size: 14px;
-      }
+<!-- NAV -->
+<nav>
+  <div class="nav-brand">
+    <span class="dot"></span> رخداد
+  </div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="setTab('all',this)">همه رویدادها</button>
+    <button class="nav-tab" onclick="setTab('evand',this)">ایوند</button>
+    <button class="nav-tab" onclick="setTab('eseminar',this)">ایسمینار</button>
+  </div>
+  <input class="nav-search" type="search" placeholder="جستجو در رویدادها..." id="searchInput" oninput="onSearch(this.value)" />
+</nav>
 
-      @media (max-width: 760px) {
-        header,
-        .hero {
-          grid-template-columns: 1fr;
-        }
+<!-- HERO -->
+<section class="hero">
+  <h1>رویدادهای <span>ایران</span> یکجا</h1>
+  <p>همه رویدادها، وبینارها و کارگاه‌ها از ایوند، ایسمینار و بیلیت‌مستر در یک پلتفرم</p>
+  <div class="stats-row">
+    <div class="stat">
+      <div class="stat-num" id="statTotal">—</div>
+      <div class="stat-label">رویداد</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num" id="statEvand">—</div>
+      <div class="stat-label">از ایوند</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num" id="statEseminar">—</div>
+      <div class="stat-label">از ایسمینار</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num" id="statFree">—</div>
+      <div class="stat-label">رویداد رایگان</div>
+    </div>
+  </div>
+</section>
 
-        header {
-          align-items: flex-start;
-          flex-direction: column;
-        }
+<!-- FILTERS -->
+<div class="filters-bar">
+  <span class="filter-label">نوع:</span>
+  <button class="filter-chip active" onclick="setFilter('type','all',this)">همه</button>
+  <button class="filter-chip" onclick="setFilter('type','online',this)">آنلاین</button>
+  <button class="filter-chip" onclick="setFilter('type','offline',this)">حضوری</button>
+  <div class="filter-sep"></div>
+  <span class="filter-label">قیمت:</span>
+  <button class="filter-chip active" onclick="setFilter('price','all',this)">همه</button>
+  <button class="filter-chip" onclick="setFilter('price','free',this)">رایگان</button>
+  <button class="filter-chip" onclick="setFilter('price','paid',this)">پولی</button>
+  <div class="filter-sep"></div>
+  <span class="filter-label">مرتب‌سازی:</span>
+  <button class="filter-chip active" onclick="setSort('date',this)">نزدیک‌ترین</button>
+  <button class="filter-chip" onclick="setSort('title',this)">نام</button>
+</div>
 
-        .copy,
-        .panel {
-          padding: 24px;
-        }
-      }
-    </style>
-  </head>
-  <body>
-    <main>
-      <header>
-        <div class="brand">رخداد</div>
-        <div class="badge">rokhdad.top</div>
-      </header>
-
-      <section class="hero">
-        <div class="copy">
-          <h1>پلتفرم رویدادهای ایران</h1>
-          <p>
-            رخداد برای کشف، تجمیع و ثبت‌نام رویدادها ساخته می‌شود. نسخه اولیه
-            سایت در حال راه‌اندازی است و به‌زودی فهرست رویدادها، ثبت‌نام و
-            ابزارهای برگزارکنندگان فعال می‌شود.
-          </p>
-          <div class="actions">
-            <a class="button primary" href="/api/health">بررسی وضعیت سرویس</a>
-            <a class="button secondary" href="mailto:admin@rokhdad.top">تماس</a>
+<!-- MAIN -->
+<div class="container">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-card">
+      <h3>منابع</h3>
+      <div style="display:flex;flex-direction:column;gap:4px;" id="sourceList">
+        <button class="source-item active" onclick="setSource('all',this)">
+          <div class="source-logo" style="background:linear-gradient(135deg,#6366f1,#8b5cf6)">ر</div>
+          <div>
+            <div class="source-name">همه منابع</div>
+            <div class="source-count" id="srcCountAll">در حال بارگذاری…</div>
           </div>
+          <span class="source-dot" style="background:var(--primary)"></span>
+        </button>
+        <button class="source-item" onclick="setSource('evand',this)">
+          <div class="source-logo" style="background:linear-gradient(135deg,#0ea5e9,#0284c7)">ا</div>
+          <div>
+            <div class="source-name">ایوند</div>
+            <div class="source-count" id="srcCountEvand">—</div>
+          </div>
+          <span class="source-dot" style="background:#0ea5e9"></span>
+        </button>
+        <button class="source-item" onclick="setSource('eseminar',this)">
+          <div class="source-logo" style="background:linear-gradient(135deg,#10b981,#059669)">ا</div>
+          <div>
+            <div class="source-name">ایسمینار</div>
+            <div class="source-count" id="srcCountEseminar">—</div>
+          </div>
+          <span class="source-dot" style="background:#10b981"></span>
+        </button>
+      </div>
+    </div>
+
+    <div class="sidebar-card">
+      <h3>وضعیت API</h3>
+      <div style="display:flex;flex-direction:column;gap:8px;" id="apiStatusList">
+        <div class="card-meta-row"><span class="source-dot" style="background:var(--muted);width:8px;height:8px" id="dotEvand"></span> <span style="font-size:13px">ایوند</span> <span id="statusEvand" style="font-size:12px;color:var(--muted);margin-right:auto">…</span></div>
+        <div class="card-meta-row"><span class="source-dot" style="background:var(--muted);width:8px;height:8px" id="dotEseminar"></span> <span style="font-size:13px">ایسمینار</span> <span id="statusEseminar" style="font-size:12px;color:var(--muted);margin-right:auto">…</span></div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- EVENTS -->
+  <section class="events-section">
+    <div class="section-header">
+      <div class="section-title" id="sectionTitle">رویدادهای اخیر</div>
+      <div class="section-meta" id="sectionMeta"></div>
+    </div>
+    <div class="events-grid" id="eventsGrid">
+      <!-- skeleton -->
+      ${Array.from({length:6}).map(()=>`
+      <div class="skeleton-card">
+        <div class="skeleton skeleton-img"></div>
+        <div class="skeleton-body">
+          <div class="skeleton skeleton-line w-3q"></div>
+          <div class="skeleton skeleton-line w-full"></div>
+          <div class="skeleton skeleton-line w-half"></div>
         </div>
+      </div>`).join('')}
+    </div>
+    <div class="load-more-wrap" id="loadMoreWrap" style="display:none">
+      <button class="load-more-btn" id="loadMoreBtn" onclick="showMore()">نمایش بیشتر</button>
+    </div>
+  </section>
+</div>
 
-        <aside class="panel">
-          <h2>نسخه اولیه شامل</h2>
-          <ul>
-            <li>تجمیع رویدادها از منابع معتبر فارسی</li>
-            <li>صفحات عمومی رویداد، برگزارکننده و سخنران</li>
-            <li>ثبت‌نام، بلیت و پرداخت برای رویدادهای داخلی</li>
-            <li>سئوی ساخت‌یافته برای دیده‌شدن رویدادها</li>
-          </ul>
-        </aside>
-      </section>
+<!-- MODAL -->
+<div class="modal-overlay" id="modal" onclick="closeModal(event)">
+  <div class="modal" id="modalBox">
+    <div class="modal-header">
+      <div>
+        <div id="modalBadge" style="margin-bottom:8px"></div>
+        <div class="modal-title" id="modalTitle"></div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <img class="modal-img" id="modalImg" src="" alt="" onerror="this.style.display='none'" />
+      <div id="modalDetails"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="modal-btn-primary" id="modalLink" onclick="openEventUrl()">مشاهده و ثبت‌نام</button>
+      <button class="modal-btn-secondary" onclick="closeModal()">بستن</button>
+    </div>
+  </div>
+</div>
 
-      <footer>Rokhdad bootstrap is ready. Full platform deployment follows.</footer>
-    </main>
-  </body>
+<!-- TOAST -->
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script>
+// ── STATE ──
+const state = {
+  all: [],           // all fetched events
+  filtered: [],      // after filters
+  displayed: [],     // currently shown
+  page: 0,
+  pageSize: 12,
+  tab: 'all',
+  source: 'all',
+  typeFilter: 'all',
+  priceFilter: 'all',
+  sort: 'date',
+  search: '',
+  loading: { evand: true, eseminar: true },
+  counts: { evand: 0, eseminar: 0 },
+  selectedEvent: null,
+};
+
+// ── SOURCES CONFIG ──
+const SOURCES = {
+  evand: { label: 'ایوند', color: '#0ea5e9', bg: 'rgba(14,165,233,0.12)', emoji: '🎫' },
+  eseminar: { label: 'ایسمینار', color: '#10b981', bg: 'rgba(16,185,129,0.12)', emoji: '🎓' },
+};
+
+// ── FETCH ──
+async function fetchEvand() {
+  try {
+    const CORS = 'https://corsproxy.io/?url=';
+    const url = `${CORS}https://api.evand.com/events?per_page=50&page=1`;
+    const r = await fetch(url);
+    const d = await r.json();
+    const events = (d.data || []).map(normalizeEvand);
+    state.counts.evand = d.meta?.pagination?.total || events.length;
+    markApiStatus('evand', true, events.length);
+    return events;
+  } catch(e) {
+    // fallback: try without proxy
+    try {
+      const r = await fetch('https://api.evand.com/events?per_page=50');
+      const d = await r.json();
+      const events = (d.data || []).map(normalizeEvand);
+      state.counts.evand = d.meta?.pagination?.total || events.length;
+      markApiStatus('evand', true, events.length);
+      return events;
+    } catch(e2) {
+      markApiStatus('evand', false);
+      return [];
+    }
+  }
+}
+
+async function fetchEseminar() {
+  const endpoints = ['/latest_webinars', '/webinars?per_page=50', '/special_webinars', '/free_webinars'];
+  const base = 'https://api.eseminar.tv/api/v1';
+  const CORS = 'https://corsproxy.io/?url=';
+  const seen = new Set();
+  const events = [];
+
+  for (const ep of endpoints) {
+    try {
+      const r = await fetch(`${CORS}${base}${ep}`);
+      const d = await r.json();
+      const items = Array.isArray(d.data) ? d.data : [];
+      for (const item of items) {
+        const id = String(item.id || item.webinar_id || '');
+        if (!id || seen.has(id)) continue;
+        seen.add(id);
+        events.push(normalizeEseminar(item));
+      }
+    } catch(_) {}
+  }
+
+  if (events.length > 0) {
+    state.counts.eseminar = events.length;
+    markApiStatus('eseminar', true, events.length);
+  } else {
+    markApiStatus('eseminar', false);
+  }
+  return events;
+}
+
+// ── NORMALIZE ──
+function normalizeEvand(e) {
+  return {
+    id: `evand-${e.id}`,
+    source: 'evand',
+    title: e.name || e.title || 'بدون عنوان',
+    image: e.cover?.url || e.image || null,
+    starts_at: e.start_date || e.starts_at || null,
+    ends_at: e.end_date || e.ends_at || null,
+    is_online: e.online === 'yes' || e.is_online === true,
+    city: e.city?.name || e.city || (e.online === 'yes' ? 'آنلاین' : null),
+    organizer: e.organization?.name || e.organizer?.name || null,
+    price: e.price ?? null,
+    is_free: e.price === 0 || e.is_free === true,
+    url: e.url || `https://evand.com/events/${e.slug || e.id}`,
+    category: e.category?.name || null,
+    raw: e,
+  };
+}
+
+function normalizeEseminar(e) {
+  const price = e.price ?? null;
+  return {
+    id: `eseminar-${e.id || e.webinar_id}`,
+    source: 'eseminar',
+    title: e.title || e.name || 'بدون عنوان',
+    image: e.cover || e.image || e.thumbnail || null,
+    starts_at: e.start_at || e.start_date || null,
+    ends_at: e.end_at || e.end_date || null,
+    is_online: true,
+    city: 'آنلاین',
+    organizer: e.speaker?.name || e.host?.name || e.teacher || null,
+    price: price,
+    is_free: price === 0 || price === null,
+    url: e.url || (e.slug ? `https://eseminar.tv/webinar/${e.slug}` : null),
+    category: e.subjects?.[0]?.name || null,
+    raw: e,
+  };
+}
+
+// ── FILTER & SORT ──
+function applyFilters() {
+  let list = [...state.all];
+
+  // source/tab
+  const src = state.tab !== 'all' ? state.tab : state.source !== 'all' ? state.source : null;
+  if (src) list = list.filter(e => e.source === src);
+
+  // type
+  if (state.typeFilter === 'online') list = list.filter(e => e.is_online);
+  else if (state.typeFilter === 'offline') list = list.filter(e => !e.is_online);
+
+  // price
+  if (state.priceFilter === 'free') list = list.filter(e => e.is_free);
+  else if (state.priceFilter === 'paid') list = list.filter(e => !e.is_free);
+
+  // search
+  if (state.search) {
+    const q = state.search.toLowerCase();
+    list = list.filter(e =>
+      e.title.toLowerCase().includes(q) ||
+      (e.organizer || '').toLowerCase().includes(q) ||
+      (e.city || '').toLowerCase().includes(q)
+    );
+  }
+
+  // sort
+  if (state.sort === 'date') {
+    list.sort((a,b) => {
+      if (!a.starts_at) return 1;
+      if (!b.starts_at) return -1;
+      return new Date(a.starts_at) - new Date(b.starts_at);
+    });
+  } else {
+    list.sort((a,b) => a.title.localeCompare(b.title, 'fa'));
+  }
+
+  state.filtered = list;
+  state.page = 0;
+  state.displayed = [];
+  renderNextPage();
+}
+
+function renderNextPage() {
+  const start = state.page * state.pageSize;
+  const slice = state.filtered.slice(start, start + state.pageSize);
+  state.displayed = [...state.displayed, ...slice];
+  state.page++;
+  renderGrid();
+}
+
+// ── RENDER ──
+function renderGrid() {
+  const grid = document.getElementById('eventsGrid');
+  const total = state.filtered.length;
+  const shown = state.displayed.length;
+
+  document.getElementById('sectionMeta').textContent = `${total} رویداد`;
+
+  if (total === 0) {
+    grid.innerHTML = `<div class="empty-state"><div class="icon">🔍</div><h3>رویدادی یافت نشد</h3><p>فیلترها را تغییر دهید</p></div>`;
+    document.getElementById('loadMoreWrap').style.display = 'none';
+    return;
+  }
+
+  grid.innerHTML = state.displayed.map(renderCard).join('');
+
+  const loadWrap = document.getElementById('loadMoreWrap');
+  const btn = document.getElementById('loadMoreBtn');
+  if (shown < total) {
+    loadWrap.style.display = 'block';
+    btn.textContent = `نمایش بیشتر (${total - shown} رویداد دیگر)`;
+    btn.disabled = false;
+  } else {
+    loadWrap.style.display = 'none';
+  }
+
+  updateStats();
+}
+
+function renderCard(event) {
+  const src = SOURCES[event.source];
+  const dateStr = formatDate(event.starts_at);
+  const priceStr = event.is_free ? 'رایگان' : event.price ? `${Number(event.price).toLocaleString('fa')} تومان` : 'نامشخص';
+  const priceClass = event.is_free ? 'free' : 'paid';
+
+  const imgHtml = event.image
+    ? `<img class="card-img" src="${escHtml(event.image)}" alt="" loading="lazy" onerror="this.parentNode.innerHTML='<div class=\\'card-img-placeholder\\'>${src.emoji}</div>'">`
+    : `<div class="card-img-placeholder">${src.emoji}</div>`;
+
+  return `
+  <div class="event-card" onclick="openModal('${escHtml(event.id)}')">
+    ${imgHtml}
+    <div class="card-body">
+      <span class="card-source-badge" style="background:${src.bg};color:${src.color}">${src.label}</span>
+      <div class="card-title">${escHtml(event.title)}</div>
+      <div class="card-meta">
+        ${dateStr ? `<div class="card-meta-row">${iconCalendar}${escHtml(dateStr)}</div>` : ''}
+        ${event.city ? `<div class="card-meta-row">${iconPin}${escHtml(event.city)}</div>` : ''}
+        ${event.organizer ? `<div class="card-meta-row">${iconUser}${escHtml(event.organizer)}</div>` : ''}
+      </div>
+    </div>
+    <div class="card-footer">
+      <span class="card-price ${priceClass}">${priceStr}</span>
+      <button class="card-btn" onclick="event.stopPropagation();goUrl('${escHtml(event.url || '')}')">جزئیات →</button>
+    </div>
+  </div>`;
+}
+
+// ── MODAL ──
+function openModal(id) {
+  const event = state.displayed.find(e => e.id === id) || state.all.find(e => e.id === id);
+  if (!event) return;
+  state.selectedEvent = event;
+  const src = SOURCES[event.source];
+
+  document.getElementById('modalBadge').innerHTML =
+    `<span class="card-source-badge" style="background:${src.bg};color:${src.color}">${src.label}</span>`;
+  document.getElementById('modalTitle').textContent = event.title;
+
+  const img = document.getElementById('modalImg');
+  if (event.image) { img.src = event.image; img.style.display = 'block'; }
+  else img.style.display = 'none';
+
+  const details = [
+    event.starts_at ? ['تاریخ', formatDate(event.starts_at)] : null,
+    event.ends_at ? ['پایان', formatDate(event.ends_at)] : null,
+    ['نوع', event.is_online ? 'آنلاین' : 'حضوری'],
+    event.city ? ['شهر', event.city] : null,
+    event.organizer ? ['برگزارکننده', event.organizer] : null,
+    event.category ? ['دسته‌بندی', event.category] : null,
+    ['قیمت', event.is_free ? 'رایگان ✅' : event.price ? `${Number(event.price).toLocaleString('fa')} تومان` : 'نامشخص'],
+  ].filter(Boolean);
+
+  document.getElementById('modalDetails').innerHTML = details.map(([k,v]) =>
+    `<div class="modal-detail-row"><span class="modal-detail-label">${k}:</span><span>${v}</span></div>`
+  ).join('');
+
+  document.getElementById('modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal(e) {
+  if (e && e.target !== document.getElementById('modal')) return;
+  document.getElementById('modal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function openEventUrl() {
+  const url = state.selectedEvent?.url;
+  if (url) window.open(url, '_blank', 'noopener');
+}
+
+function goUrl(url) {
+  if (url) window.open(url, '_blank', 'noopener');
+}
+
+// ── CONTROLS ──
+function setTab(tab, el) {
+  state.tab = tab;
+  document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  applyFilters();
+}
+
+function setSource(src, el) {
+  state.source = src;
+  document.querySelectorAll('.source-item').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  applyFilters();
+}
+
+function setFilter(type, val, el) {
+  if (type === 'type') {
+    state.typeFilter = val;
+    document.querySelectorAll('.filters-bar .filter-chip').slice(0,3).forEach(b => b.classList.remove('active'));
+  } else {
+    state.priceFilter = val;
+  }
+  // just remove active from siblings
+  const parent = el.parentNode;
+  [...parent.children].forEach(c => { if(c.classList.contains('filter-chip')) c.classList.remove('active'); });
+  el.classList.add('active');
+  applyFilters();
+}
+
+function setSort(sort, el) {
+  state.sort = sort;
+  document.querySelectorAll('.filters-bar .filter-chip').forEach(b => {
+    if(['نزدیک‌ترین','نام'].includes(b.textContent)) b.classList.remove('active');
+  });
+  el.classList.add('active');
+  applyFilters();
+}
+
+let searchTimer;
+function onSearch(val) {
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(() => { state.search = val.trim(); applyFilters(); }, 280);
+}
+
+function showMore() {
+  document.getElementById('loadMoreBtn').disabled = true;
+  renderNextPage();
+}
+
+// ── STATS ──
+function updateStats() {
+  const all = state.all;
+  document.getElementById('statTotal').textContent = all.length.toLocaleString('fa');
+  document.getElementById('statEvand').textContent = state.counts.evand.toLocaleString('fa');
+  document.getElementById('statEseminar').textContent = state.counts.eseminar.toLocaleString('fa');
+  document.getElementById('statFree').textContent = all.filter(e => e.is_free).length.toLocaleString('fa');
+
+  document.getElementById('srcCountAll').textContent = `${all.length} رویداد`;
+  document.getElementById('srcCountEvand').textContent = `${all.filter(e=>e.source==='evand').length} رویداد`;
+  document.getElementById('srcCountEseminar').textContent = `${all.filter(e=>e.source==='eseminar').length} رویداد`;
+}
+
+function markApiStatus(source, ok, count) {
+  const dot = document.getElementById(`dot${source.charAt(0).toUpperCase()+source.slice(1)}`);
+  const label = document.getElementById(`status${source.charAt(0).toUpperCase()+source.slice(1)}`);
+  if (dot) dot.style.background = ok ? 'var(--green)' : 'var(--red)';
+  if (label) label.textContent = ok ? `${count} رویداد` : 'خطا';
+}
+
+// ── HELPERS ──
+const PER_MONTHS = ['فروردین','اردیبهشت','خرداد','تیر','مرداد','شهریور','مهر','آبان','آذر','دی','بهمن','اسفند'];
+
+function formatDate(str) {
+  if (!str) return null;
+  try {
+    const d = new Date(str);
+    if (isNaN(d)) return str;
+    // try Intl Persian
+    const pDate = new Intl.DateTimeFormat('fa-IR-u-ca-persian', {
+      year: 'numeric', month: 'long', day: 'numeric',
+      hour: '2-digit', minute: '2-digit',
+    }).format(d);
+    return pDate;
+  } catch(_) { return str; }
+}
+
+function escHtml(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+const iconCalendar = `<svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="3" width="14" height="12" rx="2"/><path d="M1 7h14M5 1v4M11 1v4"/></svg>`;
+const iconPin = `<svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 2a4 4 0 0 1 4 4c0 3-4 8-4 8S4 9 4 6a4 4 0 0 1 4-4z"/><circle cx="8" cy="6" r="1.5"/></svg>`;
+const iconUser = `<svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="5" r="3"/><path d="M2 14c0-3 2.5-5 6-5s6 2 6 5"/></svg>`;
+
+function toast(msg) {
+  const el = document.createElement('div');
+  el.className = 'toast';
+  el.textContent = msg;
+  document.getElementById('toastWrap').appendChild(el);
+  setTimeout(() => el.remove(), 3200);
+}
+
+// ── INIT ──
+async function init() {
+  // Show skeletons are already in HTML
+  document.getElementById('eventsGrid').innerHTML = Array.from({length:6}).map(()=>`
+    <div class="skeleton-card">
+      <div class="skeleton skeleton-img"></div>
+      <div class="skeleton-body">
+        <div class="skeleton skeleton-line w-3q" style="height:10px;margin-bottom:6px"></div>
+        <div class="skeleton skeleton-line w-full" style="height:14px;margin-bottom:6px"></div>
+        <div class="skeleton skeleton-line w-full" style="height:14px;margin-bottom:6px"></div>
+        <div class="skeleton skeleton-line w-half" style="height:10px"></div>
+      </div>
+    </div>`).join('');
+
+  const [evandEvents, eseminarEvents] = await Promise.allSettled([fetchEvand(), fetchEseminar()]);
+
+  const evand = evandEvents.status === 'fulfilled' ? evandEvents.value : [];
+  const eseminar = eseminarEvents.status === 'fulfilled' ? eseminarEvents.value : [];
+
+  state.all = [...evand, ...eseminar];
+
+  if (state.all.length === 0) {
+    document.getElementById('eventsGrid').innerHTML = `
+      <div class="empty-state">
+        <div class="icon">⚠️</div>
+        <h3>اتصال به API برقرار نشد</h3>
+        <p>لطفاً از VPN یا اتصال مستقیم استفاده کنید</p>
+      </div>`;
+    return;
+  }
+
+  toast(`${state.all.length} رویداد از ${[evand.length?'ایوند':'',eseminar.length?'ایسمینار':''].filter(Boolean).join(' و ')} بارگذاری شد`);
+  applyFilters();
+}
+
+// keyboard close modal
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+init();
+</script>
+</body>
 </html>
-

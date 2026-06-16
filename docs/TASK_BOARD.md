@@ -145,18 +145,18 @@ The project is API-first, GitHub-first, and server-only at runtime. The local ma
 | P15-002 | 15 | Add Tailwind design foundation | DONE | P15-001 | Tailwind 4/Vite integration, RTL theme tokens, discovery shell, form controls, event cards, and responsive base layout | Local build/audit, browser desktop/mobile visual checks, and server Docker smoke test | S | MUST |
 | P15-003 | 15 | Add API client and error handling | DONE | P15-001, P14-001 | Frontend fetch client, public endpoint helpers, normalized API/network/validation errors, and mocked client tests | Node mock API tests, local build/audit, and server Docker smoke test | M | MUST |
 | P16-001 | 16 | Build homepage event discovery | DONE | P15-003, P14-001 | API-backed homepage discovery UI with loading, empty, error, retry states, event card mapping, and responsive RTL layout | Homepage mapper tests, local browser desktop/mobile smoke, and server Docker smoke test | M | MUST |
-| P16-002 | 16 | Build category and city pages | PENDING | P16-001, P14-003 | Listing pages | Browser tests | M | MUST |
-| P16-003 | 16 | Build external event source labels | PENDING | P16-001, P7-004 | Source badges and outbound links | Link tests | S | MUST |
-| P17-001 | 17 | Build event detail page | PENDING | P14-002, P15-003 | Event detail UI | Browser tests | M | MUST |
-| P17-002 | 17 | Build organizer public page | PENDING | P14-004, P15-003 | Organizer page | Browser tests | M | MUST |
-| P17-003 | 17 | Build speaker/teacher public page | PENDING | P14-004, P15-003 | Person page | Browser tests | M | MUST |
-| P18-001 | 18 | Add search API filters | PENDING | P14-001 | Search parameters | API tests | L | MUST |
-| P18-002 | 18 | Build advanced filter UI | PENDING | P18-001, P15-003 | Filter panel | Browser tests | M | MUST |
-| P18-003 | 18 | Add saved filter URL state | PENDING | P18-002 | Shareable URLs | Browser tests | S | SHOULD |
-| P19-001 | 19 | Add internal event creation model | PENDING | P7-003, P5-004 | Internal event schema | Feature tests | L | MUST |
-| P19-002 | 19 | Add registration flow | PENDING | P19-001, P5-002 | Registration APIs/UI | End-to-end test | L | MUST |
-| P19-003 | 19 | Add ticket model and QR code | PENDING | P19-002 | Ticket records and QR | QR validation test | L | MUST |
-| P20-001 | 20 | Add payment gateway abstraction | PENDING | P19-002 | Payment service contract | Unit tests | M | MUST |
+| P16-002 | 16 | Build category and city pages | DONE | P16-001, P14-003 | Listing pages | Browser tests | M | MUST |
+| P16-003 | 16 | Build external event source labels | DONE | P16-001, P7-004 | Source badges and outbound links | Link tests | S | MUST |
+| P17-001 | 17 | Build event detail page | DONE | P14-002, P15-003 | Event detail UI | Browser tests | M | MUST |
+| P17-002 | 17 | Build organizer public page | DONE | P14-004, P15-003 | Organizer page | Browser tests | M | MUST |
+| P17-003 | 17 | Build speaker/teacher public page | DONE | P14-004, P15-003 | Person page | Browser tests | M | MUST |
+| P18-001 | 18 | Add search API filters | DONE | P14-001 | Search parameters | API tests | L | MUST |
+| P18-002 | 18 | Build advanced filter UI | DONE | P18-001, P15-003 | Filter panel | Browser tests | M | MUST |
+| P18-003 | 18 | Add saved filter URL state | DONE | P18-002 | Shareable URLs | Browser tests | S | SHOULD |
+| P19-001 | 19 | Add internal event creation model | DONE | P7-003, P5-004 | Internal event schema | Feature tests | L | MUST |
+| P19-002 | 19 | Add registration flow | DONE | P19-001, P5-002 | Registration APIs/UI | End-to-end test | L | MUST |
+| P19-003 | 19 | Add ticket model and QR code | DONE | P19-002 | Ticket records and QR | QR validation test | L | MUST |
+| P20-001 | 20 | Add payment gateway abstraction | DONE | P19-002 | Payment service contract | Unit tests | M | MUST |
 | P20-002 | 20 | Implement ZarinPal gateway | PENDING | P20-001 | Gateway adapter | Sandbox test | L | MUST |
 | P20-003 | 20 | Implement Zibal gateway | PENDING | P20-001 | Gateway adapter | Sandbox test | L | SHOULD |
 | P20-004 | 20 | Add payment verification and webhooks | PENDING | P20-002 | Verify callbacks | Integration tests | L | MUST |
@@ -521,6 +521,18 @@ Completed:
 - P15-002
 - P15-003
 - P16-001
+- P16-002
+- P16-003
+- P17-001
+- P17-002
+- P17-003
+- P18-001
+- P18-002
+- P18-003
+- P19-001
+- P19-002
+- P19-003
+- P20-001
 
 In Progress:
 
@@ -535,8 +547,8 @@ Blocked:
 
 Next Recommended Task:
 
-- P16-002
+- P20-002
 
 ## 15. Next Recommended Step
 
-Next implementation can start with P16-002 to build category and city listing pages. P5-003, P6-003, and P8-003 remain blocked by their upstream dependencies.
+Next implementation can start with P20-002 to implement the ZarinPal gateway. P5-003, P6-003, and P8-003 remain blocked by their upstream dependencies.

@@ -12,9 +12,79 @@ class EventController extends Controller
     {
         $perPage = min(max((int) $request->integer('per_page', 15), 1), 50);
 
-        $events = Event::query()
-            ->with(['category', 'city', 'organizer'])
-            ->where('status', 'published')
+        $query = Event::query()
+            ->with(['category', 'city', 'organizer', 'sourceAttributions'])
+            ->where('status', 'published');
+
+        if ($request->has('q')) {
+            $keyword = trim($request->string('q'));
+            if ($keyword !== '') {
+                $query->where(function ($q) use ($keyword) {
+                    $q->where('title', 'like', "%{$keyword}%")
+                      ->orWhere('summary', 'like', "%{$keyword}%")
+                      ->orWhere('description', 'like', "%{$keyword}%");
+                });
+            }
+        } elseif ($request->has('keyword')) {
+            $keyword = trim($request->string('keyword'));
+            if ($keyword !== '') {
+                $query->where(function ($q) use ($keyword) {
+                    $q->where('title', 'like', "%{$keyword}%")
+                      ->orWhere('summary', 'like', "%{$keyword}%")
+                      ->orWhere('description', 'like', "%{$keyword}%");
+                });
+            }
+        }
+
+        if ($request->has('category')) {
+            $category = trim($request->string('category'));
+            if ($category !== '') {
+                $query->whereHas('category', function ($q) use ($category) {
+                    $q->where('slug', $category);
+                });
+            }
+        }
+
+        if ($request->has('city')) {
+            $city = trim($request->string('city'));
+            if ($city !== '') {
+                $query->whereHas('city', function ($q) use ($city) {
+                    $q->where('slug', $city);
+                });
+            }
+        }
+
+        if ($request->has('event_type')) {
+            $type = trim($request->string('event_type'));
+            if ($type !== '') {
+                $query->where('event_type', $type);
+            }
+        }
+
+        if ($request->has('source')) {
+            $source = trim($request->string('source'));
+            if ($source !== '') {
+                $query->whereHas('sourceAttributions', function ($q) use ($source) {
+                    $q->where('source_key', $source);
+                });
+            }
+        }
+
+        if ($request->has('start_date')) {
+            $startDate = trim($request->string('start_date'));
+            if ($startDate !== '') {
+                $query->where('starts_at', '>=', $startDate);
+            }
+        }
+
+        if ($request->has('end_date')) {
+            $endDate = trim($request->string('end_date'));
+            if ($endDate !== '') {
+                $query->where('starts_at', '<=', $endDate . ' 23:59:59');
+            }
+        }
+
+        $events = $query
             ->orderByRaw('starts_at IS NULL')
             ->orderBy('starts_at')
             ->orderBy('id')
@@ -80,6 +150,12 @@ class EventController extends Controller
                 'name' => $event->organizer->name,
                 'slug' => $event->organizer->slug,
             ] : null,
+            'source_attributions' => $event->sourceAttributions->map(fn ($source) => [
+                'source_key' => $source->source_key,
+                'external_id' => $source->external_id,
+                'external_url' => $source->external_url,
+                'sync_status' => $source->sync_status,
+            ])->values(),
         ];
 
         if (! $detailed) {
@@ -93,18 +169,19 @@ class EventController extends Controller
             'latitude' => $event->latitude,
             'longitude' => $event->longitude,
             'metadata' => $event->metadata,
+            'is_internal' => $event->is_internal,
+            'registration_open' => $event->registration_open,
+            'capacity' => $event->capacity,
+            'registration_starts_at' => $event->registration_starts_at?->toJSON(),
+            'registration_ends_at' => $event->registration_ends_at?->toJSON(),
+            'requires_approval' => $event->requires_approval,
+            'registration_instructions' => $event->registration_instructions,
             'people' => $event->people->map(fn ($person) => [
                 'id' => $person->id,
                 'full_name' => $person->full_name,
                 'slug' => $person->slug,
                 'role_title' => $person->pivot->role_title,
                 'sort_order' => $person->pivot->sort_order,
-            ])->values(),
-            'source_attributions' => $event->sourceAttributions->map(fn ($source) => [
-                'source_key' => $source->source_key,
-                'external_id' => $source->external_id,
-                'external_url' => $source->external_url,
-                'sync_status' => $source->sync_status,
             ])->values(),
         ];
     }

@@ -35,6 +35,13 @@ class Event extends Model
         'canonical_url',
         'metadata',
         'is_featured',
+        'is_internal',
+        'registration_open',
+        'capacity',
+        'registration_starts_at',
+        'registration_ends_at',
+        'requires_approval',
+        'registration_instructions',
     ];
 
     protected function casts(): array
@@ -46,6 +53,12 @@ class Event extends Model
             'longitude' => 'decimal:7',
             'metadata' => 'array',
             'is_featured' => 'boolean',
+            'is_internal' => 'boolean',
+            'registration_open' => 'boolean',
+            'capacity' => 'integer',
+            'registration_starts_at' => 'datetime',
+            'registration_ends_at' => 'datetime',
+            'requires_approval' => 'boolean',
         ];
     }
 
@@ -72,6 +85,21 @@ class Event extends Model
     public function sourceAttributions(): HasMany
     {
         return $this->hasMany(EventSourceAttribution::class);
+    }
+
+    public function ticketTypes(): HasMany
+    {
+        return $this->hasMany(EventTicketType::class);
+    }
+
+    public function registrations(): HasMany
+    {
+        return $this->hasMany(Registration::class);
+    }
+
+    public function tickets(): HasMany
+    {
+        return $this->hasMany(Ticket::class);
     }
 
     public function fieldOverrides(): HasMany

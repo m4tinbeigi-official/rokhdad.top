@@ -41,7 +41,7 @@ class OrganizerController extends Controller
                 'city',
                 'people' => fn ($query) => $query->where('people.is_active', true)->orderBy('full_name'),
                 'events' => fn ($query) => $query
-                    ->with(['category', 'city'])
+                    ->with(['category', 'city', 'sourceAttributions'])
                     ->where('status', 'published')
                     ->orderByRaw('starts_at IS NULL')
                     ->orderBy('starts_at')
@@ -101,6 +101,12 @@ class OrganizerController extends Controller
                 'event_type' => $event->event_type,
                 'venue_name' => $event->venue_name,
                 'canonical_url' => $event->canonical_url,
+                'source_attributions' => $event->sourceAttributions->map(fn ($source) => [
+                    'source_key' => $source->source_key,
+                    'external_id' => $source->external_id,
+                    'external_url' => $source->external_url,
+                    'sync_status' => $source->sync_status,
+                ])->values(),
                 'category' => $event->category ? [
                     'id' => $event->category->id,
                     'name' => $event->category->name,

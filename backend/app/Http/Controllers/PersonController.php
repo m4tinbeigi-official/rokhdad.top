@@ -39,7 +39,7 @@ class PersonController extends Controller
             ->with([
                 'organizers' => fn ($query) => $query->where('organizers.is_active', true)->orderBy('name'),
                 'events' => fn ($query) => $query
-                    ->with(['category', 'city', 'organizer'])
+                    ->with(['category', 'city', 'organizer', 'sourceAttributions'])
                     ->where('status', 'published')
                     ->orderBy('event_person.sort_order')
                     ->orderByRaw('starts_at IS NULL')
@@ -96,6 +96,12 @@ class PersonController extends Controller
                 'canonical_url' => $event->canonical_url,
                 'role_title' => $event->pivot->role_title,
                 'sort_order' => $event->pivot->sort_order,
+                'source_attributions' => $event->sourceAttributions->map(fn ($source) => [
+                    'source_key' => $source->source_key,
+                    'external_id' => $source->external_id,
+                    'external_url' => $source->external_url,
+                    'sync_status' => $source->sync_status,
+                ])->values(),
                 'category' => $event->category ? [
                     'id' => $event->category->id,
                     'name' => $event->category->name,

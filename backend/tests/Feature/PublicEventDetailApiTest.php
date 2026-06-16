@@ -20,6 +20,11 @@ class PublicEventDetailApiTest extends TestCase
             'status' => 'published',
             'description' => 'Long event detail',
             'metadata' => ['language' => 'fa'],
+            'is_internal' => true,
+            'registration_open' => true,
+            'capacity' => 50,
+            'requires_approval' => true,
+            'registration_instructions' => 'Bring ID.',
         ]);
         $person = Person::factory()->create(['full_name' => 'Detail Speaker']);
         $event->people()->attach($person, ['role_title' => 'Speaker', 'sort_order' => 1]);
@@ -39,6 +44,11 @@ class PublicEventDetailApiTest extends TestCase
             ->assertJsonPath('data.title', 'Published Detail Event')
             ->assertJsonPath('data.description', 'Long event detail')
             ->assertJsonPath('data.metadata.language', 'fa')
+            ->assertJsonPath('data.is_internal', true)
+            ->assertJsonPath('data.registration_open', true)
+            ->assertJsonPath('data.capacity', 50)
+            ->assertJsonPath('data.requires_approval', true)
+            ->assertJsonPath('data.registration_instructions', 'Bring ID.')
             ->assertJsonPath('data.people.0.full_name', 'Detail Speaker')
             ->assertJsonPath('data.people.0.role_title', 'Speaker')
             ->assertJsonPath('data.source_attributions.0.source_key', 'evand')
