@@ -29,6 +29,8 @@ const detailItem = ref(null)
 const registrationFeedback = ref(null)
 const isRegistering = ref(false)
 const registrationFormState = ref({})
+const registrationQuantity = ref(1)
+const registrationPromoCode = ref('')
 const filterOptions = ref({
   categories: [],
   cities: [],
@@ -229,6 +231,8 @@ async function fetchDetail() {
   detailItem.value = null
   registrationFeedback.value = null
   registrationFormState.value = {}
+  registrationQuantity.value = 1
+  registrationPromoCode.value = ''
   events.value = []
 
   try {
@@ -286,6 +290,7 @@ async function fetchDetail() {
         registration_open: rawEvent.registration_open,
         registration_instructions: rawEvent.registration_instructions,
         registration_form: rawEvent.registration_form,
+        registration_rules: rawEvent.registration_rules,
         category: rawEvent.category,
         city: rawEvent.city,
         organizer: rawEvent.organizer,
@@ -297,6 +302,8 @@ async function fetchDetail() {
         } : null,
       }
       registrationFormState.value = createRegistrationFormState(rawEvent.registration_form)
+      registrationQuantity.value = rawEvent.registration_rules?.min_quantity || 1
+      registrationPromoCode.value = ''
       applySeoMetadata(rawEvent.seo)
     } else if (pageKind.value === 'organizer-detail') {
       const orgPayload = await api.getOrganizer(slug)
@@ -360,7 +367,8 @@ async function submitEventRegistration() {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        quantity: 1,
+        quantity: Number(registrationQuantity.value || 1),
+        promo_code: registrationPromoCode.value.trim() || undefined,
         form_data: buildRegistrationFormPayload(detailItem.value?.registration_form, registrationFormState.value),
       }),
     })
@@ -1096,6 +1104,38 @@ function setJsonLd(payload) {
                   />
                 </label>
               </div>
+
+              <div v-if="detailItem.is_internal" class="grid gap-3 rounded-lg border border-line bg-canvas p-3 sm:grid-cols-2">
+                <label class="grid gap-1 text-sm font-bold text-ink">
+                  تعداد
+                  <input
+                    v-model.number="registrationQuantity"
+                    class="rounded-md border border-line bg-white px-3 py-2 text-base outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
+                    type="number"
+                    :min="detailItem.registration_rules?.min_quantity || 1"
+                    :max="detailItem.registration_rules?.max_quantity || 10"
+                  />
+                </label>
+
+                <label class="grid gap-1 text-sm font-bold text-ink">
+                  کد تخفیف
+                  <input
+                    v-model.trim="registrationPromoCode"
+                    class="rounded-md border border-line bg-white px-3 py-2 text-base uppercase outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
+                    type="text"
+                    placeholder="مثلاً SAVE25"
+                  />
+                </label>
+              </div>
+
+              <p
+                v-if="detailItem.registration_rules?.min_quantity || detailItem.registration_rules?.max_quantity"
+                class="text-xs leading-6 text-muted"
+              >
+                <span v-if="detailItem.registration_rules?.min_quantity">حداقل تعداد: {{ detailItem.registration_rules.min_quantity }}</span>
+                <span v-if="detailItem.registration_rules?.min_quantity && detailItem.registration_rules?.max_quantity"> / </span>
+                <span v-if="detailItem.registration_rules?.max_quantity">حداکثر تعداد: {{ detailItem.registration_rules.max_quantity }}</span>
+              </p>
 
               <a v-if="detailItem.source" :href="detailItem.source.url" target="_blank" rel="noopener noreferrer" class="rounded-md bg-brand-700 px-4 py-3 text-center text-sm font-bold text-white shadow-sm hover:bg-brand-800 transition">
                 ثبت‌نام در {{ detailItem.source.label }}

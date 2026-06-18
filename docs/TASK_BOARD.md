@@ -179,7 +179,7 @@ The project is API-first, GitHub-first, and server-only at runtime. The local ma
 | P26-002 | 26 | Add offline fallback page | DONE | P26-001 | Offline route | Browser offline test | S | COULD |
 | P27-001 | 27 | Add organizer dashboard foundation | DONE | P19-001, P5-004 | Organizer dashboard | Role tests | L | SHOULD |
 | P27-002 | 27 | Add custom registration forms | DONE | P27-001, P19-002 | Form builder | E2E tests | L | SHOULD |
-| P27-003 | 27 | Add promo codes and quantity rules | PENDING | P20-001, P27-001 | Ticket rules | Payment tests | L | SHOULD |
+| P27-003 | 27 | Add promo codes and quantity rules | DONE | P20-001, P27-001 | Ticket rules | Payment tests | L | SHOULD |
 | P27-004 | 27 | Add private and recurring events | PENDING | P27-001 | Visibility/series rules | API/UI tests | L | COULD |
 | P28-001 | 28 | Add embed registration widget | PENDING | P19-002 | Embeddable widget | External HTML test | L | COULD |
 | P28-002 | 28 | Add webhooks framework | PENDING | P19-002, P20-004 | Webhook subscriptions | Delivery tests | L | SHOULD |
@@ -556,6 +556,7 @@ Completed:
 - P26-002
 - P27-001
 - P27-002
+- P27-003
 
 In Progress:
 
@@ -569,8 +570,8 @@ Blocked:
 
 Next Recommended Task:
 
-- P27-003
+- P27-004
 
 ## 15. Next Recommended Step
 
-Next implementation can start with P27-003 to add promo codes and quantity rules. P6-003 and P8-003 remain blocked by their upstream dependencies.
+Next implementation can start with P27-004 to add private and recurring events. P6-003 and P8-003 remain blocked by their upstream dependencies.

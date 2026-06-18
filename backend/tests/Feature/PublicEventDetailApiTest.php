@@ -38,6 +38,10 @@ class PublicEventDetailApiTest extends TestCase
                         ],
                     ],
                 ],
+                'registration_rules' => [
+                    'min_quantity' => 2,
+                    'max_quantity' => 5,
+                ],
             ],
         ]);
         $person = Person::factory()->create(['full_name' => 'Detail Speaker']);
@@ -66,6 +70,8 @@ class PublicEventDetailApiTest extends TestCase
             ->assertJsonPath('data.registration_form.title', 'فرم تکمیلی')
             ->assertJsonPath('data.registration_form.fields.0.name', 'company')
             ->assertJsonPath('data.registration_form.fields.0.required', true)
+            ->assertJsonPath('data.registration_rules.min_quantity', 2)
+            ->assertJsonPath('data.registration_rules.max_quantity', 5)
             ->assertJsonPath('data.seo.title', 'Published Detail Event | رخداد')
             ->assertJsonPath('data.seo.canonical_url', config('app.url').'/events/published-detail-event')
             ->assertJsonPath('data.seo.open_graph.type', 'event')

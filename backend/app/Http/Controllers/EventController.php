@@ -181,6 +181,7 @@ class EventController extends Controller
             'requires_approval' => $event->requires_approval,
             'registration_instructions' => $event->registration_instructions,
             'registration_form' => $this->registrationFormPayload($event),
+            'registration_rules' => $this->registrationRulesPayload($event),
             'seo' => $this->seoPayload($event),
             'people' => $event->people->map(fn ($person) => [
                 'id' => $person->id,
@@ -238,6 +239,30 @@ class EventController extends Controller
             'title' => $event->metadata['registration_form']['title'] ?? 'فرم ثبت نام',
             'description' => $event->metadata['registration_form']['description'] ?? null,
             'fields' => $normalizedFields,
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>|null
+     */
+    private function registrationRulesPayload(Event $event): ?array
+    {
+        $rules = $event->metadata['registration_rules'] ?? null;
+
+        if (! is_array($rules)) {
+            return null;
+        }
+
+        $minQuantity = isset($rules['min_quantity']) ? (int) $rules['min_quantity'] : null;
+        $maxQuantity = isset($rules['max_quantity']) ? (int) $rules['max_quantity'] : null;
+
+        if ($minQuantity === null && $maxQuantity === null) {
+            return null;
+        }
+
+        return [
+            'min_quantity' => $minQuantity,
+            'max_quantity' => $maxQuantity,
         ];
     }
 

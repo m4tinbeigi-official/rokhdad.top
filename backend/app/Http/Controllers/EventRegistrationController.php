@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Event;
+use App\Models\EventPromoCode;
 use App\Models\EventTicketType;
 use App\Models\Registration;
 use App\Models\Ticket;
@@ -18,7 +19,7 @@ class EventRegistrationController extends Controller
     public function store(Request $request, string $slug): JsonResponse
     {
         $event = Event::query()
-            ->with('ticketTypes')
+            ->with(['ticketTypes', 'promoCodes'])
             ->where('slug', $slug)
             ->where('status', 'published')
             ->firstOrFail();
@@ -28,6 +29,7 @@ class EventRegistrationController extends Controller
         $data = $request->validate([
             'quantity' => ['nullable', 'integer', 'min:1', 'max:10'],
             'ticket_type_id' => ['nullable', 'integer'],
+            'promo_code' => ['nullable', 'string', 'max:64'],
             'form_data' => ['nullable', 'array'],
         ]);
 
@@ -39,10 +41,21 @@ class EventRegistrationController extends Controller
         }
 
         $ticketType = $this->resolveTicketType($event, $data['ticket_type_id'] ?? null, $quantity);
+        $this->ensureQuantityRules($event, $quantity);
         $this->ensureEventCapacity($event, $quantity);
         $validatedFormData = $this->validateRegistrationFormData($event, $data['form_data'] ?? null);
 
-        $totalAmount = ($ticketType?->price ?? 0) * $quantity;
+        $subtotalAmount = ($ticketType?->price ?? 0) * $quantity;
+        $promoCode = $this->resolvePromoCode($event, $data['promo_code'] ?? null, $quantity, $subtotalAmount);
+        $discountAmount = $promoCode?->discountAmount($subtotalAmount) ?? 0;
+        $totalAmount = max(0, $subtotalAmount - $discountAmount);
+        $storedFormData = $validatedFormData;
+
+        if ($promoCode || $discountAmount > 0) {
+            $storedFormData ??= [];
+            $storedFormData['promo_code'] = $promoCode?->code;
+            $storedFormData['discount_amount'] = $discountAmount;
+        }
 
         $registration = Registration::query()->create([
             'event_id' => $event->id,
@@ -52,12 +65,15 @@ class EventRegistrationController extends Controller
             'quantity' => $quantity,
             'total_amount' => $totalAmount,
             'currency' => $ticketType?->currency ?? 'IRR',
-            'form_data' => $validatedFormData,
+            'form_data' => $storedFormData,
             'confirmed_at' => $event->requires_approval ? null : now(),
         ]);
 
         if ($ticketType) {
             $ticketType->increment('sold_count', $quantity);
+        }
+        if ($promoCode) {
+            $promoCode->increment('used_count');
         }
 
         for ($index = 0; $index < $quantity; $index++) {
@@ -142,6 +158,45 @@ class EventRegistrationController extends Controller
                 'quantity' => ['Event capacity is full.'],
             ]);
         }
+    }
+
+    private function ensureQuantityRules(Event $event, int $quantity): void
+    {
+        $rules = Arr::get($event->metadata, 'registration_rules', []);
+        $minQuantity = isset($rules['min_quantity']) ? max(1, (int) $rules['min_quantity']) : null;
+        $maxQuantity = isset($rules['max_quantity']) ? max(1, (int) $rules['max_quantity']) : null;
+
+        if ($minQuantity !== null && $quantity < $minQuantity) {
+            throw ValidationException::withMessages([
+                'quantity' => ["حداقل تعداد مجاز برای این رویداد {$minQuantity} است."],
+            ]);
+        }
+
+        if ($maxQuantity !== null && $quantity > $maxQuantity) {
+            throw ValidationException::withMessages([
+                'quantity' => ["حداکثر تعداد مجاز برای این رویداد {$maxQuantity} است."],
+            ]);
+        }
+    }
+
+    private function resolvePromoCode(Event $event, ?string $promoCodeValue, int $quantity, int $subtotalAmount): ?EventPromoCode
+    {
+        $promoCodeValue = trim((string) $promoCodeValue);
+
+        if ($promoCodeValue === '') {
+            return null;
+        }
+
+        /** @var EventPromoCode|null $promoCode */
+        $promoCode = $event->promoCodes->first(fn (EventPromoCode $code) => strcasecmp($code->code, $promoCodeValue) === 0);
+
+        if (! $promoCode || ! $promoCode->isAvailableForQuantity($quantity) || $subtotalAmount <= 0) {
+            throw ValidationException::withMessages([
+                'promo_code' => ['کد تخفیف معتبر نیست یا برای این تعداد قابل استفاده نیست.'],
+            ]);
+        }
+
+        return $promoCode;
     }
 
     /**
@@ -238,6 +293,9 @@ class EventRegistrationController extends Controller
             'total_amount' => $registration->total_amount,
             'currency' => $registration->currency,
             'form_data' => $registration->form_data,
+            'subtotal_amount' => $registration->total_amount + ((int) ($registration->form_data['discount_amount'] ?? 0)),
+            'discount_amount' => (int) ($registration->form_data['discount_amount'] ?? 0),
+            'promo_code' => $registration->form_data['promo_code'] ?? null,
             'confirmed_at' => $registration->confirmed_at?->toJSON(),
             'tickets' => $registration->tickets->map(fn (Ticket $ticket) => [
                 'id' => $ticket->id,

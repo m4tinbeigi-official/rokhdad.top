@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Event;
+use App\Models\EventPromoCode;
 use App\Models\EventTicketType;
 use App\Models\Registration;
 use App\Models\User;
@@ -201,6 +202,82 @@ class EventRegistrationApiTest extends TestCase
             ->assertCreated()
             ->assertJsonPath('data.form_data.company', 'Rokhdad')
             ->assertJsonPath('data.form_data.newsletter', true);
+    }
+
+    public function test_registration_applies_valid_promo_code_discount(): void
+    {
+        $user = User::factory()->create();
+        $event = $this->internalEvent();
+        $ticketType = EventTicketType::factory()->create([
+            'event_id' => $event->id,
+            'price' => 200_000,
+            'max_per_user' => 5,
+        ]);
+        $promoCode = EventPromoCode::factory()->create([
+            'event_id' => $event->id,
+            'code' => 'SAVE25',
+            'discount_type' => 'percent',
+            'discount_value' => 25,
+        ]);
+
+        $this->actingAs($user, 'sanctum')
+            ->postJson("/api/v1/events/{$event->slug}/registrations", [
+                'quantity' => 2,
+                'ticket_type_id' => $ticketType->id,
+                'promo_code' => 'save25',
+            ])
+            ->assertCreated()
+            ->assertJsonPath('data.subtotal_amount', 400000)
+            ->assertJsonPath('data.discount_amount', 100000)
+            ->assertJsonPath('data.total_amount', 300000)
+            ->assertJsonPath('data.promo_code', 'SAVE25');
+
+        $this->assertSame(1, $promoCode->fresh()->used_count);
+    }
+
+    public function test_registration_rejects_invalid_promo_code_for_quantity(): void
+    {
+        $event = $this->internalEvent();
+        $ticketType = EventTicketType::factory()->create([
+            'event_id' => $event->id,
+            'price' => 100_000,
+            'max_per_user' => 5,
+        ]);
+        EventPromoCode::factory()->create([
+            'event_id' => $event->id,
+            'code' => 'PAIRONLY',
+            'discount_type' => 'fixed',
+            'discount_value' => 50_000,
+            'min_quantity' => 2,
+        ]);
+
+        $this->actingAs(User::factory()->create(), 'sanctum')
+            ->postJson("/api/v1/events/{$event->slug}/registrations", [
+                'quantity' => 1,
+                'ticket_type_id' => $ticketType->id,
+                'promo_code' => 'PAIRONLY',
+            ])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors('promo_code');
+    }
+
+    public function test_registration_validates_event_quantity_rules(): void
+    {
+        $event = $this->internalEvent([
+            'metadata' => [
+                'registration_rules' => [
+                    'min_quantity' => 2,
+                    'max_quantity' => 4,
+                ],
+            ],
+        ]);
+
+        $this->actingAs(User::factory()->create(), 'sanctum')
+            ->postJson("/api/v1/events/{$event->slug}/registrations", [
+                'quantity' => 1,
+            ])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors('quantity');
     }
 
     /**
