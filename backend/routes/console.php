@@ -88,8 +88,9 @@ if (! function_exists('fetchEvandOrganization')) {
     }
 }
 
-Artisan::command('evand:import {--pages=2} {--per-page=50}', function () {
-    $pages = max(1, (int) $this->option('pages'));
+Artisan::command('evand:import {--pages=} {--per-page=50}', function () {
+    $pagesOption = $this->option('pages');
+    $pages = $pagesOption !== null ? max(1, (int) $pagesOption) : null;
     $perPage = min(max(1, (int) $this->option('per-page')), 100);
     $imported = 0;
     $baseUrl = 'https://api.evand.com';
@@ -102,7 +103,10 @@ Artisan::command('evand:import {--pages=2} {--per-page=50}', function () {
         ->mapWithKeys(fn (array $city) => [(string) ($city['id'] ?? '') => $city])
         ->filter(fn ($city, string $id) => $id !== '');
 
-    for ($page = 1; $page <= $pages; $page++) {
+    $page = 1;
+    $totalPages = 1;
+
+    do {
         $response = Http::timeout(30)->retry(2, 500)->get("{$baseUrl}/events", [
             'page' => $page,
             'per_page' => $perPage,
@@ -110,10 +114,22 @@ Artisan::command('evand:import {--pages=2} {--per-page=50}', function () {
 
         if (! $response->successful()) {
             $this->error("Evand page {$page} failed with HTTP {$response->status()}.");
-            continue;
+            break;
         }
 
-        foreach ($response->json('data') ?? [] as $raw) {
+        $pagination = $response->json('meta.pagination') ?? [];
+        if ($pages === null) {
+            $totalPages = $pagination['total_pages'] ?? 1;
+        } else {
+            $totalPages = $pages;
+        }
+
+        $events = $response->json('data') ?? [];
+        if (empty($events)) {
+            break;
+        }
+
+        foreach ($events as $raw) {
             if (($raw['published'] ?? null) === 'no' || ($raw['cancelled'] ?? false) === true) {
                 continue;
             }
@@ -202,13 +218,16 @@ Artisan::command('evand:import {--pages=2} {--per-page=50}', function () {
 
             $imported++;
         }
-    }
+
+        $page++;
+    } while ($page <= $totalPages);
 
     $this->info("Imported {$imported} Evand events.");
 })->purpose('Import public Evand events into canonical Rokhdad event tables');
 
-Artisan::command('evand:import-organizers {--pages=5} {--per-page=50}', function () {
-    $pages = max(1, (int) $this->option('pages'));
+Artisan::command('evand:import-organizers {--pages=} {--per-page=50}', function () {
+    $pagesOption = $this->option('pages');
+    $pages = $pagesOption !== null ? max(1, (int) $pagesOption) : null;
     $perPage = min(max(1, (int) $this->option('per-page')), 100);
     $baseUrl = 'https://api.evand.com';
     $seen = collect();
@@ -219,7 +238,10 @@ Artisan::command('evand:import-organizers {--pages=5} {--per-page=50}', function
         ->mapWithKeys(fn (array $city) => [(string) ($city['id'] ?? '') => $city])
         ->filter(fn ($city, string $id) => $id !== '');
 
-    for ($page = 1; $page <= $pages; $page++) {
+    $page = 1;
+    $totalPages = 1;
+
+    do {
         $response = Http::timeout(30)->retry(2, 500)->get("{$baseUrl}/events", [
             'page' => $page,
             'per_page' => $perPage,
@@ -227,10 +249,22 @@ Artisan::command('evand:import-organizers {--pages=5} {--per-page=50}', function
 
         if (! $response->successful()) {
             $this->error("Evand page {$page} failed with HTTP {$response->status()}.");
-            continue;
+            break;
         }
 
-        foreach ($response->json('data') ?? [] as $raw) {
+        $pagination = $response->json('meta.pagination') ?? [];
+        if ($pages === null) {
+            $totalPages = $pagination['total_pages'] ?? 1;
+        } else {
+            $totalPages = $pages;
+        }
+
+        $events = $response->json('data') ?? [];
+        if (empty($events)) {
+            break;
+        }
+
+        foreach ($events as $raw) {
             $organization = $raw['organization'] ?? null;
             if (! is_array($organization)) {
                 $skipped++;
@@ -259,7 +293,10 @@ Artisan::command('evand:import-organizers {--pages=5} {--per-page=50}', function
             upsertEvandOrganizer($detailedOrganization ?: $organization, $city);
             $imported++;
         }
-    }
+
+        $page++;
+    } while ($page <= $totalPages);
 
     $this->info("Imported {$imported} Evand organizers. Skipped {$skipped} records without organization data.");
 })->purpose('Import and enrich Evand organizer profiles into Rokhdad organizers table');
+
