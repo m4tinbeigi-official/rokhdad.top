@@ -30,10 +30,14 @@ test('offline fallback page is available for service worker navigation fallback'
 test('Capacitor Android shell points at the Vite production build', async () => {
   const capacitorConfig = JSON.parse(await readFile(new URL('../capacitor.config.json', import.meta.url), 'utf8'))
   const androidManifest = await readFile(new URL('../android/app/src/main/AndroidManifest.xml', import.meta.url), 'utf8')
+  const androidStrings = await readFile(new URL('../android/app/src/main/res/values/strings.xml', import.meta.url), 'utf8')
+  const androidColors = await readFile(new URL('../android/app/src/main/res/values/colors.xml', import.meta.url), 'utf8')
 
   assert.equal(capacitorConfig.appId, 'top.rokhdad.app')
-  assert.equal(capacitorConfig.appName, 'Rokhdad')
+  assert.equal(capacitorConfig.appName, 'رخداد')
   assert.equal(capacitorConfig.webDir, 'dist')
   assert.match(androidManifest, /android:supportsRtl="true"/)
   assert.match(androidManifest, /android.permission.INTERNET/)
+  assert.match(androidStrings, /<string name="app_name">رخداد<\/string>/)
+  assert.match(androidColors, /<color name="colorPrimary">#0F766E<\/color>/)
 })
