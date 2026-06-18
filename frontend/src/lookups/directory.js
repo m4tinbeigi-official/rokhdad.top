@@ -33,3 +33,22 @@ export function normalizeCity(city) {
     meta: city.country_code || 'IR',
   }
 }
+
+export async function loadOrganizerDirectory(api) {
+  const payload = await api.listOrganizers({ per_page: 50 })
+  const organizers = Array.isArray(payload?.data) ? payload.data : []
+
+  return organizers.map(normalizeOrganizer)
+}
+
+export function normalizeOrganizer(organizer) {
+  return {
+    id: organizer.id,
+    title: organizer.name || 'برگزارکننده بدون نام',
+    slug: organizer.slug,
+    description: organizer.description || 'رویدادهای این برگزارکننده را در صفحه اختصاصی دنبال کنید.',
+    href: organizer.slug ? `/organizers/${organizer.slug}` : '#',
+    meta: organizer.events_count !== undefined ? `${organizer.events_count} رویداد` : 'برگزارکننده',
+  }
+}
+

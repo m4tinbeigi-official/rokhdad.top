@@ -10,7 +10,7 @@ import {
   normalizeHomepageEvent,
   readEventFiltersFromSearch,
 } from './events/homepage.js'
-import { loadCategoryDirectory, loadCityDirectory } from './lookups/directory.js'
+import { loadCategoryDirectory, loadCityDirectory, loadOrganizerDirectory } from './lookups/directory.js'
 import { loadOrganizerDashboard } from './organizer/dashboard.js'
 
 const apiBaseUrl = getApiBaseUrl()
@@ -45,6 +45,9 @@ const pageKind = computed(() => {
   }
   if (currentPath === '/cities') {
     return 'cities'
+  }
+  if (currentPath === '/organizers') {
+    return 'organizers'
   }
   if (currentPath === '/dashboard/organizer') {
     return 'organizer-dashboard'
@@ -86,18 +89,26 @@ const currentSlug = computed(() => {
   return null
 })
 
-const directoryTitle = computed(() => pageKind.value === 'cities' ? 'شهرها' : 'دسته بندی ها')
-const directoryDescription = computed(() => (
-  pageKind.value === 'cities'
-    ? 'شهرهای فعال برای مرور و فیلتر رویدادهای آینده.'
-    : 'دسته بندی های فعال برای کشف سریع تر رویدادها.'
-))
+const directoryTitle = computed(() => {
+  if (pageKind.value === 'cities') return 'شهرها'
+  if (pageKind.value === 'organizers') return 'برگزارکنندگان'
+  return 'دسته بندی ها'
+})
+const directoryDescription = computed(() => {
+  if (pageKind.value === 'cities') {
+    return 'شهرهای فعال برای مرور و فیلتر رویدادهای آینده.'
+  }
+  if (pageKind.value === 'organizers') {
+    return 'لیست برگزارکنندگان فعال رویدادها در کشور.'
+  }
+  return 'دسته بندی های فعال برای کشف سریع تر رویدادها.'
+})
 
 onMounted(() => {
   if (pageKind.value === 'home') {
     fetchEvents()
     fetchFilterOptions()
-  } else if (pageKind.value === 'categories' || pageKind.value === 'cities') {
+  } else if (pageKind.value === 'categories' || pageKind.value === 'cities' || pageKind.value === 'organizers') {
     fetchDirectory()
   } else if (pageKind.value === 'organizer-dashboard') {
     fetchOrganizerDashboard()
@@ -195,9 +206,13 @@ async function fetchDirectory() {
   directoryError.value = null
 
   try {
-    directoryItems.value = pageKind.value === 'cities'
-      ? await loadCityDirectory(api)
-      : await loadCategoryDirectory(api)
+    if (pageKind.value === 'cities') {
+      directoryItems.value = await loadCityDirectory(api)
+    } else if (pageKind.value === 'organizers') {
+      directoryItems.value = await loadOrganizerDirectory(api)
+    } else {
+      directoryItems.value = await loadCategoryDirectory(api)
+    }
   } catch (caught) {
     directoryError.value = getErrorMessage(caught)
     directoryItems.value = []
@@ -452,6 +467,9 @@ function setJsonLd(payload) {
           </a>
           <a class="rounded-md px-3 py-2 hover:bg-brand-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-500" href="/cities">
             شهرها
+          </a>
+          <a class="rounded-md px-3 py-2 hover:bg-brand-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-500" href="/organizers">
+            برگزارکنندگان
           </a>
           <a class="rounded-md px-3 py-2 hover:bg-brand-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-500" href="/dashboard/organizer">
             داشبورد برگزارکننده
@@ -766,7 +784,7 @@ function setJsonLd(payload) {
       </section>
     </main>
 
-    <main v-else-if="pageKind === 'categories' || pageKind === 'cities'" class="mx-auto grid max-w-7xl gap-6 px-4 py-6 sm:px-6 lg:px-8">
+    <main v-else-if="pageKind === 'categories' || pageKind === 'cities' || pageKind === 'organizers'" class="mx-auto grid max-w-7xl gap-6 px-4 py-6 sm:px-6 lg:px-8">
       <section class="rounded-lg border border-line bg-surface p-5 shadow-soft lg:p-7">
         <p class="mb-2 text-sm font-bold text-brand-700">مرور سریع</p>
         <h1 class="text-3xl font-black leading-tight text-ink sm:text-4xl">{{ directoryTitle }}</h1>
