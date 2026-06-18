@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Rokhdad">
+  <rect width="512" height="512" rx="96" fill="#0f766e"/>
+  <circle cx="256" cy="180" r="72" fill="#ffffff"/>
+  <path fill="#ffffff" d="M112 392c18-76 74-124 144-124s126 48 144 124H112z"/>
+  <path fill="#14b8a6" d="M204 176h104v28H204zm0 56h104v28H204z"/>
+</svg>
