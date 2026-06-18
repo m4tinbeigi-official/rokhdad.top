@@ -108,7 +108,7 @@ The project is API-first, GitHub-first, and server-only at runtime. The local ma
 | P4-004 | 4 | Define migration and seed policy | DONE | P4-001 | Migration/seed runbook and guarded Laravel DB script | Server status and rollback-plan checks | S | MUST |
 | P5-001 | 5 | Implement user identity model | DONE | P4-001 | User identity migration, model fields, factory, and API contract | Migration/model feature tests and server migration status | M | MUST |
 | P5-002 | 5 | Implement email/password auth | DONE | P5-001 | Sanctum token auth with register/login/me/logout APIs | Auth feature tests and server migration/test | M | MUST |
-| P5-003 | 5 | Implement phone OTP verification | PENDING | P5-001, P24-001 | OTP APIs | OTP happy/error tests | M | MUST |
+| P5-003 | 5 | Implement phone OTP verification | DONE | P5-001, P24-001 | OTP APIs | OTP happy/error tests | M | MUST |
 | P5-004 | 5 | Implement roles and permissions | DONE | P5-001 | RBAC tables, models, and user permission helpers | RBAC migration/model tests and server migration/test | M | MUST |
 | P6-001 | 6 | Install Filament admin foundation | DONE | P3-001, P5-004 | Filament admin panel, assets, provider, and admin-role access gate | Admin login/access feature tests and server smoke test | M | MUST |
 | P6-002 | 6 | Add admin user management | DONE | P6-001, P5-004 | Filament User resource with role assignment and guarded password edits | User resource route and CRUD feature tests | M | MUST |
@@ -487,6 +487,7 @@ Completed:
 - P4-004
 - P5-001
 - P5-002
+- P5-003
 - P5-004
 - P6-001
 - P6-002
