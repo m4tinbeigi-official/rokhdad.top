@@ -176,7 +176,7 @@ The project is API-first, GitHub-first, and server-only at runtime. The local ma
 | P25-001 | 25 | Add Capacitor Android shell | PENDING | P15-001, P26-001 | Android project shell | Build on server/CI | L | LATER |
 | P25-002 | 25 | Add Android app config and icons | PENDING | P25-001 | App metadata | Install smoke test | M | LATER |
 | P26-001 | 26 | Add PWA manifest and service worker plan | DONE | P15-001 | PWA install support | Lighthouse PWA check | M | SHOULD |
-| P26-002 | 26 | Add offline fallback page | PENDING | P26-001 | Offline route | Browser offline test | S | COULD |
+| P26-002 | 26 | Add offline fallback page | DONE | P26-001 | Offline route | Browser offline test | S | COULD |
 | P27-001 | 27 | Add organizer dashboard foundation | PENDING | P19-001, P5-004 | Organizer dashboard | Role tests | L | SHOULD |
 | P27-002 | 27 | Add custom registration forms | PENDING | P27-001, P19-002 | Form builder | E2E tests | L | SHOULD |
 | P27-003 | 27 | Add promo codes and quantity rules | PENDING | P20-001, P27-001 | Ticket rules | Payment tests | L | SHOULD |
@@ -551,6 +551,7 @@ Completed:
 - P24-002
 - P24-003
 - P26-001
+- P26-002
 
 In Progress:
 
@@ -564,8 +565,8 @@ Blocked:
 
 Next Recommended Task:
 
-- P26-002
+- P25-001
 
 ## 15. Next Recommended Step
 
-Next implementation can start with P26-002 to add the offline fallback page. P6-003 and P8-003 remain blocked by their upstream dependencies.
+Next implementation can start with P25-001 to add the Capacitor Android shell. P6-003 and P8-003 remain blocked by their upstream dependencies.

@@ -16,4 +16,13 @@ test('service worker caches shell without intercepting API requests', async () =
 
   assert.match(serviceWorker, /CACHE_NAME/)
   assert.equal(serviceWorker.includes("url.pathname.startsWith('/api/')"), true)
+  assert.equal(serviceWorker.includes('/offline.html'), true)
+  assert.equal(serviceWorker.includes("request.mode === 'navigate'"), true)
+})
+
+test('offline fallback page is available for service worker navigation fallback', async () => {
+  const offlinePage = await readFile(new URL('../public/offline.html', import.meta.url), 'utf8')
+
+  assert.match(offlinePage, /رخداد/)
+  assert.match(offlinePage, /اتصال اینترنت برقرار نیست/)
 })
