@@ -15,6 +15,8 @@ class Organizer extends Model
     use HasFactory;
 
     protected $fillable = [
+        'source_key',
+        'external_id',
         'city_id',
         'name',
         'slug',
@@ -22,7 +24,10 @@ class Organizer extends Model
         'website_url',
         'email',
         'phone_e164',
+        'logo_url',
+        'cover_url',
         'social_links',
+        'metadata',
         'is_active',
     ];
 
@@ -30,6 +35,7 @@ class Organizer extends Model
     {
         return [
             'social_links' => 'array',
+            'metadata' => 'array',
             'is_active' => 'boolean',
         ];
     }

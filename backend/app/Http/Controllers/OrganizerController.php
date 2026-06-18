@@ -70,7 +70,10 @@ class OrganizerController extends Controller
             'slug' => $organizer->slug,
             'description' => $organizer->description,
             'website_url' => $organizer->website_url,
+            'logo_url' => $organizer->logo_url,
+            'cover_url' => $organizer->cover_url,
             'social_links' => $organizer->social_links,
+            'metadata' => $organizer->metadata,
             'events_count' => $organizer->events_count,
             'city' => $organizer->city ? [
                 'id' => $organizer->city->id,
