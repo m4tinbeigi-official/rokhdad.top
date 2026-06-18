@@ -205,6 +205,54 @@ class EventController extends Controller
         $title = "{$event->title} | رخداد";
         $externalImage = $event->metadata['evand']['cover'] ?? null;
 
+        $jsonLd = [
+            [
+                '@context' => 'https://schema.org',
+                '@type' => 'Event',
+                'name' => $event->title,
+                'description' => $description,
+                'url' => $canonicalUrl,
+                'startDate' => $event->starts_at?->toAtomString(),
+                'endDate' => $event->ends_at?->toAtomString(),
+                'eventStatus' => 'https://schema.org/EventScheduled',
+                'eventAttendanceMode' => match ($event->event_type) {
+                    'online' => 'https://schema.org/OnlineEventAttendanceMode',
+                    'hybrid' => 'https://schema.org/MixedEventAttendanceMode',
+                    default => 'https://schema.org/OfflineEventAttendanceMode',
+                },
+                'image' => $externalImage ? [$externalImage] : [],
+                'organizer' => $event->organizer ? [
+                    '@type' => 'Organization',
+                    'name' => $event->organizer->name,
+                    'url' => "{$siteUrl}/organizers/{$event->organizer->slug}",
+                ] : null,
+                'location' => $event->event_type === 'online'
+                    ? [
+                        '@type' => 'VirtualLocation',
+                        'url' => $event->online_url ?: $event->canonical_url ?: $canonicalUrl,
+                    ]
+                    : [
+                        '@type' => 'Place',
+                        'name' => $event->venue_name ?: $event->city?->name,
+                        'address' => $event->venue_address,
+                    ],
+            ],
+            [
+                '@context' => 'https://schema.org',
+                '@type' => 'BreadcrumbList',
+                'itemListElement' => collect(array_values(array_filter([
+                    ['name' => 'رخداد', 'url' => $siteUrl.'/'],
+                    $event->category ? ['name' => $event->category->name, 'url' => "{$siteUrl}/categories/{$event->category->slug}"] : null,
+                    ['name' => $event->title, 'url' => $canonicalUrl],
+                ])))->map(fn ($item, int $index) => [
+                    '@type' => 'ListItem',
+                    'position' => $index + 1,
+                    'name' => $item['name'],
+                    'item' => $item['url'],
+                ])->values()->all(),
+            ],
+        ];
+
         return [
             'title' => $title,
             'description' => $description,
@@ -230,6 +278,7 @@ class EventController extends Controller
                 $event->category ? ['name' => $event->category->name, 'url' => "{$siteUrl}/categories/{$event->category->slug}"] : null,
                 ['name' => $event->title, 'url' => $canonicalUrl],
             ])),
+            'json_ld' => $jsonLd,
         ];
     }
 }

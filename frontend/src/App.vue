@@ -349,6 +349,7 @@ function applySeoMetadata(seo) {
   setMeta('twitter:description', seo.twitter?.description)
   setMeta('twitter:image', seo.twitter?.image)
   setCanonical(seo.canonical_url)
+  setJsonLd(seo.json_ld)
 }
 
 function setMeta(name, content, attribute = 'name') {
@@ -377,6 +378,21 @@ function setCanonical(url) {
     document.head.appendChild(element)
   }
   element.setAttribute('href', url)
+}
+
+function setJsonLd(payload) {
+  if (!payload) {
+    return
+  }
+
+  let element = document.head.querySelector('script[data-rokhdad-jsonld="event"]')
+  if (!element) {
+    element = document.createElement('script')
+    element.setAttribute('type', 'application/ld+json')
+    element.setAttribute('data-rokhdad-jsonld', 'event')
+    document.head.appendChild(element)
+  }
+  element.textContent = JSON.stringify(payload)
 }
 </script>
 
