@@ -8,6 +8,7 @@ use App\Models\Registration;
 use App\Models\Ticket;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -39,6 +40,7 @@ class EventRegistrationController extends Controller
 
         $ticketType = $this->resolveTicketType($event, $data['ticket_type_id'] ?? null, $quantity);
         $this->ensureEventCapacity($event, $quantity);
+        $validatedFormData = $this->validateRegistrationFormData($event, $data['form_data'] ?? null);
 
         $totalAmount = ($ticketType?->price ?? 0) * $quantity;
 
@@ -50,7 +52,7 @@ class EventRegistrationController extends Controller
             'quantity' => $quantity,
             'total_amount' => $totalAmount,
             'currency' => $ticketType?->currency ?? 'IRR',
-            'form_data' => $data['form_data'] ?? null,
+            'form_data' => $validatedFormData,
             'confirmed_at' => $event->requires_approval ? null : now(),
         ]);
 
@@ -140,6 +142,85 @@ class EventRegistrationController extends Controller
                 'quantity' => ['Event capacity is full.'],
             ]);
         }
+    }
+
+    /**
+     * @param array<string, mixed>|null $submittedData
+     * @return array<string, mixed>|null
+     */
+    private function validateRegistrationFormData(Event $event, ?array $submittedData): ?array
+    {
+        $schema = Arr::get($event->metadata, 'registration_form.fields', []);
+
+        if (! is_array($schema) || $schema === []) {
+            return $submittedData;
+        }
+
+        $submittedData ??= [];
+        $errors = [];
+        $validated = [];
+
+        foreach ($schema as $field) {
+            if (! is_array($field)) {
+                continue;
+            }
+
+            $name = trim((string) ($field['name'] ?? ''));
+            $label = trim((string) ($field['label'] ?? $name));
+            $type = trim((string) ($field['type'] ?? 'text'));
+            $required = (bool) ($field['required'] ?? false);
+
+            if ($name === '') {
+                continue;
+            }
+
+            $value = $submittedData[$name] ?? null;
+
+            if ($required && ($value === null || $value === '')) {
+                $errors["form_data.$name"] = ["{$label} الزامی است."];
+                continue;
+            }
+
+            if ($value === null || $value === '') {
+                continue;
+            }
+
+            if ($type === 'select') {
+                $options = collect($field['options'] ?? [])
+                    ->filter(fn ($option) => is_array($option) && isset($option['value']))
+                    ->pluck('value')
+                    ->map(fn ($option) => (string) $option)
+                    ->all();
+
+                if (! in_array((string) $value, $options, true)) {
+                    $errors["form_data.$name"] = ["{$label} نامعتبر است."];
+                    continue;
+                }
+            }
+
+            if ($type === 'checkbox') {
+                $validated[$name] = filter_var($value, FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE) ?? false;
+                continue;
+            }
+
+            $stringValue = trim((string) $value);
+
+            if (($field['max_length'] ?? null) !== null) {
+                $maxLength = max(1, (int) $field['max_length']);
+                if (mb_strlen($stringValue) > $maxLength) {
+                    $errors["form_data.$name"] = ["{$label} نباید بیشتر از {$maxLength} کاراکتر باشد."];
+                    continue;
+                }
+            }
+
+            $validated[$name] = $stringValue;
+        }
+
+        if ($errors !== []) {
+            throw ValidationException::withMessages($errors);
+        }
+
+        return $validated === [] ? null : $validated;
     }
 
     /**

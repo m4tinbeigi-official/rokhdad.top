@@ -180,6 +180,7 @@ class EventController extends Controller
             'registration_ends_at' => $event->registration_ends_at?->toJSON(),
             'requires_approval' => $event->requires_approval,
             'registration_instructions' => $event->registration_instructions,
+            'registration_form' => $this->registrationFormPayload($event),
             'seo' => $this->seoPayload($event),
             'people' => $event->people->map(fn ($person) => [
                 'id' => $person->id,
@@ -188,6 +189,55 @@ class EventController extends Controller
                 'role_title' => $person->pivot->role_title,
                 'sort_order' => $person->pivot->sort_order,
             ])->values(),
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>|null
+     */
+    private function registrationFormPayload(Event $event): ?array
+    {
+        $fields = $event->metadata['registration_form']['fields'] ?? null;
+
+        if (! is_array($fields) || $fields === []) {
+            return null;
+        }
+
+        $normalizedFields = collect($fields)
+            ->filter(fn ($field) => is_array($field) && ! empty($field['name']))
+            ->map(function (array $field) {
+                $type = in_array(($field['type'] ?? 'text'), ['text', 'textarea', 'select', 'checkbox'], true)
+                    ? $field['type']
+                    : 'text';
+
+                return [
+                    'name' => (string) $field['name'],
+                    'label' => (string) ($field['label'] ?? $field['name']),
+                    'type' => $type,
+                    'placeholder' => $field['placeholder'] ?? null,
+                    'required' => (bool) ($field['required'] ?? false),
+                    'max_length' => isset($field['max_length']) ? (int) $field['max_length'] : null,
+                    'options' => $type === 'select'
+                        ? collect($field['options'] ?? [])
+                            ->filter(fn ($option) => is_array($option) && isset($option['value']))
+                            ->map(fn (array $option) => [
+                                'label' => (string) ($option['label'] ?? $option['value']),
+                                'value' => (string) $option['value'],
+                            ])->values()->all()
+                        : [],
+                ];
+            })
+            ->values()
+            ->all();
+
+        if ($normalizedFields === []) {
+            return null;
+        }
+
+        return [
+            'title' => $event->metadata['registration_form']['title'] ?? 'فرم ثبت نام',
+            'description' => $event->metadata['registration_form']['description'] ?? null,
+            'fields' => $normalizedFields,
         ];
     }
 

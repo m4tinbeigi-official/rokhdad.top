@@ -10,6 +10,7 @@ import {
   normalizeHomepageEvent,
   readEventFiltersFromSearch,
 } from './events/homepage.js'
+import { buildRegistrationFormPayload, createRegistrationFormState } from './events/registration-form.js'
 import { loadCategoryDirectory, loadCityDirectory, loadOrganizerDirectory } from './lookups/directory.js'
 import { loadOrganizerDashboard } from './organizer/dashboard.js'
 
@@ -27,6 +28,7 @@ const directoryError = ref(null)
 const detailItem = ref(null)
 const registrationFeedback = ref(null)
 const isRegistering = ref(false)
+const registrationFormState = ref({})
 const filterOptions = ref({
   categories: [],
   cities: [],
@@ -226,6 +228,7 @@ async function fetchDetail() {
   error.value = null
   detailItem.value = null
   registrationFeedback.value = null
+  registrationFormState.value = {}
   events.value = []
 
   try {
@@ -282,6 +285,7 @@ async function fetchDetail() {
         is_internal: rawEvent.is_internal,
         registration_open: rawEvent.registration_open,
         registration_instructions: rawEvent.registration_instructions,
+        registration_form: rawEvent.registration_form,
         category: rawEvent.category,
         city: rawEvent.city,
         organizer: rawEvent.organizer,
@@ -292,6 +296,7 @@ async function fetchDetail() {
           url: rawEvent.source_attributions[0].external_url || '#',
         } : null,
       }
+      registrationFormState.value = createRegistrationFormState(rawEvent.registration_form)
       applySeoMetadata(rawEvent.seo)
     } else if (pageKind.value === 'organizer-detail') {
       const orgPayload = await api.getOrganizer(slug)
@@ -354,7 +359,10 @@ async function submitEventRegistration() {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ quantity: 1 }),
+      body: JSON.stringify({
+        quantity: 1,
+        form_data: buildRegistrationFormPayload(detailItem.value?.registration_form, registrationFormState.value),
+      }),
     })
     registrationFeedback.value = payload?.data?.status === 'confirmed'
       ? 'ثبت نام شما با موفقیت تایید شد.'
@@ -1027,6 +1035,68 @@ function setJsonLd(payload) {
 
             <!-- Call To Action -->
             <div class="mt-6 border-t border-line pt-4 grid gap-3">
+              <div
+                v-if="detailItem.registration_form?.fields?.length"
+                class="grid gap-3 rounded-lg border border-line bg-canvas p-3"
+              >
+                <div>
+                  <h3 class="text-sm font-black text-ink">{{ detailItem.registration_form.title || 'فرم ثبت نام' }}</h3>
+                  <p v-if="detailItem.registration_form.description" class="mt-1 text-xs leading-6 text-muted">
+                    {{ detailItem.registration_form.description }}
+                  </p>
+                </div>
+
+                <label
+                  v-for="field in detailItem.registration_form.fields"
+                  :key="field.name"
+                  class="grid gap-1 text-sm font-bold text-ink"
+                >
+                  <span>
+                    {{ field.label }}
+                    <span v-if="field.required" class="text-brand-700">*</span>
+                  </span>
+
+                  <textarea
+                    v-if="field.type === 'textarea'"
+                    v-model="registrationFormState[field.name]"
+                    class="min-h-24 rounded-md border border-line bg-white px-3 py-2 text-base outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
+                    :placeholder="field.placeholder || ''"
+                  />
+
+                  <select
+                    v-else-if="field.type === 'select'"
+                    v-model="registrationFormState[field.name]"
+                    class="rounded-md border border-line bg-white px-3 py-2 text-base outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
+                  >
+                    <option value="">انتخاب کنید</option>
+                    <option v-for="option in field.options" :key="option.value" :value="option.value">
+                      {{ option.label }}
+                    </option>
+                  </select>
+
+                  <span
+                    v-else-if="field.type === 'checkbox'"
+                    class="flex items-center gap-2 rounded-md border border-line bg-white px-3 py-2 text-sm font-medium text-ink"
+                  >
+                    <input
+                      v-model="registrationFormState[field.name]"
+                      class="h-4 w-4 accent-brand-700"
+                      type="checkbox"
+                    />
+                    {{ field.placeholder || 'تایید می کنم' }}
+                  </span>
+
+                  <input
+                    v-else
+                    v-model.trim="registrationFormState[field.name]"
+                    class="rounded-md border border-line bg-white px-3 py-2 text-base outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
+                    type="text"
+                    :maxlength="field.max_length || null"
+                    :placeholder="field.placeholder || ''"
+                  />
+                </label>
+              </div>
+
               <a v-if="detailItem.source" :href="detailItem.source.url" target="_blank" rel="noopener noreferrer" class="rounded-md bg-brand-700 px-4 py-3 text-center text-sm font-bold text-white shadow-sm hover:bg-brand-800 transition">
                 ثبت‌نام در {{ detailItem.source.label }}
               </a>

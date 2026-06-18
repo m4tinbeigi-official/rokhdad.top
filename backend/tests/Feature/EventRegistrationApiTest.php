@@ -129,6 +129,80 @@ class EventRegistrationApiTest extends TestCase
             ->assertJsonValidationErrors('ticket_type_id');
     }
 
+    public function test_registration_validates_custom_registration_form_fields(): void
+    {
+        $event = $this->internalEvent([
+            'metadata' => [
+                'registration_form' => [
+                    'fields' => [
+                        [
+                            'name' => 'company',
+                            'label' => 'نام شرکت',
+                            'type' => 'text',
+                            'required' => true,
+                            'max_length' => 10,
+                        ],
+                        [
+                            'name' => 'role',
+                            'label' => 'نقش شغلی',
+                            'type' => 'select',
+                            'required' => true,
+                            'options' => [
+                                ['label' => 'مدیر', 'value' => 'manager'],
+                                ['label' => 'کارشناس', 'value' => 'specialist'],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->actingAs(User::factory()->create(), 'sanctum')
+            ->postJson("/api/v1/events/{$event->slug}/registrations", [
+                'form_data' => [
+                    'company' => 'A very long company name',
+                    'role' => 'invalid',
+                ],
+            ])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['form_data.company', 'form_data.role']);
+    }
+
+    public function test_registration_stores_custom_registration_form_answers(): void
+    {
+        $user = User::factory()->create();
+        $event = $this->internalEvent([
+            'metadata' => [
+                'registration_form' => [
+                    'fields' => [
+                        [
+                            'name' => 'company',
+                            'label' => 'نام شرکت',
+                            'type' => 'text',
+                            'required' => true,
+                        ],
+                        [
+                            'name' => 'newsletter',
+                            'label' => 'دریافت خبرنامه',
+                            'type' => 'checkbox',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->actingAs($user, 'sanctum')
+            ->postJson("/api/v1/events/{$event->slug}/registrations", [
+                'form_data' => [
+                    'company' => 'Rokhdad',
+                    'newsletter' => true,
+                ],
+            ])
+            ->assertCreated()
+            ->assertJsonPath('data.form_data.company', 'Rokhdad')
+            ->assertJsonPath('data.form_data.newsletter', true);
+    }
+
     /**
      * @param array<string, mixed> $overrides
      */

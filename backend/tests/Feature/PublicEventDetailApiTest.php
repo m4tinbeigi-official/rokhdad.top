@@ -19,12 +19,26 @@ class PublicEventDetailApiTest extends TestCase
             'slug' => 'published-detail-event',
             'status' => 'published',
             'description' => 'Long event detail',
-            'metadata' => ['language' => 'fa'],
             'is_internal' => true,
             'registration_open' => true,
             'capacity' => 50,
             'requires_approval' => true,
             'registration_instructions' => 'Bring ID.',
+            'metadata' => [
+                'language' => 'fa',
+                'registration_form' => [
+                    'title' => 'فرم تکمیلی',
+                    'description' => 'اطلاعات شغلی خود را تکمیل کنید.',
+                    'fields' => [
+                        [
+                            'name' => 'company',
+                            'label' => 'نام شرکت',
+                            'type' => 'text',
+                            'required' => true,
+                        ],
+                    ],
+                ],
+            ],
         ]);
         $person = Person::factory()->create(['full_name' => 'Detail Speaker']);
         $event->people()->attach($person, ['role_title' => 'Speaker', 'sort_order' => 1]);
@@ -49,6 +63,9 @@ class PublicEventDetailApiTest extends TestCase
             ->assertJsonPath('data.capacity', 50)
             ->assertJsonPath('data.requires_approval', true)
             ->assertJsonPath('data.registration_instructions', 'Bring ID.')
+            ->assertJsonPath('data.registration_form.title', 'فرم تکمیلی')
+            ->assertJsonPath('data.registration_form.fields.0.name', 'company')
+            ->assertJsonPath('data.registration_form.fields.0.required', true)
             ->assertJsonPath('data.seo.title', 'Published Detail Event | رخداد')
             ->assertJsonPath('data.seo.canonical_url', config('app.url').'/events/published-detail-event')
             ->assertJsonPath('data.seo.open_graph.type', 'event')

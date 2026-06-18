@@ -82,6 +82,12 @@ This serves the static landing page from `public/landing` on port `80` and retur
 
 ## Update Workflow
 
+Mandatory operator rule for every task:
+
+- Before starting any new task, run `git pull --ff-only origin main`.
+- After finishing that task, commit and push the exact change to GitHub.
+- After the push succeeds, deploy that exact change to the server and run the relevant smoke checks.
+
 ```bash
 cd /opt/rokhdad
 git fetch origin
