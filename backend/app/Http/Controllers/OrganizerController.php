@@ -21,8 +21,10 @@ class OrganizerController extends Controller
             ->orderBy('id')
             ->paginate($perPage);
 
+        $items = $organizers->through(fn (Organizer $organizer) => $this->serializeOrganizer($organizer))->items();
+
         return response()->json([
-            'data' => $organizers->through(fn (Organizer $organizer) => $this->serializeOrganizer($organizer))->items(),
+            'data' => $items,
             'meta' => [
                 'current_page' => $organizers->currentPage(),
                 'from' => $organizers->firstItem(),
@@ -30,6 +32,7 @@ class OrganizerController extends Controller
                 'per_page' => $organizers->perPage(),
                 'to' => $organizers->lastItem(),
                 'total' => $organizers->total(),
+                'seo' => $this->indexSeoPayload($items),
             ],
         ]);
     }
@@ -83,6 +86,7 @@ class OrganizerController extends Controller
 
         return [
             ...$payload,
+            'seo' => $this->seoPayload($organizer),
             'people' => $organizer->people->map(fn ($person) => [
                 'id' => $person->id,
                 'full_name' => $person->full_name,
@@ -118,6 +122,66 @@ class OrganizerController extends Controller
                     'slug' => $event->city->slug,
                 ] : null,
             ])->values(),
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function seoPayload(Organizer $organizer): array
+    {
+        $siteUrl = rtrim((string) config('app.url'), '/');
+        $url = "{$siteUrl}/organizers/{$organizer->slug}";
+
+        return [
+            'title' => "{$organizer->name} | رخداد",
+            'description' => $organizer->description ?: "صفحه برگزارکننده {$organizer->name} در رخداد.",
+            'canonical_url' => $url,
+            'json_ld' => [
+                [
+                    '@context' => 'https://schema.org',
+                    '@type' => 'Organization',
+                    'name' => $organizer->name,
+                    'url' => $url,
+                    'description' => $organizer->description,
+                    'sameAs' => array_values(array_filter(array_merge(
+                        [$organizer->website_url],
+                        is_array($organizer->social_links) ? array_values($organizer->social_links) : [],
+                    ))),
+                    'address' => $organizer->city ? [
+                        '@type' => 'PostalAddress',
+                        'addressLocality' => $organizer->city->name,
+                        'addressRegion' => $organizer->city->province,
+                        'addressCountry' => 'IR',
+                    ] : null,
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @param list<array<string, mixed>> $organizers
+     * @return array<string, mixed>
+     */
+    private function indexSeoPayload(array $organizers): array
+    {
+        $siteUrl = rtrim((string) config('app.url'), '/');
+
+        return [
+            'title' => 'برگزارکنندگان | رخداد',
+            'canonical_url' => $siteUrl.'/organizers',
+            'json_ld' => [
+                [
+                    '@context' => 'https://schema.org',
+                    '@type' => 'ItemList',
+                    'itemListElement' => collect($organizers)->map(fn (array $organizer, int $index) => [
+                        '@type' => 'ListItem',
+                        'position' => $index + 1,
+                        'url' => "{$siteUrl}/organizers/{$organizer['slug']}",
+                        'name' => $organizer['name'],
+                    ])->values()->all(),
+                ],
+            ],
         ];
     }
 }

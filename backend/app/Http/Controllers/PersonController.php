@@ -20,8 +20,10 @@ class PersonController extends Controller
             ->orderBy('id')
             ->paginate($perPage);
 
+        $items = $people->through(fn (Person $person) => $this->serializePerson($person))->items();
+
         return response()->json([
-            'data' => $people->through(fn (Person $person) => $this->serializePerson($person))->items(),
+            'data' => $items,
             'meta' => [
                 'current_page' => $people->currentPage(),
                 'from' => $people->firstItem(),
@@ -29,6 +31,7 @@ class PersonController extends Controller
                 'per_page' => $people->perPage(),
                 'to' => $people->lastItem(),
                 'total' => $people->total(),
+                'seo' => $this->indexSeoPayload($items),
             ],
         ]);
     }
@@ -77,6 +80,7 @@ class PersonController extends Controller
 
         return [
             ...$payload,
+            'seo' => $this->seoPayload($person),
             'organizers' => $person->organizers->map(fn ($organizer) => [
                 'id' => $organizer->id,
                 'name' => $organizer->name,
@@ -118,6 +122,61 @@ class PersonController extends Controller
                     'slug' => $event->organizer->slug,
                 ] : null,
             ])->values(),
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function seoPayload(Person $person): array
+    {
+        $siteUrl = rtrim((string) config('app.url'), '/');
+        $url = "{$siteUrl}/people/{$person->slug}";
+
+        return [
+            'title' => "{$person->full_name} | رخداد",
+            'description' => $person->bio ?: "صفحه {$person->full_name} در رخداد.",
+            'canonical_url' => $url,
+            'json_ld' => [
+                [
+                    '@context' => 'https://schema.org',
+                    '@type' => 'Person',
+                    'name' => $person->full_name,
+                    'url' => $url,
+                    'jobTitle' => $person->title,
+                    'description' => $person->bio,
+                    'sameAs' => array_values(array_filter(array_merge(
+                        [$person->website_url],
+                        is_array($person->social_links) ? array_values($person->social_links) : [],
+                    ))),
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @param list<array<string, mixed>> $people
+     * @return array<string, mixed>
+     */
+    private function indexSeoPayload(array $people): array
+    {
+        $siteUrl = rtrim((string) config('app.url'), '/');
+
+        return [
+            'title' => 'اشخاص و سخنرانان | رخداد',
+            'canonical_url' => $siteUrl.'/people',
+            'json_ld' => [
+                [
+                    '@context' => 'https://schema.org',
+                    '@type' => 'ItemList',
+                    'itemListElement' => collect($people)->map(fn (array $person, int $index) => [
+                        '@type' => 'ListItem',
+                        'position' => $index + 1,
+                        'url' => "{$siteUrl}/people/{$person['slug']}",
+                        'name' => $person['full_name'],
+                    ])->values()->all(),
+                ],
+            ],
         ];
     }
 }

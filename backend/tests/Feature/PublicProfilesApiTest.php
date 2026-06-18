@@ -48,8 +48,11 @@ class PublicProfilesApiTest extends TestCase
                     'per_page',
                     'to',
                     'total',
+                    'seo',
                 ],
-            ]);
+            ])
+            ->assertJsonPath('meta.seo.json_ld.0.@type', 'ItemList')
+            ->assertJsonPath('meta.seo.json_ld.0.itemListElement.0.name', 'Alpha Org');
     }
 
     public function test_organizer_detail_returns_people_and_published_events(): void
@@ -92,6 +95,8 @@ class PublicProfilesApiTest extends TestCase
             ->assertJsonCount(1, 'data.people')
             ->assertJsonPath('data.people.0.full_name', 'Rokhdad Speaker')
             ->assertJsonPath('data.people.0.role_title', 'Host')
+            ->assertJsonPath('data.seo.json_ld.0.@type', 'Organization')
+            ->assertJsonPath('data.seo.json_ld.0.name', 'Rokhdad Org')
             ->assertJsonCount(1, 'data.events')
             ->assertJsonPath('data.events.0.slug', 'published-event')
             ->assertJsonPath('data.events.0.source_attributions.0.source_key', 'evand');
@@ -133,8 +138,11 @@ class PublicProfilesApiTest extends TestCase
                     'per_page',
                     'to',
                     'total',
+                    'seo',
                 ],
-            ]);
+            ])
+            ->assertJsonPath('meta.seo.json_ld.0.@type', 'ItemList')
+            ->assertJsonPath('meta.seo.json_ld.0.itemListElement.0.name', 'Alpha Speaker');
     }
 
     public function test_person_detail_returns_organizers_and_published_events(): void
@@ -170,6 +178,8 @@ class PublicProfilesApiTest extends TestCase
             ->assertJsonCount(1, 'data.organizers')
             ->assertJsonPath('data.organizers.0.slug', 'person-org')
             ->assertJsonPath('data.organizers.0.role_title', 'Instructor')
+            ->assertJsonPath('data.seo.json_ld.0.@type', 'Person')
+            ->assertJsonPath('data.seo.json_ld.0.name', 'Detail Speaker')
             ->assertJsonCount(1, 'data.events')
             ->assertJsonPath('data.events.0.slug', 'visible-talk')
             ->assertJsonPath('data.events.0.role_title', 'Speaker')

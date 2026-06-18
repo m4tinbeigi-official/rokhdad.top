@@ -91,8 +91,10 @@ class EventController extends Controller
             ->orderBy('id')
             ->paginate($perPage);
 
+        $items = $events->through(fn (Event $event) => $this->serializeEvent($event))->items();
+
         return response()->json([
-            'data' => $events->through(fn (Event $event) => $this->serializeEvent($event))->items(),
+            'data' => $items,
             'meta' => [
                 'current_page' => $events->currentPage(),
                 'from' => $events->firstItem(),
@@ -100,6 +102,7 @@ class EventController extends Controller
                 'per_page' => $events->perPage(),
                 'to' => $events->lastItem(),
                 'total' => $events->total(),
+                'seo' => $this->indexSeoPayload($items),
             ],
         ]);
     }
@@ -279,6 +282,44 @@ class EventController extends Controller
                 ['name' => $event->title, 'url' => $canonicalUrl],
             ])),
             'json_ld' => $jsonLd,
+        ];
+    }
+
+    /**
+     * @param list<array<string, mixed>> $events
+     * @return array<string, mixed>
+     */
+    private function indexSeoPayload(array $events): array
+    {
+        $siteUrl = rtrim((string) config('app.url'), '/');
+
+        return [
+            'title' => 'رخداد | کشف رویدادهای ایران',
+            'description' => 'فهرست رویدادهای منتشرشده در رخداد برای جستجو، کشف و ثبت نام.',
+            'canonical_url' => $siteUrl.'/',
+            'json_ld' => [
+                [
+                    '@context' => 'https://schema.org',
+                    '@type' => 'WebSite',
+                    'name' => 'رخداد',
+                    'url' => $siteUrl.'/',
+                    'potentialAction' => [
+                        '@type' => 'SearchAction',
+                        'target' => $siteUrl.'/?q={search_term_string}',
+                        'query-input' => 'required name=search_term_string',
+                    ],
+                ],
+                [
+                    '@context' => 'https://schema.org',
+                    '@type' => 'ItemList',
+                    'itemListElement' => collect($events)->map(fn (array $event, int $index) => [
+                        '@type' => 'ListItem',
+                        'position' => $index + 1,
+                        'url' => "{$siteUrl}/events/{$event['slug']}",
+                        'name' => $event['title'],
+                    ])->values()->all(),
+                ],
+            ],
         ];
     }
 }

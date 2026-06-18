@@ -168,7 +168,7 @@ The project is API-first, GitHub-first, and server-only at runtime. The local ma
 | P22-003 | 22 | Add personalized homepage API | DONE | P22-001, P14-001 | Ranking endpoint | API tests | L | SHOULD |
 | P23-001 | 23 | Add SEO metadata contract | DONE | P14-002, P17-001 | Metadata fields | HTML inspection | M | MUST |
 | P23-002 | 23 | Add schema.org Event and BreadcrumbList | DONE | P23-001 | JSON-LD | Rich result validation | M | MUST |
-| P23-003 | 23 | Add Person, Organization, ItemList, WebSite schema | PENDING | P17-002, P17-003 | JSON-LD | Rich result validation | M | SHOULD |
+| P23-003 | 23 | Add Person, Organization, ItemList, WebSite schema | DONE | P17-002, P17-003 | JSON-LD | Rich result validation | M | SHOULD |
 | P23-004 | 23 | Add sitemap and robots | DONE | P14-001 | Sitemap/robots endpoints | Curl and validator | M | MUST |
 | P24-001 | 24 | Add sms.ir provider abstraction | DONE | P5-003 | SMS provider | Sandbox/send test | M | MUST |
 | P24-002 | 24 | Add Pakett email provider abstraction | DONE | P5-002 | Email provider | Send test | M | SHOULD |
@@ -545,6 +545,7 @@ Completed:
 - P22-003
 - P23-001
 - P23-002
+- P23-003
 - P23-004
 - P24-001
 - P24-002
@@ -562,8 +563,8 @@ Blocked:
 
 Next Recommended Task:
 
-- P23-003
+- P26-001
 
 ## 15. Next Recommended Step
 
-Next implementation can start with P23-003 to add Person, Organization, ItemList, and WebSite schema. P6-003 and P8-003 remain blocked by their upstream dependencies.
+Next implementation can start with P26-001 to add PWA manifest and service worker support. P6-003 and P8-003 remain blocked by their upstream dependencies.

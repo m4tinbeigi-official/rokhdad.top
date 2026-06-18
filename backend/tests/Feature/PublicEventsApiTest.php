@@ -49,8 +49,12 @@ class PublicEventsApiTest extends TestCase
                     'last_page',
                     'per_page',
                     'total',
+                    'seo',
                 ],
-            ]);
+            ])
+            ->assertJsonPath('meta.seo.json_ld.0.@type', 'WebSite')
+            ->assertJsonPath('meta.seo.json_ld.1.@type', 'ItemList')
+            ->assertJsonPath('meta.seo.json_ld.1.itemListElement.0.name', 'Published Event');
     }
 
     public function test_events_index_is_paginated_and_ordered_by_start_time(): void
@@ -148,4 +152,3 @@ class PublicEventsApiTest extends TestCase
         $response->assertOk()->assertJsonPath('meta.total', 1)->assertJsonPath('data.0.title', 'Today Event');
     }
 }
-
