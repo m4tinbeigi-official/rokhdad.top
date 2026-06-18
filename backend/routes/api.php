@@ -7,6 +7,7 @@ use App\Http\Controllers\EventRegistrationController;
 use App\Http\Controllers\LookupController;
 use App\Http\Controllers\OrganizerController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\PersonalizedHomepageController;
 use App\Http\Controllers\PersonController;
 use App\Http\Controllers\RatingController;
 use App\Http\Controllers\SavedEventController;
@@ -102,5 +103,8 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
 
         // User saved events list (P22-002)
         Route::get('/me/saved-events', [SavedEventController::class, 'index'])->name('me.saved-events.index');
+
+        // Personalized homepage ranking (P22-003)
+        Route::get('/me/personalized-events', [PersonalizedHomepageController::class, 'index'])->name('me.personalized-events.index');
     });
 });
