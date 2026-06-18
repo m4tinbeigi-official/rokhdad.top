@@ -173,7 +173,7 @@ The project is API-first, GitHub-first, and server-only at runtime. The local ma
 | P24-001 | 24 | Add sms.ir provider abstraction | DONE | P5-003 | SMS provider | Sandbox/send test | M | MUST |
 | P24-002 | 24 | Add Pakett email provider abstraction | DONE | P5-002 | Email provider | Send test | M | SHOULD |
 | P24-003 | 24 | Add notification logs | DONE | P24-001, P24-002 | Notification history | DB tests | S | MUST |
-| P25-001 | 25 | Add Capacitor Android shell | PENDING | P15-001, P26-001 | Android project shell | Build on server/CI | L | LATER |
+| P25-001 | 25 | Add Capacitor Android shell | DONE | P15-001, P26-001 | Android project shell | Build on server/CI | L | LATER |
 | P25-002 | 25 | Add Android app config and icons | PENDING | P25-001 | App metadata | Install smoke test | M | LATER |
 | P26-001 | 26 | Add PWA manifest and service worker plan | DONE | P15-001 | PWA install support | Lighthouse PWA check | M | SHOULD |
 | P26-002 | 26 | Add offline fallback page | DONE | P26-001 | Offline route | Browser offline test | S | COULD |
@@ -550,6 +550,7 @@ Completed:
 - P24-001
 - P24-002
 - P24-003
+- P25-001
 - P26-001
 - P26-002
 
@@ -565,8 +566,8 @@ Blocked:
 
 Next Recommended Task:
 
-- P25-001
+- P25-002
 
 ## 15. Next Recommended Step
 
-Next implementation can start with P25-001 to add the Capacitor Android shell. P6-003 and P8-003 remain blocked by their upstream dependencies.
+Next implementation can start with P25-002 to add Android app metadata and icons. P6-003 and P8-003 remain blocked by their upstream dependencies.

@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Rokhdad</string>
+    <string name="title_activity_main">Rokhdad</string>
+    <string name="package_name">top.rokhdad.app</string>
+    <string name="custom_url_scheme">top.rokhdad.app</string>
+</resources>
