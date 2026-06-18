@@ -237,6 +237,7 @@ async function fetchDetail() {
           url: rawEvent.source_attributions[0].external_url || '#',
         } : null,
       }
+      applySeoMetadata(rawEvent.seo)
     } else if (pageKind.value === 'organizer-detail') {
       const orgPayload = await api.getOrganizer(slug)
       const rawOrg = orgPayload?.data
@@ -328,6 +329,54 @@ function getErrorMessage(caught) {
   }
 
   return 'خطای پیش بینی نشده رخ داد.'
+}
+
+function applySeoMetadata(seo) {
+  if (!seo) {
+    return
+  }
+
+  document.title = seo.title || 'رخداد'
+  setMeta('description', seo.description)
+  setMeta('robots', seo.robots || 'index,follow')
+  setMeta('og:type', seo.open_graph?.type, 'property')
+  setMeta('og:title', seo.open_graph?.title, 'property')
+  setMeta('og:description', seo.open_graph?.description, 'property')
+  setMeta('og:url', seo.open_graph?.url, 'property')
+  setMeta('og:image', seo.open_graph?.image, 'property')
+  setMeta('twitter:card', seo.twitter?.card)
+  setMeta('twitter:title', seo.twitter?.title)
+  setMeta('twitter:description', seo.twitter?.description)
+  setMeta('twitter:image', seo.twitter?.image)
+  setCanonical(seo.canonical_url)
+}
+
+function setMeta(name, content, attribute = 'name') {
+  if (!content) {
+    return
+  }
+
+  let element = document.head.querySelector(`meta[${attribute}="${name}"]`)
+  if (!element) {
+    element = document.createElement('meta')
+    element.setAttribute(attribute, name)
+    document.head.appendChild(element)
+  }
+  element.setAttribute('content', content)
+}
+
+function setCanonical(url) {
+  if (!url) {
+    return
+  }
+
+  let element = document.head.querySelector('link[rel="canonical"]')
+  if (!element) {
+    element = document.createElement('link')
+    element.setAttribute('rel', 'canonical')
+    document.head.appendChild(element)
+  }
+  element.setAttribute('href', url)
 }
 </script>
 

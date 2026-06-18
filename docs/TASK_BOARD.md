@@ -166,7 +166,7 @@ The project is API-first, GitHub-first, and server-only at runtime. The local ma
 | P22-001 | 22 | Add user preferences model | DONE | P5-001, P7-001 | Preference schema | Model tests | M | SHOULD |
 | P22-002 | 22 | Add saved events and favorites | DONE | P22-001, P14-001 | Saved event APIs/UI | E2E test | M | SHOULD |
 | P22-003 | 22 | Add personalized homepage API | DONE | P22-001, P14-001 | Ranking endpoint | API tests | L | SHOULD |
-| P23-001 | 23 | Add SEO metadata contract | PENDING | P14-002, P17-001 | Metadata fields | HTML inspection | M | MUST |
+| P23-001 | 23 | Add SEO metadata contract | DONE | P14-002, P17-001 | Metadata fields | HTML inspection | M | MUST |
 | P23-002 | 23 | Add schema.org Event and BreadcrumbList | PENDING | P23-001 | JSON-LD | Rich result validation | M | MUST |
 | P23-003 | 23 | Add Person, Organization, ItemList, WebSite schema | PENDING | P17-002, P17-003 | JSON-LD | Rich result validation | M | SHOULD |
 | P23-004 | 23 | Add sitemap and robots | DONE | P14-001 | Sitemap/robots endpoints | Curl and validator | M | MUST |
@@ -543,6 +543,7 @@ Completed:
 - P22-001
 - P22-002
 - P22-003
+- P23-001
 - P23-004
 - P24-001
 - P24-002
@@ -560,8 +561,8 @@ Blocked:
 
 Next Recommended Task:
 
-- P23-001
+- P23-002
 
 ## 15. Next Recommended Step
 
-Next implementation can start with P23-001 to add the SEO metadata contract. P6-003 and P8-003 remain blocked by their upstream dependencies.
+Next implementation can start with P23-002 to add schema.org Event and BreadcrumbList JSON-LD. P6-003 and P8-003 remain blocked by their upstream dependencies.

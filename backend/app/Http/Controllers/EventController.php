@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Event;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class EventController extends Controller
 {
@@ -176,6 +177,7 @@ class EventController extends Controller
             'registration_ends_at' => $event->registration_ends_at?->toJSON(),
             'requires_approval' => $event->requires_approval,
             'registration_instructions' => $event->registration_instructions,
+            'seo' => $this->seoPayload($event),
             'people' => $event->people->map(fn ($person) => [
                 'id' => $person->id,
                 'full_name' => $person->full_name,
@@ -183,6 +185,51 @@ class EventController extends Controller
                 'role_title' => $person->pivot->role_title,
                 'sort_order' => $person->pivot->sort_order,
             ])->values(),
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function seoPayload(Event $event): array
+    {
+        $siteUrl = rtrim((string) config('app.url'), '/');
+        $canonicalUrl = "{$siteUrl}/events/{$event->slug}";
+        $description = $event->summary
+            ?: Str::limit(trim(strip_tags((string) $event->description)), 155);
+
+        if (! $description) {
+            $description = 'جزئیات رویداد، زمان برگزاری، برگزارکننده و مسیر ثبت نام در رخداد.';
+        }
+
+        $title = "{$event->title} | رخداد";
+        $externalImage = $event->metadata['evand']['cover'] ?? null;
+
+        return [
+            'title' => $title,
+            'description' => $description,
+            'canonical_url' => $canonicalUrl,
+            'robots' => 'index,follow',
+            'open_graph' => [
+                'type' => 'event',
+                'title' => $title,
+                'description' => $description,
+                'url' => $canonicalUrl,
+                'image' => $externalImage,
+                'site_name' => 'رخداد',
+                'locale' => 'fa_IR',
+            ],
+            'twitter' => [
+                'card' => $externalImage ? 'summary_large_image' : 'summary',
+                'title' => $title,
+                'description' => $description,
+                'image' => $externalImage,
+            ],
+            'breadcrumbs' => array_values(array_filter([
+                ['name' => 'رخداد', 'url' => $siteUrl.'/'],
+                $event->category ? ['name' => $event->category->name, 'url' => "{$siteUrl}/categories/{$event->category->slug}"] : null,
+                ['name' => $event->title, 'url' => $canonicalUrl],
+            ])),
         ];
     }
 }
