@@ -93,6 +93,9 @@ export function createApiClient({
     getOrganizer: (slug) => request(`/organizers/${encodeURIComponent(slug)}`),
     listPeople: (query) => request('/people', { query }),
     getPerson: (slug) => request(`/people/${encodeURIComponent(slug)}`),
+    getOrganizerDashboard: (token) => request('/me/organizer-dashboard', {
+      headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+    }),
   }
 }
 

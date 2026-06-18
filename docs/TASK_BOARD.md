@@ -177,7 +177,7 @@ The project is API-first, GitHub-first, and server-only at runtime. The local ma
 | P25-002 | 25 | Add Android app config and icons | DONE | P25-001 | App metadata | Install smoke test | M | LATER |
 | P26-001 | 26 | Add PWA manifest and service worker plan | DONE | P15-001 | PWA install support | Lighthouse PWA check | M | SHOULD |
 | P26-002 | 26 | Add offline fallback page | DONE | P26-001 | Offline route | Browser offline test | S | COULD |
-| P27-001 | 27 | Add organizer dashboard foundation | PENDING | P19-001, P5-004 | Organizer dashboard | Role tests | L | SHOULD |
+| P27-001 | 27 | Add organizer dashboard foundation | DONE | P19-001, P5-004 | Organizer dashboard | Role tests | L | SHOULD |
 | P27-002 | 27 | Add custom registration forms | PENDING | P27-001, P19-002 | Form builder | E2E tests | L | SHOULD |
 | P27-003 | 27 | Add promo codes and quantity rules | PENDING | P20-001, P27-001 | Ticket rules | Payment tests | L | SHOULD |
 | P27-004 | 27 | Add private and recurring events | PENDING | P27-001 | Visibility/series rules | API/UI tests | L | COULD |
@@ -554,6 +554,7 @@ Completed:
 - P25-002
 - P26-001
 - P26-002
+- P27-001
 
 In Progress:
 
@@ -567,8 +568,8 @@ Blocked:
 
 Next Recommended Task:
 
-- P27-001
+- P27-002
 
 ## 15. Next Recommended Step
 
-Next implementation can start with P27-001 to add the organizer dashboard foundation. P6-003 and P8-003 remain blocked by their upstream dependencies.
+Next implementation can start with P27-002 to add custom registration forms. P6-003 and P8-003 remain blocked by their upstream dependencies.

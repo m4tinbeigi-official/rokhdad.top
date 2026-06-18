@@ -11,6 +11,7 @@ import {
   readEventFiltersFromSearch,
 } from './events/homepage.js'
 import { loadCategoryDirectory, loadCityDirectory } from './lookups/directory.js'
+import { loadOrganizerDashboard } from './organizer/dashboard.js'
 
 const apiBaseUrl = getApiBaseUrl()
 const api = createRokhdadApi()
@@ -33,6 +34,10 @@ const filterOptions = ref({
 const filtersLoading = ref(false)
 const eventFilters = ref(readEventFiltersFromSearch(window.location.search))
 const hasActiveFilters = computed(() => Object.values(eventFilters.value).some(Boolean))
+const organizerDashboard = ref(null)
+const organizerDashboardLoading = ref(false)
+const organizerDashboardError = ref(null)
+const hasOrganizerDashboard = computed(() => organizerDashboard.value?.organizers.length > 0)
 
 const pageKind = computed(() => {
   if (currentPath === '/categories') {
@@ -40,6 +45,9 @@ const pageKind = computed(() => {
   }
   if (currentPath === '/cities') {
     return 'cities'
+  }
+  if (currentPath === '/dashboard/organizer') {
+    return 'organizer-dashboard'
   }
   if (currentPath.startsWith('/categories/')) {
     return 'category-detail'
@@ -91,6 +99,8 @@ onMounted(() => {
     fetchFilterOptions()
   } else if (pageKind.value === 'categories' || pageKind.value === 'cities') {
     fetchDirectory()
+  } else if (pageKind.value === 'organizer-dashboard') {
+    fetchOrganizerDashboard()
   } else if (
     pageKind.value === 'category-detail' ||
     pageKind.value === 'city-detail' ||
@@ -118,6 +128,36 @@ async function fetchEvents() {
   } finally {
     isLoading.value = false
   }
+}
+
+async function fetchOrganizerDashboard() {
+  const token = window.localStorage.getItem('rokhdad_api_token')
+  organizerDashboardLoading.value = true
+  organizerDashboardError.value = null
+
+  if (!token) {
+    organizerDashboard.value = null
+    organizerDashboardLoading.value = false
+    organizerDashboardError.value = 'برای مشاهده داشبورد برگزارکننده ابتدا وارد حساب کاربری شوید.'
+    return
+  }
+
+  try {
+    organizerDashboard.value = await loadOrganizerDashboard(api, token)
+  } catch (caught) {
+    organizerDashboard.value = null
+    organizerDashboardError.value = getErrorMessage(caught)
+  } finally {
+    organizerDashboardLoading.value = false
+  }
+}
+
+function formatDashboardNumber(value) {
+  return new Intl.NumberFormat('fa-IR').format(Number(value || 0))
+}
+
+function formatDashboardMoney(value) {
+  return `${formatDashboardNumber(value)} ریال`
 }
 
 async function fetchFilterOptions() {
@@ -413,6 +453,9 @@ function setJsonLd(payload) {
           <a class="rounded-md px-3 py-2 hover:bg-brand-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-500" href="/cities">
             شهرها
           </a>
+          <a class="rounded-md px-3 py-2 hover:bg-brand-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-500" href="/dashboard/organizer">
+            داشبورد برگزارکننده
+          </a>
         </nav>
         <button class="rounded-md bg-brand-700 px-4 py-2 text-sm font-bold text-white shadow-sm hover:bg-brand-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600">
           ثبت رویداد
@@ -420,7 +463,122 @@ function setJsonLd(payload) {
       </div>
     </header>
 
-    <main v-if="pageKind === 'home'" class="mx-auto grid max-w-7xl gap-8 px-4 py-6 sm:px-6 lg:px-8">
+    <main v-if="pageKind === 'organizer-dashboard'" class="mx-auto grid max-w-7xl gap-6 px-4 py-6 sm:px-6 lg:px-8">
+      <section class="grid gap-3 border-b border-line pb-5">
+        <p class="text-sm font-bold text-brand-700">مرکز کنترل برگزارکننده</p>
+        <div class="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <h1 class="text-3xl font-black leading-tight text-ink sm:text-4xl">داشبورد برگزارکننده</h1>
+            <p class="mt-3 max-w-2xl text-sm leading-7 text-muted">
+              وضعیت رویدادها، ثبت نام ها و فروش برگزارکننده های متصل به حساب شما.
+            </p>
+          </div>
+          <button
+            class="rounded-md border border-line bg-surface px-4 py-2 text-sm font-bold text-brand-800 hover:bg-brand-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-600"
+            type="button"
+            @click="fetchOrganizerDashboard"
+          >
+            تازه سازی
+          </button>
+        </div>
+      </section>
+
+      <section v-if="organizerDashboardLoading" class="grid gap-3 md:grid-cols-4" aria-live="polite" aria-label="در حال بارگذاری داشبورد برگزارکننده">
+        <div v-for="index in 4" :key="index" class="min-h-28 animate-pulse rounded-lg border border-line bg-surface p-4 shadow-soft">
+          <div class="h-4 w-20 rounded-md bg-brand-50"></div>
+          <div class="mt-5 h-8 w-24 rounded-md bg-line"></div>
+        </div>
+      </section>
+
+      <section v-else-if="organizerDashboardError" class="rounded-lg border border-line bg-surface p-5 shadow-soft" role="alert">
+        <h2 class="text-base font-black text-ink">داشبورد در دسترس نیست</h2>
+        <p class="mt-2 text-sm leading-7 text-muted">{{ organizerDashboardError }}</p>
+      </section>
+
+      <section v-else-if="!hasOrganizerDashboard" class="rounded-lg border border-dashed border-line bg-surface p-5 text-sm leading-7 text-muted">
+        هنوز برگزارکننده ای به حساب شما متصل نشده است.
+      </section>
+
+      <template v-else>
+        <section class="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
+          <article class="rounded-lg border border-line bg-surface p-4 shadow-soft">
+            <p class="text-xs font-bold text-muted">رویدادها</p>
+            <p class="mt-3 text-2xl font-black text-ink">{{ formatDashboardNumber(organizerDashboard.summary.events_count) }}</p>
+          </article>
+          <article class="rounded-lg border border-line bg-surface p-4 shadow-soft">
+            <p class="text-xs font-bold text-muted">ثبت نام ها</p>
+            <p class="mt-3 text-2xl font-black text-ink">{{ formatDashboardNumber(organizerDashboard.summary.registrations_count) }}</p>
+          </article>
+          <article class="rounded-lg border border-line bg-surface p-4 shadow-soft">
+            <p class="text-xs font-bold text-muted">بلیط های صادرشده</p>
+            <p class="mt-3 text-2xl font-black text-ink">{{ formatDashboardNumber(organizerDashboard.summary.tickets_count) }}</p>
+          </article>
+          <article class="rounded-lg border border-line bg-surface p-4 shadow-soft">
+            <p class="text-xs font-bold text-muted">فروش ثبت شده</p>
+            <p class="mt-3 text-2xl font-black text-ink">{{ formatDashboardMoney(organizerDashboard.summary.revenue_total) }}</p>
+          </article>
+        </section>
+
+        <section class="grid gap-5 lg:grid-cols-[320px_1fr]">
+          <aside class="grid gap-3 self-start">
+            <h2 class="text-lg font-black text-ink">برگزارکننده های من</h2>
+            <article
+              v-for="organizer in organizerDashboard.organizers"
+              :key="organizer.id"
+              class="rounded-lg border border-line bg-surface p-4 shadow-soft"
+            >
+              <a class="text-base font-black text-ink hover:text-brand-800" :href="organizer.href">{{ organizer.name }}</a>
+              <div class="mt-3 flex items-center justify-between gap-3 text-xs font-bold text-muted">
+                <span>{{ organizer.role === 'owner' ? 'مالک' : 'عضو تیم' }}</span>
+                <span>{{ formatDashboardNumber(organizer.events_count) }} رویداد</span>
+              </div>
+            </article>
+          </aside>
+
+          <section class="grid gap-3">
+            <div class="flex flex-wrap items-center justify-between gap-3">
+              <h2 class="text-lg font-black text-ink">رویدادهای اخیر</h2>
+              <p class="text-xs font-bold text-muted">۸ رویداد آخر برای پایش سریع عملیات</p>
+            </div>
+            <article
+              v-for="event in organizerDashboard.events"
+              :key="event.id"
+              class="rounded-lg border border-line bg-surface p-4 shadow-soft"
+            >
+              <div class="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <a class="text-base font-black text-ink hover:text-brand-800" :href="event.href">{{ event.title }}</a>
+                  <p class="mt-1 text-xs font-bold text-muted">{{ event.organizer }} / {{ event.city }} / {{ event.category }}</p>
+                </div>
+                <span class="rounded-md bg-brand-50 px-2.5 py-1 text-xs font-black text-brand-800">
+                  {{ event.registration_open ? 'ثبت نام باز' : 'ثبت نام بسته' }}
+                </span>
+              </div>
+              <dl class="mt-4 grid gap-2 text-sm text-muted sm:grid-cols-4">
+                <div>
+                  <dt class="text-xs font-bold">ثبت نام</dt>
+                  <dd class="mt-1 font-black text-ink">{{ formatDashboardNumber(event.registrations_count) }}</dd>
+                </div>
+                <div>
+                  <dt class="text-xs font-bold">تایید شده</dt>
+                  <dd class="mt-1 font-black text-ink">{{ formatDashboardNumber(event.confirmed_registrations_count) }}</dd>
+                </div>
+                <div>
+                  <dt class="text-xs font-bold">بلیط</dt>
+                  <dd class="mt-1 font-black text-ink">{{ formatDashboardNumber(event.tickets_count) }}</dd>
+                </div>
+                <div>
+                  <dt class="text-xs font-bold">فروش</dt>
+                  <dd class="mt-1 font-black text-ink">{{ formatDashboardMoney(event.revenue_total) }}</dd>
+                </div>
+              </dl>
+            </article>
+          </section>
+        </section>
+      </template>
+    </main>
+
+    <main v-else-if="pageKind === 'home'" class="mx-auto grid max-w-7xl gap-8 px-4 py-6 sm:px-6 lg:px-8">
       <section class="grid gap-5 rounded-lg border border-line bg-surface p-5 shadow-soft lg:grid-cols-[1fr_360px] lg:items-end lg:p-7">
         <div>
           <p class="mb-2 text-sm font-bold text-brand-700">کشف رویداد</p>

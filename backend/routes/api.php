@@ -6,6 +6,7 @@ use App\Http\Controllers\EventController;
 use App\Http\Controllers\EventRegistrationController;
 use App\Http\Controllers\LookupController;
 use App\Http\Controllers\OrganizerController;
+use App\Http\Controllers\OrganizerDashboardController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PersonalizedHomepageController;
 use App\Http\Controllers\PersonController;
@@ -106,5 +107,8 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
 
         // Personalized homepage ranking (P22-003)
         Route::get('/me/personalized-events', [PersonalizedHomepageController::class, 'index'])->name('me.personalized-events.index');
+
+        // Organizer dashboard foundation (P27-001)
+        Route::get('/me/organizer-dashboard', [OrganizerDashboardController::class, 'show'])->name('me.organizer-dashboard.show');
     });
 });

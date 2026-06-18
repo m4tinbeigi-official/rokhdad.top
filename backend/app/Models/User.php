@@ -74,6 +74,13 @@ class User extends Authenticatable implements FilamentUser
         return $this->hasMany(Registration::class);
     }
 
+    public function organizers(): BelongsToMany
+    {
+        return $this->belongsToMany(Organizer::class)
+            ->withPivot(['role', 'accepted_at'])
+            ->withTimestamps();
+    }
+
     public function tickets(): HasMany
     {
         return $this->hasMany(Ticket::class);
