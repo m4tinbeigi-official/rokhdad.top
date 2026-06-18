@@ -112,6 +112,21 @@ class Event extends Model
         return $this->hasMany(EventFieldLock::class);
     }
 
+    public function comments(): HasMany
+    {
+        return $this->hasMany(Comment::class);
+    }
+
+    public function ratings(): HasMany
+    {
+        return $this->hasMany(Rating::class);
+    }
+
+    public function savedEvents(): HasMany
+    {
+        return $this->hasMany(SavedEvent::class);
+    }
+
     public function isFieldLocked(string $fieldPath): bool
     {
         return $this->fieldLocks()->where('field_path', $fieldPath)->exists();

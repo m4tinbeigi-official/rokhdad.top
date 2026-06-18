@@ -35,4 +35,25 @@ return [
         ],
     ],
 
+    'zarinpal' => [
+        'merchant_id' => env('ZARINPAL_MERCHANT_ID'),
+        'sandbox' => env('ZARINPAL_SANDBOX', true),
+    ],
+
+    'zibal' => [
+        'merchant' => env('ZIBAL_MERCHANT_ID', 'zibal'),
+    ],
+
+    'smsir' => [
+        'api_key' => env('SMSIR_API_KEY'),
+        'line_number' => env('SMSIR_LINE_NUMBER', 30007732),
+        'otp_template_id' => env('SMSIR_TEMPLATE_ID_OTP'),
+    ],
+
+    'pakett' => [
+        'api_key' => env('PAKETT_API_KEY'),
+        'from_email' => env('PAKETT_FROM_EMAIL', env('MAIL_FROM_ADDRESS', 'noreply@rokhdad.top')),
+        'from_name' => env('PAKETT_FROM_NAME', env('MAIL_FROM_NAME', 'رخداد')),
+    ],
+
 ];

@@ -108,7 +108,7 @@ The project is API-first, GitHub-first, and server-only at runtime. The local ma
 | P4-004 | 4 | Define migration and seed policy | DONE | P4-001 | Migration/seed runbook and guarded Laravel DB script | Server status and rollback-plan checks | S | MUST |
 | P5-001 | 5 | Implement user identity model | DONE | P4-001 | User identity migration, model fields, factory, and API contract | Migration/model feature tests and server migration status | M | MUST |
 | P5-002 | 5 | Implement email/password auth | DONE | P5-001 | Sanctum token auth with register/login/me/logout APIs | Auth feature tests and server migration/test | M | MUST |
-| P5-003 | 5 | Implement phone OTP verification | BLOCKED | P5-001, P24-001 | OTP APIs | OTP happy/error tests | M | MUST |
+| P5-003 | 5 | Implement phone OTP verification | PENDING | P5-001, P24-001 | OTP APIs | OTP happy/error tests | M | MUST |
 | P5-004 | 5 | Implement roles and permissions | DONE | P5-001 | RBAC tables, models, and user permission helpers | RBAC migration/model tests and server migration/test | M | MUST |
 | P6-001 | 6 | Install Filament admin foundation | DONE | P3-001, P5-004 | Filament admin panel, assets, provider, and admin-role access gate | Admin login/access feature tests and server smoke test | M | MUST |
 | P6-002 | 6 | Add admin user management | DONE | P6-001, P5-004 | Filament User resource with role assignment and guarded password edits | User resource route and CRUD feature tests | M | MUST |
@@ -157,22 +157,22 @@ The project is API-first, GitHub-first, and server-only at runtime. The local ma
 | P19-002 | 19 | Add registration flow | DONE | P19-001, P5-002 | Registration APIs/UI | End-to-end test | L | MUST |
 | P19-003 | 19 | Add ticket model and QR code | DONE | P19-002 | Ticket records and QR | QR validation test | L | MUST |
 | P20-001 | 20 | Add payment gateway abstraction | DONE | P19-002 | Payment service contract | Unit tests | M | MUST |
-| P20-002 | 20 | Implement ZarinPal gateway | PENDING | P20-001 | Gateway adapter | Sandbox test | L | MUST |
-| P20-003 | 20 | Implement Zibal gateway | PENDING | P20-001 | Gateway adapter | Sandbox test | L | SHOULD |
-| P20-004 | 20 | Add payment verification and webhooks | PENDING | P20-002 | Verify callbacks | Integration tests | L | MUST |
-| P21-001 | 21 | Add comments model and APIs | PENDING | P5-002, P7-003 | Comment endpoints | API tests | M | SHOULD |
-| P21-002 | 21 | Add ratings model and APIs | PENDING | P5-002, P7-003 | Rating endpoints | API tests | M | SHOULD |
-| P21-003 | 21 | Add moderation workflow | PENDING | P21-001, P6-001 | Admin moderation | Admin tests | M | SHOULD |
-| P22-001 | 22 | Add user preferences model | PENDING | P5-001, P7-001 | Preference schema | Model tests | M | SHOULD |
-| P22-002 | 22 | Add saved events and favorites | PENDING | P22-001, P14-001 | Saved event APIs/UI | E2E test | M | SHOULD |
+| P20-002 | 20 | Implement ZarinPal gateway | DONE | P20-001 | Gateway adapter | Sandbox test | L | MUST |
+| P20-003 | 20 | Implement Zibal gateway | DONE | P20-001 | Gateway adapter | Sandbox test | L | SHOULD |
+| P20-004 | 20 | Add payment verification and webhooks | DONE | P20-002 | Verify callbacks | Integration tests | L | MUST |
+| P21-001 | 21 | Add comments model and APIs | DONE | P5-002, P7-003 | Comment endpoints | API tests | M | SHOULD |
+| P21-002 | 21 | Add ratings model and APIs | DONE | P5-002, P7-003 | Rating endpoints | API tests | M | SHOULD |
+| P21-003 | 21 | Add moderation workflow | DONE | P21-001, P6-001 | Admin moderation | Admin tests | M | SHOULD |
+| P22-001 | 22 | Add user preferences model | DONE | P5-001, P7-001 | Preference schema | Model tests | M | SHOULD |
+| P22-002 | 22 | Add saved events and favorites | DONE | P22-001, P14-001 | Saved event APIs/UI | E2E test | M | SHOULD |
 | P22-003 | 22 | Add personalized homepage API | PENDING | P22-001, P14-001 | Ranking endpoint | API tests | L | SHOULD |
 | P23-001 | 23 | Add SEO metadata contract | PENDING | P14-002, P17-001 | Metadata fields | HTML inspection | M | MUST |
 | P23-002 | 23 | Add schema.org Event and BreadcrumbList | PENDING | P23-001 | JSON-LD | Rich result validation | M | MUST |
 | P23-003 | 23 | Add Person, Organization, ItemList, WebSite schema | PENDING | P17-002, P17-003 | JSON-LD | Rich result validation | M | SHOULD |
-| P23-004 | 23 | Add sitemap and robots | PENDING | P14-001 | Sitemap/robots endpoints | Curl and validator | M | MUST |
-| P24-001 | 24 | Add sms.ir provider abstraction | PENDING | P5-003 | SMS provider | Sandbox/send test | M | MUST |
-| P24-002 | 24 | Add Pakett email provider abstraction | PENDING | P5-002 | Email provider | Send test | M | SHOULD |
-| P24-003 | 24 | Add notification logs | PENDING | P24-001, P24-002 | Notification history | DB tests | S | MUST |
+| P23-004 | 23 | Add sitemap and robots | DONE | P14-001 | Sitemap/robots endpoints | Curl and validator | M | MUST |
+| P24-001 | 24 | Add sms.ir provider abstraction | DONE | P5-003 | SMS provider | Sandbox/send test | M | MUST |
+| P24-002 | 24 | Add Pakett email provider abstraction | DONE | P5-002 | Email provider | Send test | M | SHOULD |
+| P24-003 | 24 | Add notification logs | DONE | P24-001, P24-002 | Notification history | DB tests | S | MUST |
 | P25-001 | 25 | Add Capacitor Android shell | PENDING | P15-001, P26-001 | Android project shell | Build on server/CI | L | LATER |
 | P25-002 | 25 | Add Android app config and icons | PENDING | P25-001 | App metadata | Install smoke test | M | LATER |
 | P26-001 | 26 | Add PWA manifest and service worker plan | PENDING | P15-001 | PWA install support | Lighthouse PWA check | M | SHOULD |
@@ -533,6 +533,18 @@ Completed:
 - P19-002
 - P19-003
 - P20-001
+- P20-002
+- P20-003
+- P20-004
+- P21-001
+- P21-002
+- P21-003
+- P22-001
+- P22-002
+- P23-004
+- P24-001
+- P24-002
+- P24-003
 
 In Progress:
 
@@ -541,14 +553,13 @@ In Progress:
 Blocked:
 
 - Local Docker/build work is blocked by low free disk space on this Mac.
-- P5-003 is blocked until P24-001 provides the sms.ir OTP provider integration.
 - P6-003 is blocked until P31-004 provides the audit log data source.
 - P8-003 is blocked until P31-001 provides the structured logging standard.
 
 Next Recommended Task:
 
-- P20-002
+- P5-003
 
 ## 15. Next Recommended Step
 
-Next implementation can start with P20-002 to implement the ZarinPal gateway. P5-003, P6-003, and P8-003 remain blocked by their upstream dependencies.
+Next implementation can start with P5-003 to add phone OTP verification APIs using the completed sms.ir provider. P6-003 and P8-003 remain blocked by their upstream dependencies.
