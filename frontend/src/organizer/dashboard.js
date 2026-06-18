@@ -36,6 +36,7 @@ function normalizeOrganizerEvent(event = {}) {
     title: event.title || 'رویداد بدون عنوان',
     slug: event.slug || '',
     status: event.status || 'draft',
+    is_internal: Boolean(event.is_internal),
     starts_at: event.starts_at || null,
     event_type: event.event_type || 'in_person',
     capacity: event.capacity,

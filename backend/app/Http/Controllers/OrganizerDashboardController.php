@@ -64,6 +64,7 @@ class OrganizerDashboardController extends Controller
                     'title' => $event->title,
                     'slug' => $event->slug,
                     'status' => $event->status,
+                    'is_internal' => $event->is_internal,
                     'starts_at' => $event->starts_at?->toISOString(),
                     'event_type' => $event->event_type,
                     'capacity' => $event->capacity,

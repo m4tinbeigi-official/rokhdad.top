@@ -19,7 +19,7 @@ test('loadOrganizerDashboard passes auth token and normalizes metrics', async ()
             currency: 'IRR',
           },
           organizers: [{ id: 3, name: 'رخداد', slug: 'rokhdad', role: 'owner', events_count: 2 }],
-          events: [{ id: 10, title: 'رویداد تست', slug: 'test-event', registrations_count: 12 }],
+          events: [{ id: 10, title: 'رویداد تست', slug: 'test-event', is_internal: true, registrations_count: 12 }],
         },
       }
     },
@@ -31,6 +31,7 @@ test('loadOrganizerDashboard passes auth token and normalizes metrics', async ()
   assert.equal(dashboard.summary.revenue_total, 4500000)
   assert.equal(dashboard.organizers[0].href, '/organizers/rokhdad')
   assert.equal(dashboard.events[0].href, '/events/test-event')
+  assert.equal(dashboard.events[0].is_internal, true)
 })
 
 test('normalizeOrganizerDashboard provides empty-state fallbacks', () => {

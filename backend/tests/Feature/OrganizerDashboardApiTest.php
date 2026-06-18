@@ -68,6 +68,7 @@ class OrganizerDashboardApiTest extends TestCase
             ->assertJsonPath('data.summary.revenue_total', 1500000)
             ->assertJsonPath('data.organizers.0.slug', $organizer->slug)
             ->assertJsonPath('data.events.0.slug', $event->slug)
+            ->assertJsonPath('data.events.0.is_internal', true)
             ->assertJsonMissingPath('data.events.1');
     }
 

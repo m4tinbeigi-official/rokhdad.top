@@ -17,6 +17,7 @@ import { loadOrganizerDashboard } from './organizer/dashboard.js'
 const apiBaseUrl = getApiBaseUrl()
 const api = createRokhdadApi()
 const currentPath = window.location.pathname
+const siteOrigin = window.location.origin
 const events = ref([])
 const meta = ref(null)
 const isLoading = ref(true)
@@ -42,8 +43,12 @@ const organizerDashboard = ref(null)
 const organizerDashboardLoading = ref(false)
 const organizerDashboardError = ref(null)
 const hasOrganizerDashboard = computed(() => organizerDashboard.value?.organizers.length > 0)
+const copyFeedback = ref({})
 
 const pageKind = computed(() => {
+  if (currentPath.startsWith('/embed/events/')) {
+    return 'event-embed'
+  }
   if (currentPath === '/categories') {
     return 'categories'
   }
@@ -84,6 +89,9 @@ const currentSlug = computed(() => {
   if (pageKind.value === 'event-detail') {
     return currentPath.substring('/events/'.length)
   }
+  if (pageKind.value === 'event-embed') {
+    return currentPath.substring('/embed/events/'.length)
+  }
   if (pageKind.value === 'organizer-detail') {
     return currentPath.substring('/organizers/'.length)
   }
@@ -120,6 +128,7 @@ onMounted(() => {
     pageKind.value === 'category-detail' ||
     pageKind.value === 'city-detail' ||
     pageKind.value === 'event-detail' ||
+    pageKind.value === 'event-embed' ||
     pageKind.value === 'organizer-detail' ||
     pageKind.value === 'person-detail'
   ) {
@@ -267,7 +276,7 @@ async function fetchDetail() {
       const eventsResult = await loadHomepageEvents(api, { city: slug })
       events.value = eventsResult.events
       meta.value = eventsResult.meta
-    } else if (pageKind.value === 'event-detail') {
+    } else if (pageKind.value === 'event-detail' || pageKind.value === 'event-embed') {
       const eventPayload = await api.getEvent(slug)
       const rawEvent = eventPayload?.data
       if (!rawEvent) {
@@ -306,7 +315,9 @@ async function fetchDetail() {
       registrationFormState.value = createRegistrationFormState(rawEvent.registration_form)
       registrationQuantity.value = rawEvent.registration_rules?.min_quantity || 1
       registrationPromoCode.value = ''
-      applySeoMetadata(rawEvent.seo)
+      if (pageKind.value === 'event-detail') {
+        applySeoMetadata(rawEvent.seo)
+      }
     } else if (pageKind.value === 'organizer-detail') {
       const orgPayload = await api.getOrganizer(slug)
       const rawOrg = orgPayload?.data
@@ -404,6 +415,29 @@ function getErrorMessage(caught) {
   return 'خطای پیش بینی نشده رخ داد.'
 }
 
+function getEventEmbedUrl(slug) {
+  return `${siteOrigin}/embed/events/${slug}`
+}
+
+function getEventEmbedCode(slug) {
+  const embedUrl = getEventEmbedUrl(slug)
+  return `<iframe src="${embedUrl}" title="ثبت نام رویداد" width="100%" height="860" style="border:0;border-radius:16px;overflow:hidden" loading="lazy"></iframe>`
+}
+
+async function copyText(key, text) {
+  try {
+    await navigator.clipboard.writeText(text)
+    copyFeedback.value = { ...copyFeedback.value, [key]: 'کپی شد.' }
+    window.setTimeout(() => {
+      const nextState = { ...copyFeedback.value }
+      delete nextState[key]
+      copyFeedback.value = nextState
+    }, 2500)
+  } catch {
+    copyFeedback.value = { ...copyFeedback.value, [key]: 'کپی ناموفق بود.' }
+  }
+}
+
 function applySeoMetadata(seo) {
   if (!seo) {
     return
@@ -471,7 +505,7 @@ function setJsonLd(payload) {
 
 <template>
   <div class="min-h-screen bg-canvas text-ink">
-    <header class="border-b border-line bg-surface/95">
+    <header v-if="pageKind !== 'event-embed'" class="border-b border-line bg-surface/95">
       <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
         <a class="text-2xl font-black text-brand-900" href="/" aria-label="رخداد">
           رخداد
@@ -608,10 +642,216 @@ function setJsonLd(payload) {
                   <dd class="mt-1 font-black text-ink">{{ formatDashboardMoney(event.revenue_total) }}</dd>
                 </div>
               </dl>
+              <div
+                v-if="event.is_internal"
+                class="mt-4 grid gap-3 rounded-lg border border-dashed border-line bg-canvas p-3"
+              >
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                  <p class="text-xs font-black text-ink">ویجت ثبت نام</p>
+                  <a
+                    :href="getEventEmbedUrl(event.slug)"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="text-xs font-bold text-brand-700 hover:text-brand-900"
+                    dir="ltr"
+                  >
+                    /embed/events/{{ event.slug }}
+                  </a>
+                </div>
+                <label class="grid gap-1 text-xs font-bold text-muted">
+                  آدرس امبد
+                  <div class="flex flex-wrap items-center gap-2">
+                    <input
+                      :value="getEventEmbedUrl(event.slug)"
+                      class="min-w-0 flex-1 rounded-md border border-line bg-white px-3 py-2 text-xs text-ink outline-none"
+                      type="text"
+                      dir="ltr"
+                      readonly
+                    />
+                    <button
+                      class="rounded-md border border-line bg-white px-3 py-2 text-xs font-bold text-brand-800 hover:bg-brand-50"
+                      type="button"
+                      @click="copyText(`embed-url-${event.id}`, getEventEmbedUrl(event.slug))"
+                    >
+                      کپی
+                    </button>
+                  </div>
+                </label>
+                <label class="grid gap-1 text-xs font-bold text-muted">
+                  کد iframe
+                  <textarea
+                    :value="getEventEmbedCode(event.slug)"
+                    class="min-h-28 rounded-md border border-line bg-white px-3 py-2 text-xs leading-6 text-ink outline-none"
+                    dir="ltr"
+                    readonly
+                  />
+                </label>
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                  <p class="text-[11px] leading-5 text-muted">
+                    این ویجت فرم ثبت نام داخلی همان رویداد را برای سایت های دیگر نمایش می دهد.
+                  </p>
+                  <button
+                    class="rounded-md border border-line bg-white px-3 py-2 text-xs font-bold text-brand-800 hover:bg-brand-50"
+                    type="button"
+                    @click="copyText(`embed-code-${event.id}`, getEventEmbedCode(event.slug))"
+                  >
+                    کپی iframe
+                  </button>
+                </div>
+                <p v-if="copyFeedback[`embed-url-${event.id}`] || copyFeedback[`embed-code-${event.id}`]" class="text-[11px] font-bold text-brand-700">
+                  {{ copyFeedback[`embed-code-${event.id}`] || copyFeedback[`embed-url-${event.id}`] }}
+                </p>
+              </div>
             </article>
           </section>
         </section>
       </template>
+    </main>
+
+    <main v-else-if="pageKind === 'event-embed'" class="mx-auto grid min-h-screen max-w-2xl items-start px-3 py-3 sm:px-4 sm:py-4">
+      <div v-if="isLoading" class="flex min-h-80 items-center justify-center rounded-lg border border-line bg-surface p-6 shadow-soft">
+        <div class="text-sm font-bold text-brand-700">در حال بارگذاری ویجت ثبت نام...</div>
+      </div>
+      <div v-else-if="error" class="rounded-lg border border-line bg-surface p-5 shadow-soft" role="alert">
+        <h3 class="text-base font-black text-ink">ویجت در دسترس نیست</h3>
+        <p class="mt-2 text-sm leading-7 text-muted">{{ error }}</p>
+      </div>
+      <section v-else-if="detailItem" class="grid gap-4 rounded-lg border border-line bg-surface p-4 shadow-soft sm:p-5">
+        <div class="grid gap-3 border-b border-line pb-4">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <span class="rounded-md bg-brand-50 px-2.5 py-1 text-xs font-black text-brand-800">{{ detailItem.badge }}</span>
+            <a :href="`/events/${currentSlug}`" target="_blank" rel="noopener noreferrer" class="text-xs font-bold text-brand-700 hover:text-brand-900">
+              مشاهده صفحه رویداد
+            </a>
+          </div>
+          <div>
+            <h1 class="text-xl font-black leading-8 text-ink">{{ detailItem.title }}</h1>
+            <p class="mt-2 text-sm leading-7 text-muted">{{ detailItem.summary }}</p>
+          </div>
+          <dl class="grid gap-2 text-xs text-muted sm:grid-cols-2">
+            <div>
+              <dt class="font-bold">زمان</dt>
+              <dd class="mt-1 text-ink">{{ detailItem.date }}</dd>
+            </div>
+            <div>
+              <dt class="font-bold">مکان</dt>
+              <dd class="mt-1 text-ink">{{ detailItem.location }}</dd>
+            </div>
+            <div v-if="detailItem.organizer">
+              <dt class="font-bold">برگزارکننده</dt>
+              <dd class="mt-1 text-ink">{{ detailItem.organizer.name }}</dd>
+            </div>
+            <div v-if="detailItem.registration_rules?.min_quantity || detailItem.registration_rules?.max_quantity">
+              <dt class="font-bold">محدوده ثبت نام</dt>
+              <dd class="mt-1 text-ink">
+                <span v-if="detailItem.registration_rules?.min_quantity">حداقل {{ detailItem.registration_rules.min_quantity }}</span>
+                <span v-if="detailItem.registration_rules?.min_quantity && detailItem.registration_rules?.max_quantity"> / </span>
+                <span v-if="detailItem.registration_rules?.max_quantity">حداکثر {{ detailItem.registration_rules.max_quantity }}</span>
+              </dd>
+            </div>
+          </dl>
+        </div>
+
+        <div
+          v-if="detailItem.registration_form?.fields?.length"
+          class="grid gap-3 rounded-lg border border-line bg-canvas p-3"
+        >
+          <div>
+            <h2 class="text-sm font-black text-ink">{{ detailItem.registration_form.title || 'فرم ثبت نام' }}</h2>
+            <p v-if="detailItem.registration_form.description" class="mt-1 text-xs leading-6 text-muted">
+              {{ detailItem.registration_form.description }}
+            </p>
+          </div>
+
+          <label
+            v-for="field in detailItem.registration_form.fields"
+            :key="field.name"
+            class="grid gap-1 text-sm font-bold text-ink"
+          >
+            <span>
+              {{ field.label }}
+              <span v-if="field.required" class="text-brand-700">*</span>
+            </span>
+
+            <textarea
+              v-if="field.type === 'textarea'"
+              v-model="registrationFormState[field.name]"
+              class="min-h-24 rounded-md border border-line bg-white px-3 py-2 text-base outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
+              :placeholder="field.placeholder || ''"
+            />
+
+            <select
+              v-else-if="field.type === 'select'"
+              v-model="registrationFormState[field.name]"
+              class="rounded-md border border-line bg-white px-3 py-2 text-base outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
+            >
+              <option value="">انتخاب کنید</option>
+              <option v-for="option in field.options" :key="option.value" :value="option.value">
+                {{ option.label }}
+              </option>
+            </select>
+
+            <span
+              v-else-if="field.type === 'checkbox'"
+              class="flex items-center gap-2 rounded-md border border-line bg-white px-3 py-2 text-sm font-medium text-ink"
+            >
+              <input
+                v-model="registrationFormState[field.name]"
+                class="h-4 w-4 accent-brand-700"
+                type="checkbox"
+              />
+              {{ field.placeholder || 'تایید می کنم' }}
+            </span>
+
+            <input
+              v-else
+              v-model.trim="registrationFormState[field.name]"
+              class="rounded-md border border-line bg-white px-3 py-2 text-base outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
+              type="text"
+              :maxlength="field.max_length || null"
+              :placeholder="field.placeholder || ''"
+            />
+          </label>
+        </div>
+
+        <div v-if="detailItem.is_internal" class="grid gap-3 rounded-lg border border-line bg-canvas p-3 sm:grid-cols-2">
+          <label class="grid gap-1 text-sm font-bold text-ink">
+            تعداد
+            <input
+              v-model.number="registrationQuantity"
+              class="rounded-md border border-line bg-white px-3 py-2 text-base outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
+              type="number"
+              :min="detailItem.registration_rules?.min_quantity || 1"
+              :max="detailItem.registration_rules?.max_quantity || 10"
+            />
+          </label>
+
+          <label class="grid gap-1 text-sm font-bold text-ink">
+            کد تخفیف
+            <input
+              v-model.trim="registrationPromoCode"
+              class="rounded-md border border-line bg-white px-3 py-2 text-base uppercase outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
+              type="text"
+              placeholder="مثلاً SAVE25"
+            />
+          </label>
+        </div>
+
+        <button
+          class="rounded-md bg-brand-700 px-4 py-3 text-center text-sm font-bold text-white shadow-sm transition hover:bg-brand-800 disabled:cursor-not-allowed disabled:bg-muted"
+          type="button"
+          :disabled="isRegistering || !detailItem.is_internal || !detailItem.registration_open"
+          @click="submitEventRegistration"
+        >
+          ثبت‌نام مستقیم رویداد
+        </button>
+        <p v-if="detailItem.registration_instructions" class="text-xs leading-6 text-muted">
+          {{ detailItem.registration_instructions }}
+        </p>
+        <p v-if="registrationFeedback" class="rounded-md border border-line bg-canvas px-3 py-2 text-xs font-bold leading-6 text-muted">
+          {{ registrationFeedback }}
+        </p>
+      </section>
     </main>
 
     <main v-else-if="pageKind === 'home'" class="mx-auto grid max-w-7xl gap-8 px-4 py-6 sm:px-6 lg:px-8">
