@@ -24,6 +24,10 @@ class PublicEventDetailApiTest extends TestCase
             'capacity' => 50,
             'requires_approval' => true,
             'registration_instructions' => 'Bring ID.',
+            'visibility' => 'public',
+            'series_slug' => 'product-office-hours',
+            'recurrence_rule' => 'weekly',
+            'recurrence_ends_at' => now()->addWeeks(6),
             'metadata' => [
                 'language' => 'fa',
                 'registration_form' => [
@@ -67,6 +71,10 @@ class PublicEventDetailApiTest extends TestCase
             ->assertJsonPath('data.capacity', 50)
             ->assertJsonPath('data.requires_approval', true)
             ->assertJsonPath('data.registration_instructions', 'Bring ID.')
+            ->assertJsonPath('data.visibility', 'public')
+            ->assertJsonPath('data.series.series_slug', 'product-office-hours')
+            ->assertJsonPath('data.series.recurrence_rule', 'weekly')
+            ->assertJsonPath('data.series.is_recurring', true)
             ->assertJsonPath('data.registration_form.title', 'فرم تکمیلی')
             ->assertJsonPath('data.registration_form.fields.0.name', 'company')
             ->assertJsonPath('data.registration_form.fields.0.required', true)
@@ -95,6 +103,18 @@ class PublicEventDetailApiTest extends TestCase
         ]);
 
         $this->getJson('/api/v1/events/draft-detail-event')
+            ->assertNotFound();
+    }
+
+    public function test_event_detail_does_not_return_private_events(): void
+    {
+        Event::factory()->create([
+            'slug' => 'private-detail-event',
+            'status' => 'published',
+            'visibility' => 'private',
+        ]);
+
+        $this->getJson('/api/v1/events/private-detail-event')
             ->assertNotFound();
     }
 }

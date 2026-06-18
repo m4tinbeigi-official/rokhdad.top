@@ -289,6 +289,8 @@ async function fetchDetail() {
         is_internal: rawEvent.is_internal,
         registration_open: rawEvent.registration_open,
         registration_instructions: rawEvent.registration_instructions,
+        visibility: rawEvent.visibility || 'public',
+        series: rawEvent.series,
         registration_form: rawEvent.registration_form,
         registration_rules: rawEvent.registration_rules,
         category: rawEvent.category,
@@ -968,6 +970,9 @@ function setJsonLd(payload) {
           <div class="flex flex-wrap items-center justify-between gap-3 border-b border-line pb-4">
             <div>
               <span class="rounded-md bg-brand-50 px-2.5 py-1 text-xs font-black text-brand-800">{{ detailItem.badge }}</span>
+              <span v-if="detailItem.series?.is_recurring" class="mr-2 rounded-md bg-muted-100 px-2.5 py-1 text-xs font-black text-ink">
+                تکرارشونده
+              </span>
             </div>
             <div class="text-xs font-bold text-muted" dir="ltr">شروع: {{ detailItem.date }}</div>
           </div>
@@ -1037,6 +1042,13 @@ function setJsonLd(payload) {
                   <a :href="`/organizers/${detailItem.organizer.slug}`" class="text-brand-700 hover:text-brand-900 font-bold">
                     {{ detailItem.organizer.name }}
                   </a>
+                </dd>
+              </div>
+              <div v-if="detailItem.series?.is_recurring">
+                <dt class="font-bold text-muted">سری رویداد</dt>
+                <dd class="mt-1 text-ink font-bold">{{ detailItem.series.series_slug }}</dd>
+                <dd class="mt-1 text-xs text-muted">
+                  الگو: {{ detailItem.series.recurrence_rule }}
                 </dd>
               </div>
             </dl>

@@ -16,9 +16,15 @@ class PublicEventsApiTest extends TestCase
             'title' => 'Published Event',
             'status' => 'published',
             'starts_at' => now()->addDay(),
+            'visibility' => 'public',
         ]);
         Event::factory()->create(['status' => 'draft']);
         Event::factory()->create(['status' => 'cancelled']);
+        Event::factory()->create([
+            'title' => 'Private Event',
+            'status' => 'published',
+            'visibility' => 'private',
+        ]);
 
         $response = $this->getJson('/api/v1/events');
 
@@ -28,6 +34,7 @@ class PublicEventsApiTest extends TestCase
             ->assertJsonPath('data.0.id', $published->id)
             ->assertJsonPath('data.0.title', 'Published Event')
             ->assertJsonPath('data.0.status', 'published')
+            ->assertJsonPath('data.0.visibility', 'public')
             ->assertJsonStructure([
                 'data' => [[
                     'id',
@@ -39,6 +46,7 @@ class PublicEventsApiTest extends TestCase
                     'timezone',
                     'event_type',
                     'status',
+                    'visibility',
                     'category',
                     'city',
                     'organizer',
@@ -150,5 +158,18 @@ class PublicEventsApiTest extends TestCase
 
         $response = $this->getJson('/api/v1/events?start_date=' . now()->format('Y-m-d') . '&end_date=' . now()->addDay()->format('Y-m-d'));
         $response->assertOk()->assertJsonPath('meta.total', 1)->assertJsonPath('data.0.title', 'Today Event');
+    }
+
+    public function test_private_events_are_not_publicly_listed(): void
+    {
+        Event::factory()->create([
+            'title' => 'Hidden Event',
+            'status' => 'published',
+            'visibility' => 'private',
+        ]);
+
+        $this->getJson('/api/v1/events')
+            ->assertOk()
+            ->assertJsonPath('meta.total', 0);
     }
 }

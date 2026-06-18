@@ -27,6 +27,10 @@ class Event extends Model
         'timezone',
         'event_type',
         'status',
+        'visibility',
+        'series_slug',
+        'recurrence_rule',
+        'recurrence_ends_at',
         'venue_name',
         'venue_address',
         'latitude',
@@ -59,6 +63,7 @@ class Event extends Model
             'registration_starts_at' => 'datetime',
             'registration_ends_at' => 'datetime',
             'requires_approval' => 'boolean',
+            'recurrence_ends_at' => 'datetime',
         ];
     }
 

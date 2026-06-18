@@ -24,6 +24,10 @@ class InternalEventModelTest extends TestCase
             'registration_ends_at',
             'requires_approval',
             'registration_instructions',
+            'visibility',
+            'series_slug',
+            'recurrence_rule',
+            'recurrence_ends_at',
         ] as $column) {
             $this->assertTrue(Schema::hasColumn('events', $column), "Missing events.$column");
         }
@@ -41,6 +45,10 @@ class InternalEventModelTest extends TestCase
             'registration_ends_at' => now()->addWeek(),
             'requires_approval' => true,
             'registration_instructions' => 'Bring national ID.',
+            'visibility' => 'private',
+            'series_slug' => 'weekly-product-clinic',
+            'recurrence_rule' => 'weekly',
+            'recurrence_ends_at' => now()->addMonth(),
         ]);
 
         $this->assertTrue($event->is_internal);
@@ -48,6 +56,10 @@ class InternalEventModelTest extends TestCase
         $this->assertSame(120, $event->capacity);
         $this->assertTrue($event->registration_starts_at->isBefore($event->registration_ends_at));
         $this->assertTrue($event->requires_approval);
+        $this->assertSame('private', $event->visibility);
+        $this->assertSame('weekly-product-clinic', $event->series_slug);
+        $this->assertSame('weekly', $event->recurrence_rule);
+        $this->assertNotNull($event->recurrence_ends_at);
     }
 
     public function test_event_has_ticket_types_and_registrations(): void

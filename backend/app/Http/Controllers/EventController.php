@@ -15,7 +15,8 @@ class EventController extends Controller
 
         $query = Event::query()
             ->with(['category', 'city', 'organizer', 'sourceAttributions'])
-            ->where('status', 'published');
+            ->where('status', 'published')
+            ->where('visibility', 'public');
 
         if ($request->has('q')) {
             $keyword = trim($request->string('q'));
@@ -113,6 +114,7 @@ class EventController extends Controller
             ->with(['category', 'city', 'organizer', 'people', 'sourceAttributions'])
             ->where('slug', $slug)
             ->where('status', 'published')
+            ->where('visibility', 'public')
             ->firstOrFail();
 
         return response()->json([
@@ -135,6 +137,7 @@ class EventController extends Controller
             'timezone' => $event->timezone,
             'event_type' => $event->event_type,
             'status' => $event->status,
+            'visibility' => $event->visibility,
             'venue_name' => $event->venue_name,
             'online_url' => $event->online_url,
             'canonical_url' => $event->canonical_url,
@@ -180,6 +183,7 @@ class EventController extends Controller
             'registration_ends_at' => $event->registration_ends_at?->toJSON(),
             'requires_approval' => $event->requires_approval,
             'registration_instructions' => $event->registration_instructions,
+            'series' => $this->seriesPayload($event),
             'registration_form' => $this->registrationFormPayload($event),
             'registration_rules' => $this->registrationRulesPayload($event),
             'seo' => $this->seoPayload($event),
@@ -263,6 +267,23 @@ class EventController extends Controller
         return [
             'min_quantity' => $minQuantity,
             'max_quantity' => $maxQuantity,
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>|null
+     */
+    private function seriesPayload(Event $event): ?array
+    {
+        if (! $event->series_slug && ! $event->recurrence_rule) {
+            return null;
+        }
+
+        return [
+            'series_slug' => $event->series_slug,
+            'recurrence_rule' => $event->recurrence_rule,
+            'recurrence_ends_at' => $event->recurrence_ends_at?->toJSON(),
+            'is_recurring' => (bool) $event->recurrence_rule,
         ];
     }
 
