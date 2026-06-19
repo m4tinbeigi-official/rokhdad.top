@@ -32,6 +32,7 @@ test('loadOrganizerDashboard passes auth token and normalizes metrics', async ()
   assert.equal(dashboard.organizers[0].href, '/organizers/rokhdad')
   assert.equal(dashboard.events[0].href, '/events/test-event')
   assert.equal(dashboard.events[0].is_internal, true)
+  assert.equal(dashboard.events[0].attendees_export_href, '/api/v1/me/events/10/attendees/export')
 })
 
 test('normalizeOrganizerDashboard provides empty-state fallbacks', () => {

@@ -45,6 +45,7 @@ function normalizeOrganizerEvent(event = {}) {
     confirmed_registrations_count: Number(event.confirmed_registrations_count || 0),
     tickets_count: Number(event.tickets_count || 0),
     revenue_total: Number(event.revenue_total || 0),
+    attendees_export_href: event.id ? `/api/v1/me/events/${event.id}/attendees/export` : '#',
     organizer: event.organizer?.name || 'برگزارکننده نامشخص',
     city: event.city?.name || 'شهر نامشخص',
     category: event.category?.name || 'عمومی',

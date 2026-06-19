@@ -96,6 +96,19 @@ export function createApiClient({
     getOrganizerDashboard: (token) => request('/me/organizer-dashboard', {
       headers: token ? { Authorization: `Bearer ${token}` } : undefined,
     }),
+    exportEventAttendees: (eventId, token) => request(`/me/events/${encodeURIComponent(eventId)}/attendees/export`, {
+      headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+    }),
+    importEventAttendees: (eventId, file, token) => {
+      const formData = new FormData()
+      formData.append('file', file)
+
+      return request(`/me/events/${encodeURIComponent(eventId)}/attendees/import`, {
+        method: 'POST',
+        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+        body: formData,
+      })
+    },
   }
 }
 

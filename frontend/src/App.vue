@@ -44,6 +44,7 @@ const organizerDashboardLoading = ref(false)
 const organizerDashboardError = ref(null)
 const hasOrganizerDashboard = computed(() => organizerDashboard.value?.organizers.length > 0)
 const copyFeedback = ref({})
+const attendeeTransferState = ref({})
 
 const pageKind = computed(() => {
   if (currentPath.startsWith('/embed/events/')) {
@@ -182,6 +183,78 @@ function formatDashboardNumber(value) {
 
 function formatDashboardMoney(value) {
   return `${formatDashboardNumber(value)} ریال`
+}
+
+function setAttendeeTransferState(eventId, patch) {
+  attendeeTransferState.value = {
+    ...attendeeTransferState.value,
+    [eventId]: {
+      ...(attendeeTransferState.value[eventId] || {}),
+      ...patch,
+    },
+  }
+}
+
+async function exportAttendees(eventId) {
+  const token = window.localStorage.getItem('rokhdad_api_token')
+  if (!token) {
+    setAttendeeTransferState(eventId, { feedback: 'برای خروجی گرفتن ابتدا وارد حساب کاربری شوید.' })
+    return
+  }
+
+  setAttendeeTransferState(eventId, { exporting: true, feedback: null })
+
+  try {
+    const response = await fetch(`${apiBaseUrl}/me/events/${encodeURIComponent(eventId)}/attendees/export`, {
+      headers: {
+        Accept: 'text/csv',
+        Authorization: `Bearer ${token}`,
+      },
+    })
+
+    if (!response.ok) {
+      throw new ApiError('خروجی شرکت کننده ها ناموفق بود.', { status: response.status })
+    }
+
+    const blob = await response.blob()
+    const url = window.URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `attendees-${eventId}.csv`
+    document.body.appendChild(link)
+    link.click()
+    link.remove()
+    window.URL.revokeObjectURL(url)
+
+    setAttendeeTransferState(eventId, { exporting: false, feedback: 'فایل خروجی دانلود شد.' })
+  } catch (caught) {
+    setAttendeeTransferState(eventId, { exporting: false, feedback: getErrorMessage(caught) })
+  }
+}
+
+async function importAttendees(eventId, file) {
+  const token = window.localStorage.getItem('rokhdad_api_token')
+  if (!token) {
+    setAttendeeTransferState(eventId, { feedback: 'برای ورود فایل ابتدا وارد حساب کاربری شوید.' })
+    return
+  }
+
+  if (!file) {
+    return
+  }
+
+  setAttendeeTransferState(eventId, { importing: true, feedback: null })
+
+  try {
+    const payload = await api.importEventAttendees(eventId, file, token)
+    setAttendeeTransferState(eventId, {
+      importing: false,
+      feedback: `${payload?.data?.imported_count || 0} شرکت کننده وارد شد.`,
+    })
+    await fetchOrganizerDashboard()
+  } catch (caught) {
+    setAttendeeTransferState(eventId, { importing: false, feedback: getErrorMessage(caught) })
+  }
 }
 
 async function fetchFilterOptions() {
@@ -646,6 +719,35 @@ function setJsonLd(payload) {
                 v-if="event.is_internal"
                 class="mt-4 grid gap-3 rounded-lg border border-dashed border-line bg-canvas p-3"
               >
+                <div class="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-line bg-white p-3">
+                  <div>
+                    <p class="text-xs font-black text-ink">شرکت کننده ها</p>
+                    <p class="mt-1 text-[11px] leading-5 text-muted">دریافت فایل CSV یا ورود گروهی attendee برای همین رویداد</p>
+                  </div>
+                  <div class="flex flex-wrap items-center gap-2">
+                    <button
+                      class="rounded-md border border-line bg-white px-3 py-2 text-xs font-bold text-brand-800 hover:bg-brand-50 disabled:cursor-not-allowed disabled:bg-canvas"
+                      type="button"
+                      :disabled="attendeeTransferState[event.id]?.exporting"
+                      @click="exportAttendees(event.id)"
+                    >
+                      {{ attendeeTransferState[event.id]?.exporting ? 'در حال خروجی...' : 'خروجی CSV' }}
+                    </button>
+                    <label class="cursor-pointer rounded-md border border-line bg-white px-3 py-2 text-xs font-bold text-brand-800 hover:bg-brand-50">
+                      {{ attendeeTransferState[event.id]?.importing ? 'در حال ورود...' : 'ورود CSV' }}
+                      <input
+                        class="hidden"
+                        type="file"
+                        accept=".csv,text/csv"
+                        :disabled="attendeeTransferState[event.id]?.importing"
+                        @change="(inputEvent) => importAttendees(event.id, inputEvent.target.files?.[0])"
+                      />
+                    </label>
+                  </div>
+                </div>
+                <p v-if="attendeeTransferState[event.id]?.feedback" class="text-[11px] font-bold text-brand-700">
+                  {{ attendeeTransferState[event.id].feedback }}
+                </p>
                 <div class="flex flex-wrap items-center justify-between gap-2">
                   <p class="text-xs font-black text-ink">ویجت ثبت نام</p>
                   <a

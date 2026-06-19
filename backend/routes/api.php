@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\AttendeeTransferController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\EventRegistrationController;
@@ -111,6 +112,8 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
 
         // Organizer dashboard foundation (P27-001)
         Route::get('/me/organizer-dashboard', [OrganizerDashboardController::class, 'show'])->name('me.organizer-dashboard.show');
+        Route::get('/me/events/{id}/attendees/export', [AttendeeTransferController::class, 'export'])->name('me.events.attendees.export');
+        Route::post('/me/events/{id}/attendees/import', [AttendeeTransferController::class, 'import'])->name('me.events.attendees.import');
 
         // Webhook subscriptions (P28-002)
         Route::get('/me/webhook-subscriptions', [WebhookSubscriptionController::class, 'index'])->name('me.webhook-subscriptions.index');
