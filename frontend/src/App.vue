@@ -185,6 +185,10 @@ function formatDashboardMoney(value) {
   return `${formatDashboardNumber(value)} ریال`
 }
 
+function formatEventTypeLabel(value) {
+  return { in_person: 'حضوری', online: 'آنلاین', hybrid: 'ترکیبی' }[value] || 'سایر'
+}
+
 function setAttendeeTransferState(eventId, patch) {
   attendeeTransferState.value = {
     ...attendeeTransferState.value,
@@ -662,6 +666,69 @@ function setJsonLd(payload) {
           </article>
         </section>
 
+        <section class="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
+          <article class="rounded-lg border border-line bg-surface p-4 shadow-soft">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <h2 class="text-lg font-black text-ink">تحلیل ثبت نام</h2>
+              <p class="text-xs font-bold text-muted">۱۴ روز اخیر</p>
+            </div>
+            <div class="mt-4 grid gap-3 md:grid-cols-3">
+              <div class="rounded-lg border border-line bg-canvas p-3">
+                <p class="text-xs font-bold text-muted">نرخ تبدیل</p>
+                <p class="mt-2 text-xl font-black text-ink">{{ organizerDashboard.summary.conversion_rate }}٪</p>
+              </div>
+              <div class="rounded-lg border border-line bg-canvas p-3">
+                <p class="text-xs font-bold text-muted">میانگین درآمد هر ثبت نام</p>
+                <p class="mt-2 text-xl font-black text-ink">{{ formatDashboardMoney(organizerDashboard.summary.avg_revenue_per_registration) }}</p>
+              </div>
+              <div class="rounded-lg border border-line bg-canvas p-3">
+                <p class="text-xs font-bold text-muted">فانل وضعیت</p>
+                <p class="mt-2 text-sm font-bold text-ink">
+                  تایید {{ formatDashboardNumber(organizerDashboard.analytics.registration_funnel.confirmed) }} /
+                  انتظار {{ formatDashboardNumber(organizerDashboard.analytics.registration_funnel.pending) }} /
+                  لغوشده {{ formatDashboardNumber(organizerDashboard.analytics.registration_funnel.cancelled) }}
+                </p>
+              </div>
+            </div>
+            <div class="mt-4 grid gap-2">
+              <div
+                v-for="point in organizerDashboard.analytics.registrations_timeline"
+                :key="point.date"
+                class="grid grid-cols-[86px_1fr_48px] items-center gap-3 text-xs"
+              >
+                <span class="font-bold text-muted" dir="ltr">{{ point.date }}</span>
+                <div class="h-2 overflow-hidden rounded-full bg-brand-50">
+                  <div
+                    class="h-full rounded-full bg-brand-700"
+                    :style="{ width: `${Math.max(6, Math.min(100, (point.registrations_count / Math.max(1, ...organizerDashboard.analytics.registrations_timeline.map((item) => item.registrations_count || 0))) * 100))}%` }"
+                  ></div>
+                </div>
+                <span class="font-black text-ink">{{ formatDashboardNumber(point.registrations_count) }}</span>
+              </div>
+            </div>
+          </article>
+
+          <article class="rounded-lg border border-line bg-surface p-4 shadow-soft">
+            <h2 class="text-lg font-black text-ink">ترکیب رویدادها</h2>
+            <div class="mt-4 grid gap-3">
+              <div
+                v-for="item in organizerDashboard.analytics.event_type_breakdown"
+                :key="item.event_type"
+                class="rounded-lg border border-line bg-canvas p-3"
+              >
+                <div class="flex items-center justify-between gap-3">
+                  <p class="text-sm font-black text-ink">{{ formatEventTypeLabel(item.event_type) }}</p>
+                  <span class="text-xs font-bold text-muted">{{ formatDashboardNumber(item.events_count) }} رویداد</span>
+                </div>
+                <div class="mt-2 flex items-center justify-between gap-3 text-xs text-muted">
+                  <span>{{ formatDashboardNumber(item.registrations_count) }} ثبت نام</span>
+                  <span>{{ formatDashboardMoney(item.revenue_total) }}</span>
+                </div>
+              </div>
+            </div>
+          </article>
+        </section>
+
         <section class="grid gap-5 lg:grid-cols-[320px_1fr]">
           <aside class="grid gap-3 self-start">
             <h2 class="text-lg font-black text-ink">برگزارکننده های من</h2>
@@ -682,6 +749,28 @@ function setJsonLd(payload) {
             <div class="flex flex-wrap items-center justify-between gap-3">
               <h2 class="text-lg font-black text-ink">رویدادهای اخیر</h2>
               <p class="text-xs font-bold text-muted">۸ رویداد آخر برای پایش سریع عملیات</p>
+            </div>
+            <div v-if="organizerDashboard.analytics.top_events.length > 0" class="rounded-lg border border-line bg-surface p-4 shadow-soft">
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <h3 class="text-base font-black text-ink">پرفروش ترین رویدادها</h3>
+                <p class="text-xs font-bold text-muted">مرتب شده بر اساس فروش ثبت شده</p>
+              </div>
+              <div class="mt-4 grid gap-3">
+                <div
+                  v-for="event in organizerDashboard.analytics.top_events"
+                  :key="`top-${event.id}`"
+                  class="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-line bg-canvas p-3"
+                >
+                  <div>
+                    <a class="text-sm font-black text-ink hover:text-brand-800" :href="event.href">{{ event.title }}</a>
+                    <p class="mt-1 text-xs text-muted">
+                      {{ formatDashboardNumber(event.confirmed_registrations_count) }} تایید شده از
+                      {{ formatDashboardNumber(event.registrations_count) }} ثبت نام
+                    </p>
+                  </div>
+                  <p class="text-sm font-black text-ink">{{ formatDashboardMoney(event.revenue_total) }}</p>
+                </div>
+              </div>
             </div>
             <article
               v-for="event in organizerDashboard.events"

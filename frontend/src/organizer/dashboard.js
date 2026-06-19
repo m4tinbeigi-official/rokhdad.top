@@ -13,9 +13,47 @@ export function normalizeOrganizerDashboard(data = {}) {
       tickets_count: Number(data.summary?.tickets_count || 0),
       revenue_total: Number(data.summary?.revenue_total || 0),
       currency: data.summary?.currency || 'IRR',
+      conversion_rate: Number(data.summary?.conversion_rate || 0),
+      avg_revenue_per_registration: Number(data.summary?.avg_revenue_per_registration || 0),
     },
+    analytics: normalizeAnalytics(data.analytics),
     organizers: Array.isArray(data.organizers) ? data.organizers.map(normalizeOrganizer) : [],
     events: Array.isArray(data.events) ? data.events.map(normalizeOrganizerEvent) : [],
+  }
+}
+
+function normalizeAnalytics(analytics = {}) {
+  return {
+    registration_funnel: {
+      pending: Number(analytics.registration_funnel?.pending || 0),
+      confirmed: Number(analytics.registration_funnel?.confirmed || 0),
+      cancelled: Number(analytics.registration_funnel?.cancelled || 0),
+    },
+    registrations_timeline: Array.isArray(analytics.registrations_timeline)
+      ? analytics.registrations_timeline.map((point) => ({
+        date: point.date || '',
+        registrations_count: Number(point.registrations_count || 0),
+      }))
+      : [],
+    event_type_breakdown: Array.isArray(analytics.event_type_breakdown)
+      ? analytics.event_type_breakdown.map((item) => ({
+        event_type: item.event_type || 'in_person',
+        events_count: Number(item.events_count || 0),
+        registrations_count: Number(item.registrations_count || 0),
+        revenue_total: Number(item.revenue_total || 0),
+      }))
+      : [],
+    top_events: Array.isArray(analytics.top_events)
+      ? analytics.top_events.map((event) => ({
+        id: event.id,
+        title: event.title || 'رویداد بدون عنوان',
+        slug: event.slug || '',
+        registrations_count: Number(event.registrations_count || 0),
+        confirmed_registrations_count: Number(event.confirmed_registrations_count || 0),
+        revenue_total: Number(event.revenue_total || 0),
+        href: event.slug ? `/events/${event.slug}` : '#',
+      }))
+      : [],
   }
 }
 

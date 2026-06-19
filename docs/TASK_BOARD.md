@@ -184,7 +184,7 @@ The project is API-first, GitHub-first, and server-only at runtime. The local ma
 | P28-001 | 28 | Add embed registration widget | DONE | P19-002 | Embeddable widget | External HTML test | L | COULD |
 | P28-002 | 28 | Add webhooks framework | DONE | P19-002, P20-004 | Webhook subscriptions | Delivery tests | L | SHOULD |
 | P28-003 | 28 | Add attendee import/export | DONE | P19-002, P27-001 | CSV import/export | File tests | M | SHOULD |
-| P29-001 | 29 | Add organizer analytics dashboard | PENDING | P27-001, P19-002 | Analytics UI/API | Data accuracy tests | L | SHOULD |
+| P29-001 | 29 | Add organizer analytics dashboard | DONE | P27-001, P19-002 | Analytics UI/API | Data accuracy tests | L | SHOULD |
 | P29-002 | 29 | Add campaign manager foundation | PENDING | P24-001, P24-002 | Campaign workflow | Send simulation | L | COULD |
 | P30-001 | 30 | Add settlement ledger model | PENDING | P20-004 | Ledger tables | Accounting tests | L | SHOULD |
 | P30-002 | 30 | Add organizer settlement dashboard | PENDING | P30-001, P27-001 | Settlement UI | Admin review | L | SHOULD |
@@ -561,6 +561,7 @@ Completed:
 - P28-001
 - P28-002
 - P28-003
+- P29-001
 
 In Progress:
 
@@ -574,8 +575,8 @@ Blocked:
 
 Next Recommended Task:
 
-- P29-001
+- P29-002
 
 ## 15. Next Recommended Step
 
-Next implementation can continue with P29-001 for organizer analytics dashboard. P6-003 and P8-003 remain blocked by their upstream dependencies.
+Next implementation can continue with P29-002 for campaign manager foundation. P6-003 and P8-003 remain blocked by their upstream dependencies.

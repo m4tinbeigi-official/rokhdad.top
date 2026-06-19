@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Event;
+use App\Models\Registration;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 
 class OrganizerDashboardController extends Controller
 {
@@ -41,6 +43,11 @@ class OrganizerDashboardController extends Controller
             ->limit(8)
             ->get();
 
+        $registrations = Registration::query()
+            ->with('event:id,organizer_id,event_type,title,slug')
+            ->whereHas('event', fn ($query) => $query->whereIn('organizer_id', $organizerIds))
+            ->get();
+
         return response()->json([
             'data' => [
                 'summary' => [
@@ -51,6 +58,51 @@ class OrganizerDashboardController extends Controller
                     'tickets_count' => (int) $eventStats->sum('tickets_count'),
                     'revenue_total' => (int) $eventStats->sum('paid_revenue'),
                     'currency' => 'IRR',
+                    'conversion_rate' => $eventStats->sum('registrations_count') > 0
+                        ? round(($eventStats->sum('confirmed_registrations_count') / $eventStats->sum('registrations_count')) * 100, 1)
+                        : 0,
+                    'avg_revenue_per_registration' => $eventStats->sum('registrations_count') > 0
+                        ? (int) round($eventStats->sum('paid_revenue') / $eventStats->sum('registrations_count'))
+                        : 0,
+                ],
+                'analytics' => [
+                    'registration_funnel' => [
+                        'pending' => (int) $registrations->where('status', 'pending')->count(),
+                        'confirmed' => (int) $registrations->where('status', 'confirmed')->count(),
+                        'cancelled' => (int) $registrations->where('status', 'cancelled')->count(),
+                    ],
+                    'registrations_timeline' => collect(range(13, 0))
+                        ->map(function (int $daysAgo) use ($registrations) {
+                            $day = Carbon::now()->subDays($daysAgo);
+                            $count = $registrations->filter(fn (Registration $registration) => $registration->created_at?->isSameDay($day))->count();
+
+                            return [
+                                'date' => $day->toDateString(),
+                                'registrations_count' => $count,
+                            ];
+                        })
+                        ->push([
+                            'date' => Carbon::now()->toDateString(),
+                            'registrations_count' => $registrations->filter(fn (Registration $registration) => $registration->created_at?->isSameDay(Carbon::now()))->count(),
+                        ])->values(),
+                    'event_type_breakdown' => collect(['in_person', 'online', 'hybrid'])
+                        ->map(fn (string $type) => [
+                            'event_type' => $type,
+                            'events_count' => (int) $eventStats->where('event_type', $type)->count(),
+                            'registrations_count' => (int) $eventStats->where('event_type', $type)->sum('registrations_count'),
+                            'revenue_total' => (int) $eventStats->where('event_type', $type)->sum('paid_revenue'),
+                        ])->values(),
+                    'top_events' => $eventStats
+                        ->sortByDesc('paid_revenue')
+                        ->take(5)
+                        ->map(fn (Event $event) => [
+                            'id' => $event->id,
+                            'title' => $event->title,
+                            'slug' => $event->slug,
+                            'registrations_count' => (int) $event->registrations_count,
+                            'confirmed_registrations_count' => (int) $event->confirmed_registrations_count,
+                            'revenue_total' => (int) ($event->paid_revenue ?? 0),
+                        ])->values(),
                 ],
                 'organizers' => $organizers->map(fn ($organizer) => [
                     'id' => $organizer->id,
