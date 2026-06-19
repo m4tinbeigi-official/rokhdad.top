@@ -14,6 +14,7 @@ use App\Http\Controllers\RatingController;
 use App\Http\Controllers\SavedEventController;
 use App\Http\Controllers\TicketValidationController;
 use App\Http\Controllers\UserPreferenceController;
+use App\Http\Controllers\WebhookSubscriptionController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/health', function () {
@@ -110,5 +111,11 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
 
         // Organizer dashboard foundation (P27-001)
         Route::get('/me/organizer-dashboard', [OrganizerDashboardController::class, 'show'])->name('me.organizer-dashboard.show');
+
+        // Webhook subscriptions (P28-002)
+        Route::get('/me/webhook-subscriptions', [WebhookSubscriptionController::class, 'index'])->name('me.webhook-subscriptions.index');
+        Route::post('/me/webhook-subscriptions', [WebhookSubscriptionController::class, 'store'])->name('me.webhook-subscriptions.store');
+        Route::put('/me/webhook-subscriptions/{id}', [WebhookSubscriptionController::class, 'update'])->name('me.webhook-subscriptions.update');
+        Route::delete('/me/webhook-subscriptions/{id}', [WebhookSubscriptionController::class, 'destroy'])->name('me.webhook-subscriptions.destroy');
     });
 });

@@ -7,6 +7,8 @@ use App\Models\EventPromoCode;
 use App\Models\EventTicketType;
 use App\Models\Registration;
 use App\Models\Ticket;
+use App\Webhooks\WebhookDispatcher;
+use App\Webhooks\WebhookEventCatalog;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -16,6 +18,8 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class EventRegistrationController extends Controller
 {
+    public function __construct(private WebhookDispatcher $webhooks) {}
+
     public function store(Request $request, string $slug): JsonResponse
     {
         $event = Event::query()
@@ -85,6 +89,34 @@ class EventRegistrationController extends Controller
                 'price' => $ticketType?->price ?? 0,
                 'expires_at' => $event->ends_at,
             ]);
+        }
+
+        $this->webhooks->dispatchForOrganizer(
+            (int) $event->organizer_id,
+            WebhookEventCatalog::REGISTRATION_CREATED,
+            [
+                'registration' => $this->serializeRegistration($registration->load(['event', 'user', 'tickets'])),
+                'event' => [
+                    'id' => $event->id,
+                    'slug' => $event->slug,
+                    'title' => $event->title,
+                ],
+            ],
+        );
+
+        if ($registration->status === 'confirmed') {
+            $this->webhooks->dispatchForOrganizer(
+                (int) $event->organizer_id,
+                WebhookEventCatalog::REGISTRATION_CONFIRMED,
+                [
+                    'registration' => $this->serializeRegistration($registration->load(['event', 'user', 'tickets'])),
+                    'event' => [
+                        'id' => $event->id,
+                        'slug' => $event->slug,
+                        'title' => $event->title,
+                    ],
+                ],
+            );
         }
 
         return response()->json([

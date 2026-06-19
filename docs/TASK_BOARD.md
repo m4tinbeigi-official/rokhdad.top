@@ -182,7 +182,7 @@ The project is API-first, GitHub-first, and server-only at runtime. The local ma
 | P27-003 | 27 | Add promo codes and quantity rules | DONE | P20-001, P27-001 | Ticket rules | Payment tests | L | SHOULD |
 | P27-004 | 27 | Add private and recurring events | DONE | P27-001 | Visibility/series rules | API/UI tests | L | COULD |
 | P28-001 | 28 | Add embed registration widget | DONE | P19-002 | Embeddable widget | External HTML test | L | COULD |
-| P28-002 | 28 | Add webhooks framework | PENDING | P19-002, P20-004 | Webhook subscriptions | Delivery tests | L | SHOULD |
+| P28-002 | 28 | Add webhooks framework | DONE | P19-002, P20-004 | Webhook subscriptions | Delivery tests | L | SHOULD |
 | P28-003 | 28 | Add attendee import/export | PENDING | P19-002, P27-001 | CSV import/export | File tests | M | SHOULD |
 | P29-001 | 29 | Add organizer analytics dashboard | PENDING | P27-001, P19-002 | Analytics UI/API | Data accuracy tests | L | SHOULD |
 | P29-002 | 29 | Add campaign manager foundation | PENDING | P24-001, P24-002 | Campaign workflow | Send simulation | L | COULD |
@@ -559,6 +559,7 @@ Completed:
 - P27-003
 - P27-004
 - P28-001
+- P28-002
 
 In Progress:
 
@@ -572,9 +573,8 @@ Blocked:
 
 Next Recommended Task:
 
-- P6-003
-- P8-003
+- P28-003
 
 ## 15. Next Recommended Step
 
-Next implementation remains blocked on P6-003 and P8-003 upstream dependencies.
+Next implementation can continue with P28-003 for attendee import/export. P6-003 and P8-003 remain blocked by their upstream dependencies.

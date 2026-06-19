@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Payment;
 use App\Models\Registration;
 use App\Payments\PaymentGatewayRegistry;
+use App\Webhooks\WebhookDispatcher;
+use App\Webhooks\WebhookEventCatalog;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -12,7 +14,10 @@ use Illuminate\Support\Str;
 
 class PaymentController extends Controller
 {
-    public function __construct(private PaymentGatewayRegistry $registry) {}
+    public function __construct(
+        private PaymentGatewayRegistry $registry,
+        private WebhookDispatcher $webhooks,
+    ) {}
 
     /**
      * Initiate a payment for a registration.
@@ -107,6 +112,30 @@ class PaymentController extends Controller
             // Update registration payment status
             $payment->registration()->update(['payment_status' => 'paid']);
             $payment->registration->confirm();
+            $payment->refresh();
+            $payment->loadMissing(['registration.event', 'registration.user']);
+
+            $this->webhooks->dispatchForOrganizer(
+                (int) $payment->registration->event->organizer_id,
+                WebhookEventCatalog::PAYMENT_PAID,
+                [
+                    'payment' => [
+                        'id' => $payment->id,
+                        'gateway' => $payment->gateway,
+                        'status' => $payment->status,
+                        'amount' => $payment->amount,
+                        'currency' => $payment->currency,
+                        'gateway_ref_id' => $payment->gateway_ref_id,
+                        'registration_id' => $payment->registration_id,
+                    ],
+                    'registration' => [
+                        'id' => $payment->registration->id,
+                        'status' => $payment->registration->fresh()->status,
+                        'payment_status' => $payment->registration->fresh()->payment_status,
+                        'event_id' => $payment->registration->event_id,
+                    ],
+                ],
+            );
 
             // Redirect frontend to success page
             $frontendUrl = rtrim((string) config('app.frontend_url', config('app.url')), '/');
@@ -115,6 +144,24 @@ class PaymentController extends Controller
         }
 
         $payment->markFailed($verification->rawResponse);
+        $payment->refresh();
+        $payment->loadMissing('registration.event');
+
+        $this->webhooks->dispatchForOrganizer(
+            (int) $payment->registration->event->organizer_id,
+            WebhookEventCatalog::PAYMENT_FAILED,
+            [
+                'payment' => [
+                    'id' => $payment->id,
+                    'gateway' => $payment->gateway,
+                    'status' => $payment->status,
+                    'amount' => $payment->amount,
+                    'currency' => $payment->currency,
+                    'registration_id' => $payment->registration_id,
+                ],
+                'gateway_payload' => $payload,
+            ],
+        );
 
         $frontendUrl = rtrim((string) config('app.frontend_url', config('app.url')), '/');
 

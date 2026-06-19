@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Models\WebhookSubscription;
 
 class Organizer extends Model
 {
@@ -60,5 +61,10 @@ class Organizer extends Model
     public function events(): HasMany
     {
         return $this->hasMany(Event::class);
+    }
+
+    public function webhookSubscriptions(): HasMany
+    {
+        return $this->hasMany(WebhookSubscription::class);
     }
 }
