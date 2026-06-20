@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AttendeeTransferController;
 use App\Http\Controllers\CommentController;
+use App\Http\Controllers\CampaignController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\EventRegistrationController;
 use App\Http\Controllers\LookupController;
@@ -114,6 +115,9 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
         Route::get('/me/organizer-dashboard', [OrganizerDashboardController::class, 'show'])->name('me.organizer-dashboard.show');
         Route::get('/me/events/{id}/attendees/export', [AttendeeTransferController::class, 'export'])->name('me.events.attendees.export');
         Route::post('/me/events/{id}/attendees/import', [AttendeeTransferController::class, 'import'])->name('me.events.attendees.import');
+        Route::get('/me/campaigns', [CampaignController::class, 'index'])->name('me.campaigns.index');
+        Route::post('/me/campaigns', [CampaignController::class, 'store'])->name('me.campaigns.store');
+        Route::post('/me/campaigns/{id}/simulate', [CampaignController::class, 'sendSimulation'])->name('me.campaigns.simulate');
 
         // Webhook subscriptions (P28-002)
         Route::get('/me/webhook-subscriptions', [WebhookSubscriptionController::class, 'index'])->name('me.webhook-subscriptions.index');

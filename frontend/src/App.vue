@@ -45,6 +45,8 @@ const organizerDashboardError = ref(null)
 const hasOrganizerDashboard = computed(() => organizerDashboard.value?.organizers.length > 0)
 const copyFeedback = ref({})
 const attendeeTransferState = ref({})
+const campaignDrafts = ref({})
+const campaignActionState = ref({})
 
 const pageKind = computed(() => {
   if (currentPath.startsWith('/embed/events/')) {
@@ -187,6 +189,84 @@ function formatDashboardMoney(value) {
 
 function formatEventTypeLabel(value) {
   return { in_person: 'حضوری', online: 'آنلاین', hybrid: 'ترکیبی' }[value] || 'سایر'
+}
+
+function formatCampaignChannel(value) {
+  return value === 'sms' ? 'پیامک' : 'ایمیل'
+}
+
+function formatCampaignAudience(value) {
+  return {
+    all_registrations: 'همه ثبت نام ها',
+    confirmed_only: 'فقط تایید شده ها',
+    pending_only: 'فقط در انتظارها',
+  }[value] || 'مخاطب سفارشی'
+}
+
+function ensureCampaignDraft(event) {
+  if (campaignDrafts.value[event.id]) {
+    return campaignDrafts.value[event.id]
+  }
+
+  const draft = {
+    organizer_id: event.organizer?.id || null,
+    event_id: event.id,
+    name: `کمپین ${event.title}`,
+    channel: 'email',
+    audience_type: 'confirmed_only',
+    subject: `یادآوری ${event.title}`,
+    message: 'این یک پیام نمونه برای اجرای کمپین است.',
+  }
+  campaignDrafts.value = { ...campaignDrafts.value, [event.id]: draft }
+  return draft
+}
+
+function updateCampaignDraft(event, patch) {
+  const draft = ensureCampaignDraft(event)
+  campaignDrafts.value = {
+    ...campaignDrafts.value,
+    [event.id]: {
+      ...draft,
+      ...patch,
+    },
+  }
+}
+
+async function createCampaign(event) {
+  const token = window.localStorage.getItem('rokhdad_api_token')
+  if (!token) {
+    campaignActionState.value = { ...campaignActionState.value, [event.id]: { feedback: 'برای ساخت کمپین ابتدا وارد حساب کاربری شوید.' } }
+    return
+  }
+
+  const draft = ensureCampaignDraft(event)
+  campaignActionState.value = { ...campaignActionState.value, [event.id]: { creating: true, feedback: null } }
+
+  try {
+    await api.createCampaign(draft, token)
+    campaignActionState.value = { ...campaignActionState.value, [event.id]: { creating: false, feedback: 'کمپین ذخیره شد.' } }
+    await fetchOrganizerDashboard()
+  } catch (caught) {
+    campaignActionState.value = { ...campaignActionState.value, [event.id]: { creating: false, feedback: getErrorMessage(caught) } }
+  }
+}
+
+async function simulateCampaign(campaignId, eventId) {
+  const token = window.localStorage.getItem('rokhdad_api_token')
+  if (!token) {
+    campaignActionState.value = { ...campaignActionState.value, [eventId]: { feedback: 'برای اجرای شبیه سازی ابتدا وارد حساب کاربری شوید.' } }
+    return
+  }
+
+  campaignActionState.value = { ...campaignActionState.value, [eventId]: { simulating: true, feedback: null } }
+
+  try {
+    await api.simulateCampaign(campaignId, token)
+    campaignActionState.value = { ...campaignActionState.value, [eventId]: { simulating: false, feedback: 'شبیه سازی ارسال انجام شد.' } }
+    await fetchOrganizerDashboard()
+  } catch (caught) {
+    campaignActionState.value = { ...campaignActionState.value, [eventId]: { simulating: false, feedback: getErrorMessage(caught) } }
+  }
 }
 
 function setAttendeeTransferState(eventId, patch) {
@@ -772,6 +852,39 @@ function setJsonLd(payload) {
                 </div>
               </div>
             </div>
+            <div v-if="organizerDashboard.campaigns.length > 0" class="rounded-lg border border-line bg-surface p-4 shadow-soft">
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <h3 class="text-base font-black text-ink">کمپین های اخیر</h3>
+                <p class="text-xs font-bold text-muted">foundation برای پیام رسانی برگزارکننده</p>
+              </div>
+              <div class="mt-4 grid gap-3">
+                <div
+                  v-for="campaign in organizerDashboard.campaigns"
+                  :key="campaign.id"
+                  class="rounded-lg border border-line bg-canvas p-3"
+                >
+                  <div class="flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                      <p class="text-sm font-black text-ink">{{ campaign.name }}</p>
+                      <p class="mt-1 text-xs text-muted">
+                        {{ formatCampaignChannel(campaign.channel) }} / {{ formatCampaignAudience(campaign.audience_type) }} / {{ campaign.status }}
+                      </p>
+                    </div>
+                    <button
+                      class="rounded-md border border-line bg-white px-3 py-2 text-xs font-bold text-brand-800 hover:bg-brand-50 disabled:cursor-not-allowed disabled:bg-canvas"
+                      type="button"
+                      :disabled="campaignActionState[campaign.event?.id || campaign.id]?.simulating"
+                      @click="simulateCampaign(campaign.id, campaign.event?.id || campaign.id)"
+                    >
+                      {{ campaignActionState[campaign.event?.id || campaign.id]?.simulating ? 'در حال شبیه سازی...' : 'شبیه سازی ارسال' }}
+                    </button>
+                  </div>
+                  <p class="mt-2 text-xs text-muted">
+                    {{ formatDashboardNumber(campaign.sent_count) }} ارسال از {{ formatDashboardNumber(campaign.recipients_count) }} مخاطب
+                  </p>
+                </div>
+              </div>
+            </div>
             <article
               v-for="event in organizerDashboard.events"
               :key="event.id"
@@ -808,6 +921,77 @@ function setJsonLd(payload) {
                 v-if="event.is_internal"
                 class="mt-4 grid gap-3 rounded-lg border border-dashed border-line bg-canvas p-3"
               >
+                <div class="grid gap-3 rounded-lg border border-line bg-white p-3">
+                  <div>
+                    <p class="text-xs font-black text-ink">کمپین پیام</p>
+                    <p class="mt-1 text-[11px] leading-5 text-muted">ذخیره کمپین و اجرای شبیه سازی روی مخاطبان رویداد</p>
+                  </div>
+                  <div class="grid gap-3 sm:grid-cols-2">
+                    <label class="grid gap-1 text-xs font-bold text-muted">
+                      نام کمپین
+                      <input
+                        :value="ensureCampaignDraft(event).name"
+                        class="rounded-md border border-line bg-white px-3 py-2 text-xs text-ink outline-none"
+                        type="text"
+                        @input="(draftEvent) => updateCampaignDraft(event, { name: draftEvent.target.value })"
+                      />
+                    </label>
+                    <label class="grid gap-1 text-xs font-bold text-muted">
+                      کانال
+                      <select
+                        :value="ensureCampaignDraft(event).channel"
+                        class="rounded-md border border-line bg-white px-3 py-2 text-xs text-ink outline-none"
+                        @change="(draftEvent) => updateCampaignDraft(event, { channel: draftEvent.target.value })"
+                      >
+                        <option value="email">ایمیل</option>
+                        <option value="sms">پیامک</option>
+                      </select>
+                    </label>
+                    <label class="grid gap-1 text-xs font-bold text-muted">
+                      مخاطبان
+                      <select
+                        :value="ensureCampaignDraft(event).audience_type"
+                        class="rounded-md border border-line bg-white px-3 py-2 text-xs text-ink outline-none"
+                        @change="(draftEvent) => updateCampaignDraft(event, { audience_type: draftEvent.target.value })"
+                      >
+                        <option value="all_registrations">همه ثبت نام ها</option>
+                        <option value="confirmed_only">فقط تایید شده ها</option>
+                        <option value="pending_only">فقط در انتظارها</option>
+                      </select>
+                    </label>
+                    <label class="grid gap-1 text-xs font-bold text-muted">
+                      موضوع
+                      <input
+                        :value="ensureCampaignDraft(event).subject"
+                        class="rounded-md border border-line bg-white px-3 py-2 text-xs text-ink outline-none"
+                        type="text"
+                        @input="(draftEvent) => updateCampaignDraft(event, { subject: draftEvent.target.value })"
+                      />
+                    </label>
+                  </div>
+                  <label class="grid gap-1 text-xs font-bold text-muted">
+                    پیام
+                    <textarea
+                      :value="ensureCampaignDraft(event).message"
+                      class="min-h-24 rounded-md border border-line bg-white px-3 py-2 text-xs leading-6 text-ink outline-none"
+                      @input="(draftEvent) => updateCampaignDraft(event, { message: draftEvent.target.value })"
+                    ></textarea>
+                  </label>
+                  <div class="flex flex-wrap items-center justify-between gap-2">
+                    <p class="text-[11px] leading-5 text-muted">این مرحله foundation است و فعلاً ارسال واقعی به شکل شبیه سازی ثبت می‌شود.</p>
+                    <button
+                      class="rounded-md border border-line bg-white px-3 py-2 text-xs font-bold text-brand-800 hover:bg-brand-50 disabled:cursor-not-allowed disabled:bg-canvas"
+                      type="button"
+                      :disabled="campaignActionState[event.id]?.creating"
+                      @click="createCampaign(event)"
+                    >
+                      {{ campaignActionState[event.id]?.creating ? 'در حال ذخیره...' : 'ذخیره کمپین' }}
+                    </button>
+                  </div>
+                  <p v-if="campaignActionState[event.id]?.feedback" class="text-[11px] font-bold text-brand-700">
+                    {{ campaignActionState[event.id].feedback }}
+                  </p>
+                </div>
                 <div class="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-line bg-white p-3">
                   <div>
                     <p class="text-xs font-black text-ink">شرکت کننده ها</p>

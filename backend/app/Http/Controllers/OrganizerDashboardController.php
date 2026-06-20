@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Event;
+use App\Models\Campaign;
 use App\Models\Registration;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -46,6 +47,12 @@ class OrganizerDashboardController extends Controller
         $registrations = Registration::query()
             ->with('event:id,organizer_id,event_type,title,slug')
             ->whereHas('event', fn ($query) => $query->whereIn('organizer_id', $organizerIds))
+            ->get();
+        $campaigns = Campaign::query()
+            ->with(['organizer:id,name,slug', 'event:id,title,slug'])
+            ->whereIn('organizer_id', $organizerIds)
+            ->latest()
+            ->limit(6)
             ->get();
 
         return response()->json([
@@ -104,6 +111,20 @@ class OrganizerDashboardController extends Controller
                             'revenue_total' => (int) ($event->paid_revenue ?? 0),
                         ])->values(),
                 ],
+                'campaigns' => $campaigns->map(fn (Campaign $campaign) => [
+                    'id' => $campaign->id,
+                    'name' => $campaign->name,
+                    'channel' => $campaign->channel,
+                    'audience_type' => $campaign->audience_type,
+                    'status' => $campaign->status,
+                    'subject' => $campaign->subject,
+                    'message' => $campaign->message,
+                    'recipients_count' => $campaign->recipients_count,
+                    'sent_count' => $campaign->sent_count,
+                    'last_sent_at' => $campaign->last_sent_at?->toISOString(),
+                    'organizer' => $campaign->organizer,
+                    'event' => $campaign->event,
+                ])->values(),
                 'organizers' => $organizers->map(fn ($organizer) => [
                     'id' => $organizer->id,
                     'name' => $organizer->name,

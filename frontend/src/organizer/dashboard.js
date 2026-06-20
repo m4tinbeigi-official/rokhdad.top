@@ -17,8 +17,31 @@ export function normalizeOrganizerDashboard(data = {}) {
       avg_revenue_per_registration: Number(data.summary?.avg_revenue_per_registration || 0),
     },
     analytics: normalizeAnalytics(data.analytics),
+    campaigns: Array.isArray(data.campaigns) ? data.campaigns.map(normalizeCampaign) : [],
     organizers: Array.isArray(data.organizers) ? data.organizers.map(normalizeOrganizer) : [],
     events: Array.isArray(data.events) ? data.events.map(normalizeOrganizerEvent) : [],
+  }
+}
+
+function normalizeCampaign(campaign = {}) {
+  return {
+    id: campaign.id,
+    name: campaign.name || 'کمپین بدون نام',
+    channel: campaign.channel || 'email',
+    audience_type: campaign.audience_type || 'all_registrations',
+    status: campaign.status || 'draft',
+    subject: campaign.subject || '',
+    message: campaign.message || '',
+    recipients_count: Number(campaign.recipients_count || 0),
+    sent_count: Number(campaign.sent_count || 0),
+    last_sent_at: campaign.last_sent_at || null,
+    organizer: campaign.organizer?.name || 'برگزارکننده نامشخص',
+    event: campaign.event ? {
+      id: campaign.event.id,
+      title: campaign.event.title || 'رویداد',
+      slug: campaign.event.slug || '',
+      href: campaign.event.slug ? `/events/${campaign.event.slug}` : '#',
+    } : null,
   }
 }
 

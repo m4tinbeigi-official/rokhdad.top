@@ -96,6 +96,21 @@ export function createApiClient({
     getOrganizerDashboard: (token) => request('/me/organizer-dashboard', {
       headers: token ? { Authorization: `Bearer ${token}` } : undefined,
     }),
+    listCampaigns: (token) => request('/me/campaigns', {
+      headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+    }),
+    createCampaign: (payload, token) => request('/me/campaigns', {
+      method: 'POST',
+      headers: {
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    }),
+    simulateCampaign: (campaignId, token) => request(`/me/campaigns/${encodeURIComponent(campaignId)}/simulate`, {
+      method: 'POST',
+      headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+    }),
     exportEventAttendees: (eventId, token) => request(`/me/events/${encodeURIComponent(eventId)}/attendees/export`, {
       headers: token ? { Authorization: `Bearer ${token}` } : undefined,
     }),
