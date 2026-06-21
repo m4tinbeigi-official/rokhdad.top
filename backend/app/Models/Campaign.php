@@ -4,31 +4,23 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Campaign extends Model
 {
     protected $fillable = [
-        'organizer_id',
-        'event_id',
-        'name',
-        'channel',
-        'audience_type',
-        'status',
-        'subject',
-        'message',
-        'recipients_count',
-        'sent_count',
-        'last_sent_at',
-        'metadata',
+        'organizer_id', 'name', 'description', 'channel', 
+        'target_audience', 'starts_at', 'ends_at', 'status',
+        'template', 'settings'
     ];
 
     protected function casts(): array
     {
         return [
-            'recipients_count' => 'integer',
-            'sent_count' => 'integer',
-            'last_sent_at' => 'datetime',
-            'metadata' => 'array',
+            'target_audience' => 'array',
+            'settings' => 'array',
+            'starts_at' => 'datetime',
+            'ends_at' => 'datetime',
         ];
     }
 
@@ -37,8 +29,35 @@ class Campaign extends Model
         return $this->belongsTo(Organizer::class);
     }
 
-    public function event(): BelongsTo
+    public function messages(): HasMany
     {
-        return $this->belongsTo(Event::class);
+        return $this->hasMany(CampaignMessage::class);
+    }
+
+    public function analytics(): HasMany
+    {
+        return $this->hasMany(CampaignAnalytics::class);
+    }
+
+    public function isActive(): bool
+    {
+        return $this->status === 'active' && 
+               $this->starts_at <= now() && 
+               $this->ends_at >= now();
+    }
+
+    public function launch(): void
+    {
+        $this->update(['status' => 'active', 'starts_at' => now()]);
+    }
+
+    public function pause(): void
+    {
+        $this->update(['status' => 'paused']);
+    }
+
+    public function cancel(): void
+    {
+        $this->update(['status' => 'cancelled']);
     }
 }
