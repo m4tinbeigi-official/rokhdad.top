@@ -145,7 +145,7 @@ async function fetchEvents() {
   syncFilterUrl()
 
   try {
-    const result = await loadHomepageEvents(api, eventFilters.value)
+    const result = await loadHomepageEvents(api, { ...eventFilters.value, per_page: 12 })
     events.value = result.events
     meta.value = result.meta
   } catch (caught) {
@@ -361,6 +361,35 @@ function resetFilters() {
   eventFilters.value = createDefaultEventFilters()
   fetchEvents()
 }
+
+const featuredEvents = computed(() => events.value.filter((event) => event.isFeatured).slice(0, 6))
+const regularEvents = computed(() => {
+  const featuredIds = new Set(featuredEvents.value.map((event) => event.id))
+  return events.value.filter((event) => !featuredIds.has(event.id))
+})
+const quickCategories = computed(() => filterOptions.value.categories.slice(0, 10))
+
+const sourceTabs = [
+  { key: '', label: 'همه منابع' },
+  { key: 'evand', label: 'ایوند' },
+  { key: 'eseminar', label: 'ایسمینار' },
+]
+
+function selectSource(sourceKey) {
+  eventFilters.value.source = sourceKey
+  fetchEvents()
+}
+
+function selectCategory(categorySlug) {
+  eventFilters.value.category = eventFilters.value.category === categorySlug ? '' : categorySlug
+  fetchEvents()
+}
+
+const eventInitial = (title) => (title || '?').trim().charAt(0)
+const sourceBadgeClass = (key) => ({
+  evand: 'bg-amber-500/90 text-white',
+  eseminar: 'bg-sky-600/90 text-white',
+}[key] || 'bg-brand-700/90 text-white')
 
 function syncFilterUrl() {
   const search = buildEventFilterSearch(eventFilters.value)
@@ -1230,15 +1259,31 @@ function setJsonLd(payload) {
     </main>
 
     <main v-else-if="pageKind === 'home'" class="mx-auto grid max-w-7xl gap-8 px-4 py-6 sm:px-6 lg:px-8">
-      <section class="grid gap-5 rounded-lg border border-line bg-surface p-5 shadow-soft lg:grid-cols-[1fr_360px] lg:items-end lg:p-7">
-        <div>
-          <p class="mb-2 text-sm font-bold text-brand-700">کشف رویداد</p>
-          <h1 class="max-w-3xl text-3xl font-black leading-tight text-ink sm:text-4xl">
-            کشف رویدادهای فناوری، کسب وکار و آموزش در ایران
-          </h1>
-          <p class="mt-4 max-w-2xl text-base leading-8 text-muted">
-            تازه ترین رویدادهای منتشرشده از API رخداد خوانده می شوند و این صفحه برای فیلترهای بعدی آماده است.
+      <section class="grid gap-5 overflow-hidden rounded-2xl border border-line bg-linear-to-bl from-brand-800 via-brand-700 to-brand-500 p-5 shadow-soft lg:grid-cols-[1fr_380px] lg:items-end lg:p-8">
+        <div class="text-white">
+          <p class="mb-2 inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-xs font-bold text-white backdrop-blur">
+            رخداد · گردآوری رویدادها از ایوند و ایسمینار
           </p>
+          <h1 class="max-w-3xl text-3xl font-black leading-tight sm:text-4xl">
+            همه رویدادها و وبینارهای ایران، یکجا
+          </h1>
+          <p class="mt-4 max-w-2xl text-base leading-8 text-white/85">
+            رویدادهای حضوری ایوند و وبینارهای ایسمینار هر ساعت به‌صورت خودکار گردآوری و اینجا نمایش داده می‌شوند. جستجو کن، فیلتر کن و مستقیم به منبع برو.
+          </p>
+          <dl class="mt-6 flex flex-wrap gap-6 text-white">
+            <div>
+              <dt class="text-xs font-bold text-white/70">رویدادهای این صفحه</dt>
+              <dd class="text-2xl font-black">{{ meta?.total ? new Intl.NumberFormat('fa-IR').format(meta.total) : '—' }}</dd>
+            </div>
+            <div>
+              <dt class="text-xs font-bold text-white/70">منابع متصل</dt>
+              <dd class="text-2xl font-black">۲</dd>
+            </div>
+            <div>
+              <dt class="text-xs font-bold text-white/70">به‌روزرسانی</dt>
+              <dd class="text-2xl font-black">هر ساعت</dd>
+            </div>
+          </dl>
         </div>
 
         <form class="grid gap-3 rounded-lg border border-line bg-canvas p-4" role="search" aria-label="جستجوی رویداد" @submit.prevent="fetchEvents">
@@ -1327,18 +1372,75 @@ function setJsonLd(payload) {
         </form>
       </section>
 
+      <section v-if="quickCategories.length" class="flex flex-wrap gap-2" aria-label="دسته بندی های پرکاربرد">
+        <button
+          v-for="category in quickCategories"
+          :key="category.slug"
+          type="button"
+          class="rounded-full border px-4 py-2 text-sm font-bold transition focus-ring"
+          :class="eventFilters.category === category.slug
+            ? 'border-brand-600 bg-brand-700 text-white'
+            : 'border-line bg-surface text-brand-800 hover:bg-brand-50'"
+          @click="selectCategory(category.slug)"
+        >
+          {{ category.title }}
+        </button>
+      </section>
+
       <section class="grid gap-4">
         <div class="flex flex-wrap items-end justify-between gap-3">
           <div>
-            <h2 class="text-xl font-black text-ink">رویدادهای منتخب</h2>
+            <h2 class="text-xl font-black text-ink">رویدادها</h2>
             <p class="mt-1 text-sm text-muted">
               <template v-if="meta?.total">نمایش {{ events.length }} رویداد از {{ meta.total }} نتیجه</template>
-              <template v-else>رویدادهای منتشرشده از API عمومی رخداد</template>
+              <template v-else>رویدادهای گردآوری‌شده از ایوند و ایسمینار</template>
             </p>
           </div>
-          <p class="rounded-md border border-line bg-surface px-3 py-2 text-xs font-bold text-muted" dir="ltr">
-            API: {{ apiBaseUrl }}
-          </p>
+          <div class="inline-flex rounded-full border border-line bg-surface p-1" role="tablist" aria-label="فیلتر منبع">
+            <button
+              v-for="tab in sourceTabs"
+              :key="tab.key || 'all'"
+              type="button"
+              role="tab"
+              :aria-selected="(eventFilters.source || '') === tab.key"
+              class="rounded-full px-4 py-2 text-sm font-bold transition focus-ring"
+              :class="(eventFilters.source || '') === tab.key
+                ? 'bg-brand-700 text-white'
+                : 'text-muted hover:text-brand-800'"
+              @click="selectSource(tab.key)"
+            >
+              {{ tab.label }}
+            </button>
+          </div>
+        </div>
+
+        <div v-if="!isLoading && !error && featuredEvents.length" class="grid gap-3">
+          <h3 class="text-sm font-black text-brand-800">رویدادهای ویژه</h3>
+          <div class="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+            <a
+              v-for="event in featuredEvents"
+              :key="`featured-${event.id}`"
+              :href="event.href"
+              class="group relative flex flex-col overflow-hidden rounded-2xl border border-line bg-surface shadow-soft transition hover:-translate-y-0.5 hover:shadow-lg focus-ring"
+            >
+              <div class="relative aspect-[16/9] w-full overflow-hidden bg-brand-50">
+                <img v-if="event.cover" :src="event.cover" :alt="event.title" loading="lazy" class="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
+                <div v-else class="flex h-full w-full items-center justify-center bg-linear-to-bl from-brand-700 to-brand-500 text-4xl font-black text-white/90">
+                  {{ eventInitial(event.title) }}
+                </div>
+                <span class="absolute right-3 top-3 rounded-full bg-amber-400 px-2.5 py-1 text-xs font-black text-amber-950 shadow">ویژه</span>
+                <span v-if="event.source" class="absolute left-3 top-3 rounded-full px-2.5 py-1 text-xs font-bold shadow" :class="sourceBadgeClass(event.source.key)">{{ event.source.label }}</span>
+              </div>
+              <div class="flex flex-1 flex-col gap-2 p-4">
+                <span class="text-xs font-bold text-muted">{{ event.date }}</span>
+                <h4 class="text-base font-black leading-7 text-ink line-clamp-2 group-hover:text-brand-800">{{ event.title }}</h4>
+                <div class="mt-auto flex items-center justify-between gap-2 pt-2 text-xs font-bold text-muted">
+                  <span class="rounded-md bg-brand-50 px-2 py-1 text-brand-800">{{ event.badge }}</span>
+                  <span>{{ event.city || event.location }}</span>
+                </div>
+              </div>
+            </a>
+          </div>
         </div>
 
         <div v-if="isLoading" class="grid gap-3 md:grid-cols-3" aria-live="polite" aria-label="در حال بارگذاری رویدادها">
@@ -1370,48 +1472,54 @@ function setJsonLd(payload) {
           هنوز رویداد منتشرشده ای برای نمایش وجود ندارد.
         </div>
 
-        <div v-else class="grid gap-3 md:grid-cols-3">
+        <div v-else class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <article
-            v-for="event in events"
+            v-for="event in regularEvents"
             :key="event.id || event.slug || event.title"
-            class="rounded-lg border border-line bg-surface p-4 shadow-soft"
+            class="group flex flex-col overflow-hidden rounded-2xl border border-line bg-surface shadow-soft transition hover:-translate-y-0.5 hover:shadow-lg"
           >
-            <div class="mb-4 flex items-center justify-between gap-3">
-              <span class="rounded-md bg-brand-50 px-2.5 py-1 text-xs font-black text-brand-800">{{ event.badge }}</span>
-              <span class="text-xs font-bold text-muted">{{ event.date }}</span>
-            </div>
-            <h3 class="text-lg font-black leading-8 text-ink">
-              <a class="hover:text-brand-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-600" :href="event.href">
-                {{ event.title }}
-              </a>
-            </h3>
-            <p class="mt-2 line-clamp-3 text-sm leading-7 text-muted">{{ event.summary }}</p>
-
-            <!-- External Source Badge (P16-003) -->
-            <div v-if="event.source" class="mt-3 flex items-center gap-2">
-              <span class="text-xs text-muted">منبع اصلی:</span>
-              <a :href="event.source.url" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 rounded bg-muted-100 px-2 py-0.5 text-xs font-bold text-brand-800 hover:bg-brand-50 hover:text-brand-900 border border-brand-200">
+            <a :href="event.href" class="relative block aspect-[16/9] w-full overflow-hidden bg-brand-50 focus-ring">
+              <img v-if="event.cover" :src="event.cover" :alt="event.title" loading="lazy" class="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
+              <div v-else class="flex h-full w-full items-center justify-center bg-linear-to-bl from-brand-700 to-brand-500 text-4xl font-black text-white/90">
+                {{ eventInitial(event.title) }}
+              </div>
+              <span v-if="event.source" class="absolute left-3 top-3 rounded-full px-2.5 py-1 text-xs font-bold shadow" :class="sourceBadgeClass(event.source.key)">
                 {{ event.source.label }}
+              </span>
+              <span class="absolute right-3 top-3 rounded-full bg-black/55 px-2.5 py-1 text-xs font-bold text-white backdrop-blur">{{ event.badge }}</span>
+            </a>
+
+            <div class="flex flex-1 flex-col gap-3 p-4">
+              <span class="text-xs font-bold text-brand-700">{{ event.date }}</span>
+              <h3 class="text-lg font-black leading-8 text-ink line-clamp-2">
+                <a class="hover:text-brand-800 focus-ring" :href="event.href">{{ event.title }}</a>
+              </h3>
+              <p class="line-clamp-2 text-sm leading-7 text-muted">{{ event.summary }}</p>
+
+              <dl class="mt-auto grid gap-1.5 border-t border-line pt-3 text-sm text-muted">
+                <div class="flex items-center justify-between gap-3">
+                  <dt>مکان</dt>
+                  <dd class="font-bold text-ink">{{ event.location }}</dd>
+                </div>
+                <div class="flex items-center justify-between gap-3">
+                  <dt>برگزارکننده</dt>
+                  <dd class="truncate font-bold text-ink">{{ event.organizer }}</dd>
+                </div>
+              </dl>
+
+              <a
+                v-if="event.source"
+                :href="event.source.url"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="inline-flex items-center justify-center gap-1 rounded-lg border border-line bg-canvas px-3 py-2 text-xs font-bold text-brand-800 transition hover:bg-brand-50"
+              >
+                مشاهده در {{ event.source.label }}
                 <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                 </svg>
               </a>
             </div>
-
-            <dl class="mt-4 grid gap-2 text-sm text-muted">
-              <div class="flex items-center justify-between gap-3">
-                <dt>مکان</dt>
-                <dd class="font-bold text-ink">{{ event.location }}</dd>
-              </div>
-              <div class="flex items-center justify-between gap-3">
-                <dt>برگزارکننده</dt>
-                <dd class="font-bold text-ink">{{ event.organizer }}</dd>
-              </div>
-              <div class="flex items-center justify-between gap-3">
-                <dt>دسته</dt>
-                <dd class="font-bold text-ink">{{ event.category }}</dd>
-              </div>
-            </dl>
           </article>
         </div>
       </section>

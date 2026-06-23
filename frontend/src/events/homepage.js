@@ -73,7 +73,11 @@ export function normalizeHomepageEvent(event) {
     location: getEventLocation(event),
     organizer: event.organizer?.name || 'برگزارکننده نامشخص',
     category: event.category?.name || 'عمومی',
+    city: event.city?.name || null,
+    type: event.event_type || null,
     badge: eventTypeLabels[event.event_type] || 'رویداد',
+    cover: event.cover_url || event.metadata?.evand?.cover || event.metadata?.eseminar?.cover || null,
+    isFeatured: Boolean(event.is_featured),
     href: event.slug ? `/events/${event.slug}` : '#',
     role_title: event.role_title,
     source: source ? {

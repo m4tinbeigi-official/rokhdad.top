@@ -56,4 +56,18 @@ return [
         'from_name' => env('PAKETT_FROM_NAME', env('MAIL_FROM_NAME', 'رخداد')),
     ],
 
+    // External event sources aggregated onto rokhdad.top
+    'evand' => [
+        'base_url' => env('EVAND_API_BASE', 'https://api.evand.com'),
+    ],
+
+    'eseminar' => [
+        // Confirm the real endpoint; this is the public Eseminar API base.
+        'base_url' => env('ESEMINAR_API_BASE', 'https://eseminar.tv/api/v1'),
+        'events_path' => env('ESEMINAR_EVENTS_PATH', '/events'),
+        // Optional bearer token if Eseminar requires authentication.
+        'token' => env('ESEMINAR_API_TOKEN'),
+        'site_url' => env('ESEMINAR_SITE_URL', 'https://eseminar.tv'),
+    ],
+
 ];

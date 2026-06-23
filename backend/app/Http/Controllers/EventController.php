@@ -141,6 +141,7 @@ class EventController extends Controller
             'venue_name' => $event->venue_name,
             'online_url' => $event->online_url,
             'canonical_url' => $event->canonical_url,
+            'cover_url' => $this->coverUrl($event),
             'is_featured' => $event->is_featured,
             'category' => $event->category ? [
                 'id' => $event->category->id,
@@ -195,6 +196,19 @@ class EventController extends Controller
                 'sort_order' => $person->pivot->sort_order,
             ])->values(),
         ];
+    }
+
+    /**
+     * Best-effort cover image URL from any source's metadata.
+     */
+    private function coverUrl(Event $event): ?string
+    {
+        $metadata = $event->metadata ?? [];
+
+        return $metadata['cover_url']
+            ?? $metadata['evand']['cover']
+            ?? $metadata['eseminar']['cover']
+            ?? null;
     }
 
     /**
