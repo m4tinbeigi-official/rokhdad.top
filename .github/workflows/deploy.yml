@@ -37,18 +37,30 @@ jobs:
             git fetch --all --prune
             git reset --hard origin/main
 
-            # 2) Rebuild the images with the exact tags the compose file expects
+            # 2) Rebuild the frontend image (the elegant UI lives here).
+            #    NOTE: backend is intentionally NOT auto-recreated. The deploy dir
+            #    is currently missing its .env (MARIADB_*/MONGO_*/REDIS_* unset),
+            #    so recreating backend risks bringing it up without DB credentials
+            #    and returning 502. Deploy backend manually after the .env is
+            #    confirmed (see DEPLOY.md).
             docker build -t rokhdad/frontend:latest ./frontend
-            docker build -t rokhdad/backend:latest ./backend
 
-            # 3) Recreate the running containers with the new images.
-            #    IMPORTANT: this stack is composed from TWO files — the base file
-            #    plus the migration override (which defines the 127.0.0.1:3001->3000
-            #    and backend port mappings). Both must be passed or the port
-            #    mappings are dropped and nginx returns 502.
+            # 3) Recreate ONLY the frontend, passing BOTH compose files so the
+            #    127.0.0.1:3001->3000 port mapping from the override is preserved
+            #    (running with the base file alone drops it and nginx returns 502).
             cd "$DEPLOY"
             COMPOSE="docker compose -f docker-compose.yml -f docker-compose.migration-override.yml"
-            $COMPOSE up -d --no-deps --force-recreate frontend backend
+            $COMPOSE up -d --no-deps --force-recreate frontend
 
-            # 4) Clean up dangling images to save disk
+            # 4) Health check — fail the deploy (and surface it in Actions) if the
+            #    site is not serving a normal status code.
+            sleep 5
+            CODE=$(curl -ksS -o /dev/null -w '%{http_code}' https://rokhdad.top || echo 000)
+            echo "Homepage HTTP status: $CODE"
+            case "$CODE" in
+              200|301|302) echo "Site healthy." ;;
+              *) echo "Site unhealthy (HTTP $CODE) after deploy"; exit 1 ;;
+            esac
+
+            # 5) Clean up dangling images to save disk
             docker image prune -f

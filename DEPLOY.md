@@ -55,3 +55,20 @@ git push origin main
   workflow انجام می‌شود.
 - اگر بعداً worker/سرویس دیگری هم خواستی خودکار شود، یک خط `docker build` و نام سرویس در
   `docker compose up -d ...` اضافه می‌شود.
+
+## دیپلوی دستی backend (تا وقتی .env تأیید شود)
+
+workflow فعلاً فقط **frontend** را خودکار دیپلوی می‌کند. علت: در پوشه‌ی دیپلوی فایل `.env`
+دیده نمی‌شود (هشدار `MARIADB_…/MONGO_…/REDIS_… not set`)، و recreate کردن backend بدون آن
+ریسک بالاآمدن بدون رمز دیتابیس و خطای ۵۰۲ دارد.
+
+بعد از اطمینان از وجود `.env` در `/opt/rokhdad/deploy`، دیپلوی backend به‌صورت دستی و امن:
+
+```bash
+cd /opt/rokhdad/src && git pull
+docker build -t rokhdad/backend:latest ./backend
+cd /opt/rokhdad/deploy
+docker compose -f docker-compose.yml -f docker-compose.migration-override.yml up -d --no-deps --force-recreate backend
+curl -ksI https://rokhdad.top/api/v1/events | head -n1   # باید 200 بدهد
+```
+
