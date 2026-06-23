@@ -23,14 +23,12 @@ cat ~/deploy_key      # کل این خروجی (کلید خصوصی) را کپی
 |---|---|
 | `SSH_HOST` | `193.151.139.93` |
 | `SSH_USER` | `root` |
-| `SSH_KEY` | `-----BEGIN OPENSSH PRIVATE KEY-----
-b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAAAMwAAAAtzc2gtZW
-QyNTUxOQAAACCVc382aMcXbONLIKnEv4PttIDi/3nlVdjaVjxjVXO0twAAAJiTLI7YkyyO
-2AAAAAtzc2gtZWQyNTUxOQAAACCVc382aMcXbONLIKnEv4PttIDi/3nlVdjaVjxjVXO0tw
-AAAEBoc8zTKTXwAzxqe9lc0394qHeCY1UlwmPuN4YYIgrPfJVzfzZoxxds40sgqcS/g+20
-gOL/eeVV2NpWPGNVc7S3AAAAEHJvb3RAcmlja3NhbmNoZXoBAgMEBQ==
------END OPENSSH PRIVATE KEY-----` |
-| `SSH_PORT` |`22` |
+| `SSH_KEY` | کلید خصوصی را اینجا **ننویس** — مستقیم در فیلد سکرت گیت‌هاب پیست کن |
+| `SSH_PORT` | `22` |
+
+> ⚠️ هشدار امنیتی: هرگز کلید خصوصی یا رمز را داخل فایل‌های ریپو نگذار؛ این ریپو عمومی است و
+> هر چیزی که commit شود برای همه قابل‌دیدن خواهد بود. مقادیر حساس فقط در
+> «Settings → Secrets and variables → Actions» وارد می‌شوند.
 
 ### ۳) پیش‌نیازهای سرور
 
