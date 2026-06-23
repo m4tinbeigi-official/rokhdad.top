@@ -23,8 +23,14 @@ cat ~/deploy_key      # کل این خروجی (کلید خصوصی) را کپی
 |---|---|
 | `SSH_HOST` | `193.151.139.93` |
 | `SSH_USER` | `root` |
-| `SSH_KEY` | کل کلید خصوصی از مرحله ۱ (`-----BEGIN ... END-----`) |
-| `SSH_PORT` | فقط اگر پورت SSH غیر ۲۲ است |
+| `SSH_KEY` | `-----BEGIN OPENSSH PRIVATE KEY-----
+b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAAAMwAAAAtzc2gtZW
+QyNTUxOQAAACCVc382aMcXbONLIKnEv4PttIDi/3nlVdjaVjxjVXO0twAAAJiTLI7YkyyO
+2AAAAAtzc2gtZWQyNTUxOQAAACCVc382aMcXbONLIKnEv4PttIDi/3nlVdjaVjxjVXO0tw
+AAAEBoc8zTKTXwAzxqe9lc0394qHeCY1UlwmPuN4YYIgrPfJVzfzZoxxds40sgqcS/g+20
+gOL/eeVV2NpWPGNVc7S3AAAAEHJvb3RAcmlja3NhbmNoZXoBAgMEBQ==
+-----END OPENSSH PRIVATE KEY-----` |
+| `SSH_PORT` |`22` |
 
 ### ۳) پیش‌نیازهای سرور
 
