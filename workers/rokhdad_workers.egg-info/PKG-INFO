@@ -1,0 +1,9 @@
+Metadata-Version: 2.4
+Name: rokhdad-workers
+Version: 0.1.0
+Summary: Python worker skeleton for Rokhdad ingestion, normalization, and image jobs.
+Requires-Python: >=3.12
+Requires-Dist: Pillow<12,>=10
+Requires-Dist: pymongo<5,>=4.8
+Requires-Dist: redis<7,>=5
+Requires-Dist: graphiti-core

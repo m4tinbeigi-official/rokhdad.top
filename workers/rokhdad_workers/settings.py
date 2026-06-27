@@ -38,3 +38,16 @@ def mongodb_uri_from_env() -> str | None:
 
 def mongodb_database_from_env() -> str:
     return os.getenv("MONGODB_DATABASE", "rokhdad")
+
+
+def neo4j_uri_from_env() -> str:
+    return os.getenv("NEO4J_URI", "bolt://localhost:7687")
+
+
+def neo4j_user_from_env() -> str:
+    return os.getenv("NEO4J_USER", "neo4j")
+
+
+def neo4j_password_from_env() -> str | None:
+    return os.getenv("NEO4J_PASSWORD")
+

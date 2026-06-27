@@ -544,13 +544,13 @@ Artisan::command('eseminar:import {--pages=} {--per-page=50}', function () {
 | Laravel scheduler to be running, e.g. a cron entry on the server:
 |   * * * * * cd /path/to/backend && php artisan schedule:run >> /dev/null 2>&1
 */
-Schedule::command('evand:import')
-    ->hourly()
+Schedule::command('evand:import --pages=2')
+    ->everyMinute()
     ->withoutOverlapping()
     ->runInBackground();
 
-Schedule::command('eseminar:import')
-    ->hourly()
+Schedule::command('eseminar:import --pages=2')
+    ->everyMinute()
     ->withoutOverlapping()
     ->runInBackground();
 

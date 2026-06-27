@@ -1,0 +1,4 @@
+Pillow<12,>=10
+pymongo<5,>=4.8
+redis<7,>=5
+graphiti-core

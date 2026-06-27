@@ -11,6 +11,7 @@ dependencies = [
     "Pillow>=10,<12",
     "pymongo>=4.8,<5",
     "redis>=5,<7",
+    "graphiti-core",
 ]
 
 [tool.setuptools.packages.find]
