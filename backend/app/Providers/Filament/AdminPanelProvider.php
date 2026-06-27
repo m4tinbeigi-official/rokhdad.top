@@ -32,7 +32,8 @@ class AdminPanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::Amber,
             ])
-            ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
+            ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
+            ->discoverResources(in: app_path('Filament/Resources/RequestLogs'), for: 'App\\Filament\\Resources\\RequestLogs')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
             ->pages([
                 Dashboard::class,
@@ -43,7 +44,7 @@ class AdminPanelProvider extends PanelProvider
                 FilamentInfoWidget::class,
             ])
             ->plugins([
-                // \HusamTariq\FilamentDatabaseSchedule\FilamentDatabaseSchedulePlugin::make(),
+                \HusamTariq\FilamentDatabaseSchedule\FilamentDatabaseSchedulePlugin::make(),
             ])
             ->middleware([
                 EncryptCookies::class,
@@ -82,6 +83,7 @@ class AdminPanelProvider extends PanelProvider
                             width: 200%;
                             height: 200%;
                             background: radial-gradient(circle, rgba(245, 158, 11, 0.15) 0%, rgba(0,0,0,0) 50%);
+                            // protected static ?string $navigationIcon = \'heroicon-o-magnifying-glass\'; // disabled to avoid type conflict
                             animation: pulse 15s infinite;
                             z-index: 0;
                             pointer-events: none;

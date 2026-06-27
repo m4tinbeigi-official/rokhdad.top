@@ -5,11 +5,13 @@ namespace App\Http\Controllers;
 use App\Models\Payment;
 use App\Models\Registration;
 use App\Payments\PaymentGatewayRegistry;
+use App\Services\SettlementService;
 use App\Webhooks\WebhookDispatcher;
 use App\Webhooks\WebhookEventCatalog;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class PaymentController extends Controller
@@ -114,6 +116,20 @@ class PaymentController extends Controller
             $payment->registration->confirm();
             $payment->refresh();
             $payment->loadMissing(['registration.event', 'registration.user']);
+
+            // Record the settlement entries (gross credit + platform fee debit)
+            // for the organizer of the event. Wrapped in a transaction so the
+            // running ledger balance stays consistent.
+            $organizerId = (int) $payment->registration->event->organizer_id;
+            if ($organizerId > 0) {
+                DB::transaction(function () use ($organizerId, $payment): void {
+                    SettlementService::recordSuccessfulPayment(
+                        $organizerId,
+                        $payment->id,
+                        (int) $payment->amount,
+                    );
+                });
+            }
 
             $this->webhooks->dispatchForOrganizer(
                 (int) $payment->registration->event->organizer_id,

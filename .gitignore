@@ -26,3 +26,26 @@ coverage/
 *.pid
 tmp/
 storage/app/private/
+
+# Local databases and test/runtime caches
+*.sqlite
+*.db
+backend/.phpunit.result.cache
+
+# Python local environment/build artifacts
+.venv/
+workers/.venv/
+*.egg-info/
+
+# AI assistant local caches and transcripts
+.codebase-memory/
+.claude/tmp/
+.claude/logs/
+.claude/cache/
+.claude/settings.local.json
+.gemini/tmp/
+.gemini/inbox/
+
+# Local server/secrets notes
+.server-credentials
+server-info.md

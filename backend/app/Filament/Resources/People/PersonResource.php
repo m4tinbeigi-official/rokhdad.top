@@ -23,7 +23,7 @@ class PersonResource extends Resource
     protected static ?string $modelLabel = 'مدرس / سخنران';
     protected static ?string $pluralModelLabel = 'اشخاص (مدرسین و سخنرانان)';
     protected static ?string $navigationLabel = 'اشخاص';
-    protected static ?string $navigationGroup = 'مدیریت رویدادها';
+    protected static \UnitEnum|string|null $navigationGroup = 'مدیریت رویدادها';
 
     public static function form(Schema $schema): Schema
     {

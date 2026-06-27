@@ -23,7 +23,7 @@ class EventSourceResource extends Resource
     protected static ?string $modelLabel = 'منبع رویداد';
     protected static ?string $pluralModelLabel = 'منابع رویداد';
     protected static ?string $navigationLabel = 'منابع رویداد';
-    protected static ?string $navigationGroup = 'تنظیمات سیستم';
+    protected static \UnitEnum|string|null $navigationGroup = 'تنظیمات سیستم';
 
     public static function form(Schema $schema): Schema
     {

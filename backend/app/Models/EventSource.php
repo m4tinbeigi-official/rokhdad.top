@@ -17,6 +17,7 @@ class EventSource extends Model
         'name',
         'base_url',
         'api_base_url',
+        'proxy_url',
         'auth_type',
         'status',
         'health_status',
@@ -56,6 +57,11 @@ class EventSource extends Model
     public function activeApiKeys(): HasMany
     {
         return $this->apiKeys()->where('status', 'active');
+    }
+
+    public function requestLogs(): HasMany
+    {
+        return $this->hasMany(RequestLog::class);
     }
 
     public function recordHealthSuccess(): void

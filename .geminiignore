@@ -1,0 +1,38 @@
+# Dependencies and generated output
+/backend/vendor/
+/frontend/node_modules/
+/frontend/dist/
+/workers/.venv/
+/workers/*.egg-info/
+**/__pycache__/
+
+# Runtime/cache/local data
+/backend/storage/
+/backend/bootstrap/cache/
+/backend/database/*.sqlite
+*.sqlite
+*.db
+*.log
+*.pid
+/.codebase-memory/
+
+# Lockfiles and package manager metadata
+/backend/composer.lock
+/frontend/package-lock.json
+/frontend/node_modules/.package-lock.json
+
+# Secrets and local server notes
+.env
+.env.*
+!.env.example
+!backend/.env.example
+/.server-credentials
+/server-info.md
+
+# Large reference dumps; open a specific file only for provider API work
+/docs/site/
+
+# OS/editor
+.DS_Store
+.idea/
+.vscode/

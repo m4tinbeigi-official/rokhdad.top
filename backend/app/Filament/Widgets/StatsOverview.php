@@ -14,7 +14,7 @@ class StatsOverview extends StatsOverviewWidget
     protected static ?int $sort = 1;
     
     // Refresh the widget every 60 seconds automatically
-    protected static ?string $pollingInterval = '60s';
+    protected ?string $pollingInterval = '60s';
 
     protected function getStats(): array
     {

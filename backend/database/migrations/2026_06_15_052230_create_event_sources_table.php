@@ -14,6 +14,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('base_url')->nullable();
             $table->string('api_base_url')->nullable();
+            $table->string('proxy_url')->nullable();
             $table->string('auth_type', 20)->default('none');
             $table->string('status', 20)->default('active')->index();
             $table->boolean('is_enabled')->default(true)->index();

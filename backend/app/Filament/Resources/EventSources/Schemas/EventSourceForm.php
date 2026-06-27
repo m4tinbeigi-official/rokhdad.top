@@ -23,7 +23,11 @@ class EventSourceForm
                 TextInput::make('base_url')
                     ->url(),
                 TextInput::make('api_base_url')
-                    ->url(),
+                    ->url()
+                    ->nullable(),
+                TextInput::make('proxy_url')
+                    ->url()
+                    ->nullable(),
                 Select::make('auth_type')
                     ->options([
                         'none' => 'None',

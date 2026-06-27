@@ -81,6 +81,15 @@ class User extends Authenticatable implements FilamentUser
             ->withTimestamps();
     }
 
+    /**
+     * Convenience accessor for the user's primary organizer (first linked).
+     * Lets settlement code use `$user->organizer`.
+     */
+    public function getOrganizerAttribute(): ?Organizer
+    {
+        return $this->organizers()->first();
+    }
+
     public function tickets(): HasMany
     {
         return $this->hasMany(Ticket::class);

@@ -11,13 +11,16 @@ use App\Http\Controllers\OrganizerController;
 use App\Http\Controllers\OrganizerDashboardController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PersonalizedHomepageController;
+use App\Http\Controllers\AiSearchController;
 use App\Http\Controllers\PersonController;
 use App\Http\Controllers\RatingController;
 use App\Http\Controllers\SavedEventController;
 use App\Http\Controllers\TicketValidationController;
 use App\Http\Controllers\UserPreferenceController;
 use App\Http\Controllers\WebhookSubscriptionController;
+use App\Http\Controllers\HermesProxyController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\TaskManagementController;
 
 Route::get('/health', function () {
     return response()->json([
@@ -58,6 +61,11 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
     // Events (P14-001, P14-002)
     Route::get('/events', [EventController::class, 'index'])->name('events.index');
     Route::get('/events/{slug}', [EventController::class, 'show'])->name('events.show');
+
+    // AI Search
+    Route::post('/ai/search', [AiSearchController::class, 'search'])->name('ai.search');
+    // Autocomplete suggestions for AI queries
+    Route::get('/ai/suggestions', [AiSearchController::class, 'suggestions'])->name('ai.suggestions');
 
     // Comments (P21-001) – public list, auth-only create/delete
     Route::get('/events/{slug}/comments', [CommentController::class, 'index'])->name('events.comments.index');
@@ -124,5 +132,19 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
         Route::post('/me/webhook-subscriptions', [WebhookSubscriptionController::class, 'store'])->name('me.webhook-subscriptions.store');
         Route::put('/me/webhook-subscriptions/{id}', [WebhookSubscriptionController::class, 'update'])->name('me.webhook-subscriptions.update');
         Route::delete('/me/webhook-subscriptions/{id}', [WebhookSubscriptionController::class, 'destroy'])->name('me.webhook-subscriptions.destroy');
+
+        // Hermes knowledge-graph proxy (developer/admin tooling).
+        Route::prefix('hermes')->name('hermes.')->group(function () {
+            Route::get('/ping', [HermesProxyController::class, 'ping'])->name('ping');
+            Route::post('/search', [HermesProxyController::class, 'search'])->name('search');
+            Route::post('/trace', [HermesProxyController::class, 'trace'])->name('trace');
+            Route::post('/snippet', [HermesProxyController::class, 'snippet'])->name('snippet');
+        });
     });
+
+// Task management API (admin only)
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/admin/tasks', [TaskManagementController::class, 'index'])->name('admin.tasks.index');
+    Route::post('/admin/tasks/{id}', [TaskManagementController::class, 'action'])->name('admin.tasks.action');
+});
 });

@@ -2,13 +2,14 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Http;
 use App\Models\Category;
 use App\Models\City;
 use App\Models\Event;
+use App\Models\EventSource;
 use App\Models\EventSourceAttribution;
 use App\Models\Organizer;
+use App\Services\EventSourceHttpClient;
+use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
@@ -22,14 +23,22 @@ class EvandHistoricalSync extends Command
         $this->info("Starting Evand Historical Sync...");
         Log::info('EvandHistoricalSync Started');
 
-        $baseUrl = 'https://api.evand.com';
-        
+        $baseUrl     = 'https://api.evand.com';
+        $eventSource = EventSource::where('source_key', 'evand')->first();
+        $http        = $eventSource
+            ? new EventSourceHttpClient($eventSource)
+            : null;
+
         $this->info("Fetching category and city maps...");
-        $categoryMap = collect(Http::timeout(20)->get("{$baseUrl}/categories")->json('data') ?? [])
+        $categoryMap = collect($http
+            ? $http->get("{$baseUrl}/categories")->json('data') ?? []
+            : [])
             ->mapWithKeys(fn (array $c) => [(string) ($c['id'] ?? '') => $c])
             ->filter(fn ($c, string $id) => $id !== '');
 
-        $cityMap = collect(Http::timeout(20)->get("{$baseUrl}/cities")->json('data') ?? [])
+        $cityMap = collect($http
+            ? $http->get("{$baseUrl}/cities")->json('data') ?? []
+            : [])
             ->mapWithKeys(fn (array $c) => [(string) ($c['id'] ?? '') => $c])
             ->filter(fn ($c, string $id) => $id !== '');
 
@@ -41,10 +50,12 @@ class EvandHistoricalSync extends Command
 
         do {
             $this->info("Fetching organizations page {$orgPage} / {$totalOrgPages}");
-            $response = Http::timeout(30)->retry(3, 1000)->get("{$baseUrl}/organizations", [
-                'page' => $orgPage,
-                'per_page' => 100,
-            ]);
+            $response = $http
+                ? $http->get("{$baseUrl}/organizations", [
+                    'page' => $orgPage,
+                    'per_page' => 100,
+                ])
+                : throw new \RuntimeException('EventSourceHttpClient not available');
 
             if (! $response->successful()) {
                 $this->error("Failed to fetch organizations page {$orgPage}");
@@ -86,7 +97,7 @@ class EvandHistoricalSync extends Command
                 if (($orgRaw['events_count'] ?? 0) === 0) continue;
 
                 // 2. Fetch events for this organizer
-                $this->processOrganizerEvents($orgSlug, $organizer, $categoryMap, $cityMap, $baseUrl, $totalEventsProcessed);
+                $this->processOrganizerEvents($orgSlug, $organizer, $categoryMap, $cityMap, $baseUrl, $totalEventsProcessed, $http);
             }
 
             // Log progress every page
@@ -111,16 +122,18 @@ class EvandHistoricalSync extends Command
         ]);
     }
 
-    protected function processOrganizerEvents($orgSlug, $organizer, $categoryMap, $cityMap, $baseUrl, &$totalEventsProcessed)
+    protected function processOrganizerEvents($orgSlug, $organizer, $categoryMap, $cityMap, $baseUrl, &$totalEventsProcessed, ?EventSourceHttpClient $http = null)
     {
         $eventPage = 1;
         $totalEventPages = 1;
 
         do {
-            $response = Http::timeout(20)->retry(2, 500)->get("{$baseUrl}/organizations/{$orgSlug}/events", [
-                'page' => $eventPage,
+            $response = $http
+                ? $http->get("{$baseUrl}/organizations/{$orgSlug}/events", [
+                'page'     => $eventPage,
                 'per_page' => 50,
-            ]);
+                ])
+                : throw new \RuntimeException('EventSourceHttpClient not available');
 
             if (! $response->successful()) break;
 
@@ -135,7 +148,9 @@ class EvandHistoricalSync extends Command
                 $eventSlug = (string) ($eventRaw['slug'] ?? '');
                 if ($eventSlug === '') continue;
 
-                $detailResponse = Http::timeout(20)->retry(2, 500)->get("{$baseUrl}/events/{$eventSlug}");
+                $detailResponse = $http
+                    ? $http->get("{$baseUrl}/events/{$eventSlug}")
+                    : throw new \RuntimeException('EventSourceHttpClient not available');
                 if (! $detailResponse->successful()) continue;
 
                 $raw = $detailResponse->json('data') ?? [];

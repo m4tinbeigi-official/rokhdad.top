@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { ApiError, NetworkError, createRokhdadApi, getApiBaseUrl } from './api/client.js'
 import {
   buildEventFilterSearch,
@@ -47,6 +47,60 @@ const copyFeedback = ref({})
 const attendeeTransferState = ref({})
 const campaignDrafts = ref({})
 const campaignActionState = ref({})
+const aiQuery = ref('')
+const aiSuggestions = ref([])
+const suggestionsLoading = ref(false)
+let suggestionTimeout = null
+const isAiSearching = ref(false)
+const aiResults = ref([])
+const aiSearchError = ref(null)
+
+async function submitAiSearch() {
+  if (!aiQuery.value.trim()) return
+
+  isAiSearching.value = true
+  aiSearchError.value = null
+  aiResults.value = []
+
+  try {
+    const payload = await api.aiSearch({ query: aiQuery.value.trim() })
+    const events = Array.isArray(payload?.data) ? payload.data : []
+    
+    aiResults.value = events.map(normalizeHomepageEvent)
+    
+    if (aiResults.value.length === 0) {
+      aiSearchError.value = 'متاسفانه رویدادی مرتبط با درخواست شما پیدا نکردیم.'
+    }
+  } catch (err) {
+    aiSearchError.value = err?.payload?.message || 'خطا در ارتباط با هوش مصنوعی. لطفا دوباره تلاش کنید.'
+  } finally {
+    isAiSearching.value = false
+  }
+}
+
+watch(
+  aiQuery,
+  (newVal) => {
+    if (suggestionTimeout) clearTimeout(suggestionTimeout);
+    if (!newVal.trim()) {
+      aiSuggestions.value = [];
+      return;
+    }
+    suggestionsLoading.value = true;
+    suggestionTimeout = setTimeout(async () => {
+      try {
+        const suggestions = await api.aiSuggestions(newVal.trim());
+        aiSuggestions.value = suggestions?.data || [];
+      } catch (e) {
+        console.error(e);
+        aiSuggestions.value = [];
+      } finally {
+        suggestionsLoading.value = false;
+      }
+    }, 300);
+  }
+);
+
 
 const pageKind = computed(() => {
   if (currentPath.startsWith('/embed/events/')) {
@@ -1259,117 +1313,95 @@ function setJsonLd(payload) {
     </main>
 
     <main v-else-if="pageKind === 'home'" class="mx-auto grid max-w-7xl gap-8 px-4 py-6 sm:px-6 lg:px-8">
-      <section class="grid gap-5 overflow-hidden rounded-2xl border border-line bg-linear-to-bl from-brand-800 via-brand-700 to-brand-500 p-5 shadow-soft lg:grid-cols-[1fr_380px] lg:items-end lg:p-8">
-        <div class="text-white">
-          <p class="mb-2 inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-xs font-bold text-white backdrop-blur">
-            رخداد · گردآوری رویدادها از ایوند و ایسمینار
-          </p>
-          <h1 class="max-w-3xl text-3xl font-black leading-tight sm:text-4xl">
-            همه رویدادها و وبینارهای ایران، یکجا
-          </h1>
-          <p class="mt-4 max-w-2xl text-base leading-8 text-white/85">
-            رویدادهای حضوری ایوند و وبینارهای ایسمینار هر ساعت به‌صورت خودکار گردآوری و اینجا نمایش داده می‌شوند. جستجو کن، فیلتر کن و مستقیم به منبع برو.
-          </p>
-          <dl class="mt-6 flex flex-wrap gap-6 text-white">
-            <div>
-              <dt class="text-xs font-bold text-white/70">رویدادهای این صفحه</dt>
-              <dd class="text-2xl font-black">{{ meta?.total ? new Intl.NumberFormat('fa-IR').format(meta.total) : '—' }}</dd>
-            </div>
-            <div>
-              <dt class="text-xs font-bold text-white/70">منابع متصل</dt>
-              <dd class="text-2xl font-black">۲</dd>
-            </div>
-            <div>
-              <dt class="text-xs font-bold text-white/70">به‌روزرسانی</dt>
-              <dd class="text-2xl font-black">هر ساعت</dd>
-            </div>
-          </dl>
-        </div>
+      <section class="relative overflow-hidden rounded-3xl border border-white/20 bg-linear-to-br from-brand-900 via-brand-700 to-brand-500 shadow-2xl">
+        <!-- Decorative background elements -->
+        <div class="pointer-events-none absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTM2IDM0djI2aDJWMzRoLTIyek0wIDM0djI2aDJWMzRIMHptMC0zNGgydjI2SDBWMHptMzYgMGgydjI2aC0yVjB6Ii8+PC9nPjwvZz48L3N2Zz4=')]"></div>
+        <div class="pointer-events-none absolute -right-48 -top-48 h-96 w-96 rounded-full bg-brand-400/30 blur-3xl"></div>
+        <div class="pointer-events-none absolute -bottom-48 -left-48 h-96 w-96 rounded-full bg-white/10 blur-3xl"></div>
 
-        <form class="grid gap-3 rounded-lg border border-line bg-canvas p-4" role="search" aria-label="جستجوی رویداد" @submit.prevent="fetchEvents">
-          <label class="grid gap-1 text-sm font-bold text-ink">
-            جستجو
-            <input
-              v-model.trim="eventFilters.q"
-              class="rounded-md border border-line bg-white px-3 py-2 text-base outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
-              type="search"
-              placeholder="نام رویداد، شهر یا موضوع"
-            />
-          </label>
-          <div class="grid grid-cols-2 gap-3">
-            <label class="grid gap-1 text-sm font-bold text-ink">
-              شهر
-              <select v-model="eventFilters.city" class="rounded-md border border-line bg-white px-3 py-2 text-base outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-100">
+        <div class="relative grid gap-10 p-6 sm:p-10 lg:grid-cols-[1fr_420px] lg:items-center lg:p-12">
+          <div class="text-white z-10">
+            <span class="mb-4 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-xs font-bold text-white shadow-sm backdrop-blur-md">
+              <span class="relative flex h-2 w-2">
+                <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75"></span>
+                <span class="relative inline-flex h-2 w-2 rounded-full bg-green-500"></span>
+              </span>
+              رخداد · گردآوری خودکار از ایوند و ایسمینار
+            </span>
+            <h1 class="mt-2 max-w-3xl text-4xl font-black leading-tight tracking-tight sm:text-5xl lg:text-6xl">
+              دنیای رویدادها، <br />
+              <span class="text-transparent bg-clip-text bg-gradient-to-l from-white to-brand-200">در یک نگاه</span>
+            </h1>
+            <p class="mt-6 max-w-2xl text-lg leading-relaxed text-white/90">
+              رویدادهای حضوری و وبینارهای آنلاین هر ساعت به‌صورت خودکار گردآوری می‌شوند. جستجو کن، فیلتر کن و مستقیم به منبع اصلی برو.
+            </p>
+            <dl class="mt-8 flex flex-wrap gap-8 text-white">
+              <div class="flex flex-col">
+                <dt class="text-sm font-bold text-brand-100">رویدادهای این صفحه</dt>
+                <dd class="mt-1 text-3xl font-black">{{ meta?.total ? new Intl.NumberFormat('fa-IR').format(meta.total) : '—' }}</dd>
+              </div>
+              <div class="flex flex-col">
+                <dt class="text-sm font-bold text-brand-100">منابع متصل</dt>
+                <dd class="mt-1 text-3xl font-black">۲</dd>
+              </div>
+            </dl>
+          </div>
+
+          <form class="relative z-10 grid gap-4 rounded-2xl border border-white/20 bg-white/10 p-6 shadow-xl backdrop-blur-xl" role="search" aria-label="جستجوی رویداد" @submit.prevent="fetchEvents">
+            <h2 class="text-lg font-black text-white">جستجوی هوشمند</h2>
+            <div class="relative">
+              <input
+                v-model.trim="eventFilters.q"
+                class="w-full rounded-xl border-0 bg-white/90 px-4 py-3.5 pr-11 text-base text-ink shadow-inner outline-none transition focus:bg-white focus:ring-4 focus:ring-brand-400/30 placeholder:text-muted/60"
+                type="search"
+                placeholder="نام رویداد، شهر یا موضوع..."
+              />
+              <svg class="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted/60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+              <select v-model="eventFilters.city" class="rounded-xl border-0 bg-white/90 px-3 py-3 text-sm text-ink outline-none transition focus:bg-white focus:ring-4 focus:ring-brand-400/30">
                 <option value="">همه شهرها</option>
-                <option v-for="city in filterOptions.cities" :key="city.slug" :value="city.slug">
-                  {{ city.title }}
-                </option>
+                <option v-for="city in filterOptions.cities" :key="city.slug" :value="city.slug">{{ city.title }}</option>
               </select>
-            </label>
-            <label class="grid gap-1 text-sm font-bold text-ink">
-              نوع
-              <select v-model="eventFilters.event_type" class="rounded-md border border-line bg-white px-3 py-2 text-base outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-100">
-                <option value="">همه</option>
+              <select v-model="eventFilters.event_type" class="rounded-xl border-0 bg-white/90 px-3 py-3 text-sm text-ink outline-none transition focus:bg-white focus:ring-4 focus:ring-brand-400/30">
+                <option value="">همه انواع</option>
                 <option value="in_person">حضوری</option>
                 <option value="online">آنلاین</option>
                 <option value="hybrid">ترکیبی</option>
               </select>
-            </label>
-          </div>
-          <div class="grid grid-cols-2 gap-3">
-            <label class="grid gap-1 text-sm font-bold text-ink">
-              دسته
-              <select v-model="eventFilters.category" class="rounded-md border border-line bg-white px-3 py-2 text-base outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-100">
-                <option value="">همه دسته ها</option>
-                <option v-for="category in filterOptions.categories" :key="category.slug" :value="category.slug">
-                  {{ category.title }}
-                </option>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+              <select v-model="eventFilters.category" class="rounded-xl border-0 bg-white/90 px-3 py-3 text-sm text-ink outline-none transition focus:bg-white focus:ring-4 focus:ring-brand-400/30">
+                <option value="">همه دسته‌ها</option>
+                <option v-for="category in filterOptions.categories" :key="category.slug" :value="category.slug">{{ category.title }}</option>
               </select>
-            </label>
-            <label class="grid gap-1 text-sm font-bold text-ink">
-              منبع
-              <select v-model="eventFilters.source" class="rounded-md border border-line bg-white px-3 py-2 text-base outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-100">
+              <select v-model="eventFilters.source" class="rounded-xl border-0 bg-white/90 px-3 py-3 text-sm text-ink outline-none transition focus:bg-white focus:ring-4 focus:ring-brand-400/30">
                 <option value="">همه منابع</option>
                 <option value="evand">ایوند</option>
                 <option value="eseminar">ایسمینار</option>
-                <option value="bilitmaster">بلیط مستر</option>
               </select>
-            </label>
-          </div>
-          <div class="grid grid-cols-2 gap-3">
-            <label class="grid gap-1 text-sm font-bold text-ink">
-              از تاریخ
-              <input v-model="eventFilters.start_date" class="rounded-md border border-line bg-white px-3 py-2 text-base outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-100" type="date" />
-            </label>
-            <label class="grid gap-1 text-sm font-bold text-ink">
-              تا تاریخ
-              <input v-model="eventFilters.end_date" class="rounded-md border border-line bg-white px-3 py-2 text-base outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-100" type="date" />
-            </label>
-          </div>
-          <div class="flex flex-wrap items-center justify-between gap-2">
-            <p class="text-xs font-bold text-muted">
-              <template v-if="filtersLoading">در حال دریافت گزینه های فیلتر...</template>
-              <template v-else-if="hasActiveFilters">فیلترها روی نتایج API اعمال می شوند.</template>
-              <template v-else>بدون فیلتر فعال</template>
-            </p>
-            <div class="flex gap-2">
+            </div>
+            <div class="mt-2 flex items-center justify-between">
               <button
                 v-if="hasActiveFilters"
-                class="rounded-md border border-line bg-white px-3 py-2 text-sm font-bold text-muted hover:bg-brand-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-600"
+                class="rounded-xl px-4 py-2.5 text-sm font-bold text-white/80 transition hover:bg-white/10 hover:text-white"
                 type="button"
                 @click="resetFilters"
               >
                 پاک کردن
               </button>
+              <div v-else></div>
               <button
-                class="rounded-md bg-brand-700 px-4 py-2 text-sm font-bold text-white shadow-sm hover:bg-brand-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600"
+                class="rounded-xl bg-white px-6 py-2.5 text-sm font-bold text-brand-800 shadow-md transition hover:bg-brand-50 hover:shadow-lg focus:outline-none focus:ring-4 focus:ring-white/40"
                 type="submit"
               >
                 اعمال فیلتر
               </button>
             </div>
-          </div>
-        </form>
+          </form>
+        </div>
       </section>
 
       <section v-if="quickCategories.length" class="flex flex-wrap gap-2" aria-label="دسته بندی های پرکاربرد">
@@ -1421,7 +1453,7 @@ function setJsonLd(payload) {
               v-for="event in featuredEvents"
               :key="`featured-${event.id}`"
               :href="event.href"
-              class="group relative flex flex-col overflow-hidden rounded-2xl border border-line bg-surface shadow-soft transition hover:-translate-y-0.5 hover:shadow-lg focus-ring"
+              class="group relative flex flex-col overflow-hidden rounded-2xl border border-line bg-surface shadow-md transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl focus-ring"
             >
               <div class="relative aspect-[16/9] w-full overflow-hidden bg-brand-50">
                 <img v-if="event.cover" :src="event.cover" :alt="event.title" loading="lazy" class="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
@@ -1476,7 +1508,7 @@ function setJsonLd(payload) {
           <article
             v-for="event in regularEvents"
             :key="event.id || event.slug || event.title"
-            class="group flex flex-col overflow-hidden rounded-2xl border border-line bg-surface shadow-soft transition hover:-translate-y-0.5 hover:shadow-lg"
+            class="group flex flex-col overflow-hidden rounded-2xl border border-line bg-surface shadow-md transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl"
           >
             <a :href="event.href" class="relative block aspect-[16/9] w-full overflow-hidden bg-brand-50 focus-ring">
               <img v-if="event.cover" :src="event.cover" :alt="event.title" loading="lazy" class="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
@@ -1521,6 +1553,103 @@ function setJsonLd(payload) {
               </a>
             </div>
           </article>
+        </div>
+      </section>
+
+      <!-- AI Search Section -->
+      <section class="mt-8 overflow-hidden rounded-3xl border border-line bg-white shadow-lg lg:grid lg:grid-cols-2 lg:items-center">
+        <div class="p-8 sm:p-12">
+          <div class="mb-4 inline-flex items-center gap-2 rounded-full bg-indigo-50 px-3 py-1 text-xs font-bold text-indigo-700">
+            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+            هوش مصنوعی رخداد
+          </div>
+          <h2 class="text-3xl font-black leading-tight text-ink">رویداد دلخواهت رو پیدا کن</h2>
+          <p class="mt-4 text-base leading-8 text-muted">
+            کافیه به زبان ساده بگی دنبال چی هستی. مثلاً "رویدادهای استارتاپی تهران تو این هفته" یا "وبینارهای آموزش سئو". هوش مصنوعی ما بهترین گزینه‌ها رو برات پیدا می‌کنه.
+          </p>
+
+          <form class="mt-8" @submit.prevent="submitAiSearch">
+            <div class="relative flex items-center">
+              <input
+                v-model="aiQuery"
+                type="text"
+                placeholder="اینجا بنویس..."
+                class="w-full rounded-2xl border border-line bg-canvas py-4 pl-16 pr-5 text-base text-ink outline-none transition focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-100"
+                :disabled="isAiSearching"
+              />
+              <button
+                type="submit"
+                class="absolute left-2 top-1/2 flex -translate-y-1/2 items-center justify-center rounded-xl bg-indigo-600 p-2.5 text-white transition hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-70"
+                :disabled="isAiSearching || !aiQuery.trim()"
+              >
+                <svg v-if="!isAiSearching" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+                <svg v-else class="h-5 w-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+              </button>
+            <ul v-if="!suggestionsLoading && aiSuggestions.length" class="absolute left-0 right-0 top-full mt-1 bg-white border border-gray-200 rounded shadow-lg z-10">
+  <li v-for="s in aiSuggestions" :key="s" class="px-3 py-2 hover:bg-gray-100 cursor-pointer" @click="aiQuery = s">{{ s }}</li>
+</ul>
+</div>
+          </form>
+
+          <div v-if="aiSearchError" class="mt-4 rounded-xl bg-red-50 p-4 text-sm font-bold text-red-600">
+            {{ aiSearchError }}
+          </div>
+        </div>
+
+        <div class="bg-canvas p-6 sm:p-8 lg:h-full lg:border-r lg:border-line">
+          <div v-if="isAiSearching" class="flex h-full min-h-[300px] flex-col items-center justify-center gap-4 text-muted">
+            <div class="relative flex h-16 w-16">
+              <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-indigo-400 opacity-20"></span>
+              <div class="relative flex h-16 w-16 items-center justify-center rounded-full bg-indigo-100 text-indigo-600">
+                <svg class="h-8 w-8 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+              </div>
+            </div>
+            <p class="font-bold animate-pulse text-indigo-800">در حال جستجو و تحلیل...</p>
+          </div>
+
+          <div v-else-if="aiResults.length > 0" class="flex flex-col gap-4">
+            <h3 class="text-sm font-black text-indigo-800">پیشنهادهای هوش مصنوعی برای شما:</h3>
+            <a
+              v-for="event in aiResults"
+              :key="`ai-${event.id}`"
+              :href="event.href"
+              class="group flex items-center gap-4 rounded-2xl border border-line bg-white p-3 shadow-sm transition hover:shadow-md"
+            >
+              <div class="h-20 w-20 shrink-0 overflow-hidden rounded-xl bg-brand-50">
+                <img v-if="event.cover" :src="event.cover" :alt="event.title" class="h-full w-full object-cover" loading="lazy" />
+                <div v-else class="flex h-full w-full items-center justify-center bg-brand-100 text-xl font-black text-brand-700">
+                  {{ eventInitial(event.title) }}
+                </div>
+              </div>
+              <div class="flex flex-col gap-1 overflow-hidden">
+                <h4 class="truncate text-sm font-black text-ink group-hover:text-brand-700">{{ event.title }}</h4>
+                <p class="text-xs font-bold text-muted">{{ event.date }}</p>
+                <div class="mt-1 flex items-center gap-2 text-xs font-bold">
+                  <span class="rounded-md bg-brand-50 px-2 py-0.5 text-brand-800">{{ event.badge }}</span>
+                  <span class="truncate text-muted">{{ event.location }}</span>
+                </div>
+              </div>
+            </a>
+          </div>
+
+          <div v-else class="flex h-full min-h-[300px] flex-col items-center justify-center gap-4 text-center text-muted">
+            <div class="flex h-16 w-16 items-center justify-center rounded-full bg-white shadow-sm border border-line">
+              <svg class="h-8 w-8 text-muted/50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+              </svg>
+            </div>
+            <p class="font-bold">آماده پاسخگویی به شما</p>
+            <p class="max-w-xs text-sm">از کادر جستجو استفاده کنید تا رویدادهای مرتبط را پیدا کنم.</p>
+          </div>
         </div>
       </section>
     </main>

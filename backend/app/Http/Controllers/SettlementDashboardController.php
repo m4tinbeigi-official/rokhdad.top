@@ -56,7 +56,11 @@ class SettlementDashboardController extends Controller
 
         $success = SettlementService::createWithdrawalRequest(
             $organizer,
-            $validated['amount']
+            $validated['amount'],
+            [
+                'bank_account' => $validated['bank_account'],
+                'notes' => $validated['notes'] ?? null,
+            ]
         );
 
         if (!$success) {

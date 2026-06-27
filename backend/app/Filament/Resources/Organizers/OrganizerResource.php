@@ -23,7 +23,7 @@ class OrganizerResource extends Resource
     protected static ?string $modelLabel = 'برگزارکننده';
     protected static ?string $pluralModelLabel = 'برگزارکنندگان';
     protected static ?string $navigationLabel = 'برگزارکنندگان';
-    protected static ?string $navigationGroup = 'مدیریت رویدادها';
+    protected static \UnitEnum|string|null $navigationGroup = 'مدیریت رویدادها';
 
     public static function form(Schema $schema): Schema
     {

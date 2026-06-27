@@ -34,6 +34,9 @@ class EventSourcesTable
                     ->badge(),
                 TextColumn::make('rate_limit_per_minute')
                     ->numeric(),
+                TextColumn::make('proxy_url')
+                    ->url()
+                    ->searchable(),
                 TextColumn::make('last_checked_at')
                     ->dateTime()
                     ->sortable(),

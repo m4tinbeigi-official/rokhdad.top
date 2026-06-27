@@ -70,4 +70,9 @@ return [
         'site_url' => env('ESEMINAR_SITE_URL', 'https://eseminar.tv'),
     ],
 
+    'bynara' => [
+        'base_url' => env('BYNARA_API_URL', 'https://router.bynara.id/v1'),
+        'key' => env('BYNARA_API_KEY'),
+    ],
+
 ];

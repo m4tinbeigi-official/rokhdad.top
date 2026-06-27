@@ -22,7 +22,7 @@ class CommentResource extends Resource
     protected static ?string $modelLabel = 'نظر';
     protected static ?string $pluralModelLabel = 'نظرات';
     protected static ?string $navigationLabel = 'مدیریت نظرات';
-    protected static ?string $navigationGroup = 'تعاملات کاربر';
+    protected static \UnitEnum|string|null $navigationGroup = 'تعاملات کاربر';
 
     public static function form(Schema $schema): Schema
     {

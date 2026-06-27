@@ -87,6 +87,16 @@ export function createApiClient({
     request,
     listEvents: (query) => request('/events', { query }),
     getEvent: (slug) => request(`/events/${encodeURIComponent(slug)}`),
+    aiSearch: (payload) => request('/ai/search', { 
+      method: 'POST', 
+      body: JSON.stringify(payload),
+      headers: { 'Content-Type': 'application/json' } 
+    }),
+    // Get autocomplete suggestions based on current input
+    aiSuggestions: (query) => request('/ai/suggestions', { 
+      method: 'GET',
+      query: { q: query },
+    }),
     listCategories: () => request('/categories'),
     listCities: () => request('/cities'),
     listOrganizers: (query) => request('/organizers', { query }),

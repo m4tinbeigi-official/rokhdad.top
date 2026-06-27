@@ -73,4 +73,14 @@ class Organizer extends Model
     {
         return $this->hasMany(Campaign::class);
     }
+
+    public function payouts(): HasMany
+    {
+        return $this->hasMany(Payout::class);
+    }
+
+    public function settlementLedgers(): HasMany
+    {
+        return $this->hasMany(SettlementLedger::class);
+    }
 }
