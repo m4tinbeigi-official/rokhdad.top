@@ -1,0 +1,10 @@
+@import url('https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn-font@v33.003/vazirmatn-with-yalda-font-face.css');
+
+body, input, select, textarea, button, .fi-sidebar, .fi-header, .fi-main, .fi-logo, .fi-ta, .fi-fo, .fi-in, .fi-modal, .fi-section, .fi-dropdown, .fi-tabs, .fi-breadcrumbs {
+    font-family: 'Vazirmatn', sans-serif !important;
+}
+
+/* Ensure the numbers are also looking Persian/clean */
+span, p, a, button, input, td, th {
+    font-variant-numeric: proportional-nums;
+}

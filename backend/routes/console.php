@@ -544,3 +544,5 @@ Artisan::command('eseminar:import {--pages=} {--per-page=50}', function () {
 | Laravel scheduler to be running, e.g. a cron entry on the server:
 |   * * * * * cd /path/to/backend && php artisan schedule:run >> /dev/null 2>&1
 */
+Schedule::command('google:fetch-metrics --days=1')->dailyAt('02:00');
+

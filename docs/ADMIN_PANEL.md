@@ -24,8 +24,14 @@ structure (`Pages/`, `Schemas/` for forms, `Tables/` for list views).
 | `Events` | Canonical events. |
 | `Organizers` | Event organizers. |
 | `People` | People (speakers/contacts) with event & organizer relations. |
+
+**هوش مصنوعی (AI)**
+
+| Resource | Manages |
+|---|---|
 | `EventMergeProposals` | Dedup merge proposals awaiting review. |
-| `AiServices` | AI service configuration. |
+| `AiServices` | AI service configuration (custom settings & API keys). |
+| `AiSearchQueries` | Log search queries and metadata/filters extracted by AI. |
 
 **فروش و مالی (Sales & Finance)**
 
@@ -121,6 +127,15 @@ structure (`Pages/`, `Schemas/` for forms, `Tables/` for list views).
 
 - `StatsOverview` — dashboard stats overview.
 - `EvandSyncStatsWidget` — surfaces Evand synchronization statistics on the dashboard.
+
+## Localization & RTL Configuration (راست‌چین و فارسی‌سازی)
+
+The admin panel is configured to be fully Right-to-Left (RTL) and translated to Persian:
+
+- **Locale Setting:** Set to `'locale' => 'fa'` in `config/app.php`.
+- **RTL Direction:** Managed via the translation file key `'direction' => 'rtl'` in `lang/vendor/filament-panels/fa/layout.php`. Filament detects this setting and automatically switches the panel layout direction to RTL.
+- **Custom Font & Styles:** A custom CSS stylesheet `resources/css/custom-filament.css` is registered in `AdminPanelProvider.php` to load and apply the **Vazirmatn** Persian font and adjust typography across all Filament elements.
+- **Asset Publishing:** Run `php artisan filament:assets` after making changes to compile and copy the custom styles to `public/css/app/custom-filament-styles.css`.
 
 ## Console Commands
 

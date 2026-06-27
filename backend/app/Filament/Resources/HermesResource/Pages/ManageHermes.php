@@ -26,21 +26,38 @@ class ManageHermes extends Page
 
     protected function getFormSchema(): array
     {
+        $activeService = \App\Models\AiService::where('is_active', true)->first();
+        
         return [
-            TextInput::make('endpoint')
-                ->label('Endpoint هرمس')
-                ->default(config('hermes.endpoint'))
+            Forms\Components\Select::make('provider')
+                ->label('ارائه‌دهنده (Provider)')
+                ->options([
+                    'openai' => 'OpenAI',
+                    'google' => 'Google (Gemini)',
+                    'anthropic' => 'Anthropic',
+                    'custom' => 'سفارشی',
+                ])
+                ->default($activeService?->provider ?? 'openai')
+                ->required(),
+            TextInput::make('model_name')
+                ->label('نام مدل (Model)')
+                ->default($activeService?->model_name ?? 'gpt-4o')
                 ->required()
-                ->placeholder('مثلاً http://localhost:8000/api'),
+                ->placeholder('مثلاً gpt-4o یا gemini-1.5-pro'),
+            TextInput::make('base_url')
+                ->label('آدرس پایه (Base URL)')
+                ->default($activeService?->base_url ?? 'https://api.openai.com/v1')
+                ->required()
+                ->placeholder('مثلاً https://api.openai.com/v1'),
             TextInput::make('api_key')
-                ->label('API Key (اختیاری)')
-                ->placeholder(config('hermes.api_key') ? 'برای حفظ کلید فعلی خالی بگذارید' : 'کلید دسترسی')
+                ->label('کلید دسترسی API Key')
+                ->placeholder($activeService?->api_key ? 'برای حفظ کلید فعلی خالی بگذارید' : 'کلید دسترسی را وارد کنید')
                 ->password()
                 ->revealable()
                 ->dehydrated(fn ($state): bool => filled($state)),
             Textarea::make('chat')
-                ->label('دستورات چت')
-                ->placeholder("از دستورات زیر استفاده کنید:\nsearch <pattern>\ntrace <function> <inbound|outbound>\nsnippet <qualified_name>")
+                ->label('تست دستورات چت (محلی)')
+                ->placeholder("مثلاً: فایل App.vue را پیدا کن...")
                 ->rows(4),
         ];
     }
@@ -48,19 +65,23 @@ class ManageHermes extends Page
     public function submit()
     {
         $data = $this->form->getState();
-        // Persist settings into .env. The API key is only overwritten when a new
-        // value is supplied (empty input keeps the current key).
-        $envPath = base_path('.env');
-        if (file_exists($envPath)) {
-            $env = file_get_contents($envPath);
-            $env = $this->setEnvValue($env, 'HERMES_ENDPOINT', $data['endpoint']);
-            if (filled($data['api_key'] ?? null)) {
-                $env = $this->setEnvValue($env, 'HERMES_API_KEY', $data['api_key']);
-            }
-            file_put_contents($envPath, $env);
-            Artisan::call('config:clear');
-            Artisan::call('config:cache');
+        
+        // Update or create the active AI Service in the database
+        $activeService = \App\Models\AiService::where('is_active', true)->first();
+        if (!$activeService) {
+            $activeService = new \App\Models\AiService();
+            $activeService->is_active = true;
+            $activeService->name = 'Default Hermes Service';
         }
+        
+        if (isset($data['provider'])) $activeService->provider = $data['provider'];
+        if (isset($data['model_name'])) $activeService->model_name = $data['model_name'];
+        if (isset($data['base_url'])) $activeService->base_url = $data['base_url'];
+        if (filled($data['api_key'] ?? null)) {
+            $activeService->api_key = $data['api_key'];
+        }
+        
+        $activeService->save();
 
         $chat = trim($data['chat'] ?? '');
         if ($chat === '') {
@@ -115,7 +136,9 @@ class ManageHermes extends Page
                 
                 // Keep the prompt empty for the next message
                 $this->form->fill([
-                    'endpoint' => $data['endpoint'],
+                    'provider' => $data['provider'],
+                    'model_name' => $data['model_name'],
+                    'base_url' => $data['base_url'],
                     'api_key' => $data['api_key'],
                     'chat' => '',
                 ]);
@@ -134,17 +157,4 @@ class ManageHermes extends Page
         ];
     }
 
-    /**
-     * Set or append an env key, quoting the value safely.
-     */
-    private function setEnvValue(string $env, string $key, string $value): string
-    {
-        $line = $key.'="'.addslashes($value).'"';
-
-        if (preg_match('/^'.preg_quote($key, '/').'=.*/m', $env)) {
-            return preg_replace('/^'.preg_quote($key, '/').'=.*/m', $line, $env);
-        }
-
-        return rtrim($env, "\n")."\n".$line."\n";
-    }
 }

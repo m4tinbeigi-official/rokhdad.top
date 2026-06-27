@@ -26,5 +26,6 @@
 - `NOTIFICATIONS.md`: SMS (sms.ir) and email (Pakett) sending, notification logs.
 - `CAMPAIGNS.md`: Organizer email/SMS campaigns, audiences, and simulation.
 - `ADMIN_PANEL.md`: Filament admin panel, resources, widgets, and console commands.
+- `GOOGLE_INTEGRATION.md`: Google Analytics and Search Console OAuth flow, DB schemas, cron-scheduler, and admin charts.
 - `INGESTION_SOURCES.md`: External source connectors and the normalization/dedup/enrichment pipeline.
 - `MOBILE_APP.md`: Capacitor Android packaging of the Vue frontend.

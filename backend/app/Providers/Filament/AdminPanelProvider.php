@@ -46,6 +46,9 @@ class AdminPanelProvider extends PanelProvider
             ->plugins([
                 \HusamTariq\FilamentDatabaseSchedule\FilamentDatabaseSchedulePlugin::make(),
             ])
+            ->assets([
+                \Filament\Support\Assets\Css::make('custom-filament-styles', resource_path('css/custom-filament.css')),
+            ])
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
