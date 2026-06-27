@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Controller;
+
 use App\Models\Organizer;
 use App\Services\SettlementService;
 use Illuminate\Http\Request;
