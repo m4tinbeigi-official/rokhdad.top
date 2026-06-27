@@ -41,7 +41,7 @@
                     </button>
                 @else
                     <button type="button" wire:click="connectGoogle" class="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-amber-500 hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 transition-colors">
-                        <svg class="w-5 h-5 ml-2" viewBox="0 0 24 24" fill="currentColor">
+                        <svg class="w-5 h-5 me-2" viewBox="0 0 24 24" fill="currentColor">
                             <path d="M12.24 10.285V14.4h6.887c-.648 2.41-2.519 4.114-5.136 4.114-3.41 0-6.19-2.78-6.19-6.19s2.78-6.19 6.19-6.19c1.602 0 3.018.611 4.1 1.62l3.073-3.073C19.296 2.915 15.996 1.5 12.24 1.5 6.033 1.5 1 6.533 1 12.74s5.033 11.24 11.24 11.24c6.476 0 11.24-4.555 11.24-11.24 0-.797-.08-1.571-.23-2.315H12.24z"/>
                         </svg>
                         اتصال به حساب گوگل
