@@ -37,22 +37,34 @@ jobs:
             git fetch --all --prune
             git reset --hard origin/main
 
-            # 2) Rebuild the frontend image (the elegant UI lives here).
-            #    NOTE: backend is intentionally NOT auto-recreated. The deploy dir
-            #    is currently missing its .env (MARIADB_*/MONGO_*/REDIS_* unset),
-            #    so recreating backend risks bringing it up without DB credentials
-            #    and returning 502. Deploy backend manually after the .env is
-            #    confirmed (see DEPLOY.md).
+            # 2) Rebuild both images from the freshly pulled code.
+            #    Frontend: the elegant UI. Backend: the API + Filament admin panel.
+            #    The backend image bakes Filament asset publishing into its start
+            #    command, so no manual `php artisan filament:assets` is ever needed.
             docker build -t rokhdad/frontend:latest ./frontend
+            docker build -t rokhdad/backend:latest -f ./deploy/backend.Dockerfile ./backend
 
-            # 3) Recreate ONLY the frontend, passing BOTH compose files so the
+            # 3) Recreate the frontend, passing BOTH compose files so the
             #    127.0.0.1:3001->3000 port mapping from the override is preserved
             #    (running with the base file alone drops it and nginx returns 502).
             cd "$DEPLOY"
             COMPOSE="docker compose -f docker-compose.yml -f docker-compose.migration-override.yml"
             $COMPOSE up -d --no-deps --force-recreate frontend
 
-            # 4) Health check — fail the deploy (and surface it in Actions) if the
+            # 4) Recreate the backend ONLY when the env file is present. compose
+            #    loads it via `env_file: ../.env`, i.e. one level above $DEPLOY.
+            #    Without DB/Mongo/Redis credentials the backend boots into a 502,
+            #    so we skip (not fail) the recreate and warn instead.
+            ENV_FILE="$(cd "$DEPLOY/.." && pwd)/.env"
+            if [ -f "$ENV_FILE" ]; then
+              echo "Env file found at $ENV_FILE — recreating backend."
+              $COMPOSE up -d --no-deps --force-recreate backend
+            else
+              echo "WARNING: $ENV_FILE missing — skipping backend recreate to avoid a 502."
+              echo "Create it once on the server, then re-run this workflow to ship the backend."
+            fi
+
+            # 5) Health check — fail the deploy (and surface it in Actions) if the
             #    site is not serving a normal status code.
             sleep 5
             CODE=$(curl -ksS -o /dev/null -w '%{http_code}' https://rokhdad.top || echo 000)
@@ -62,5 +74,16 @@ jobs:
               *) echo "Site unhealthy (HTTP $CODE) after deploy"; exit 1 ;;
             esac
 
-            # 5) Clean up dangling images to save disk
+            # 6) Backend/admin health check — only when we actually recreated it.
+            if [ -f "$ENV_FILE" ]; then
+              sleep 5
+              ADMIN=$(curl -ksS -o /dev/null -w '%{http_code}' https://rokhdad.top/admin/login || echo 000)
+              echo "Admin login HTTP status: $ADMIN"
+              case "$ADMIN" in
+                200|301|302) echo "Admin panel healthy." ;;
+                *) echo "Admin panel unhealthy (HTTP $ADMIN) after deploy"; exit 1 ;;
+              esac
+            fi
+
+            # 7) Clean up dangling images to save disk
             docker image prune -f
