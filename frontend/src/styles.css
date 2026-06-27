@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
 @theme {
+  /* Color palette */
   --color-canvas: #f6faf8;
   --color-surface: #ffffff;
   --color-ink: #10201d;
@@ -13,8 +14,16 @@
   --color-brand-700: #0b7469;
   --color-brand-800: #075f57;
   --color-brand-900: #063f3b;
+  /* Dark mode variants */
+  @media (prefers-color-scheme: dark) {
+    --color-canvas: #0f1e1a;
+    --color-surface: #10201d;
+    --color-ink: #e0f2ea;
+    --color-muted: #a0b9b3;
+    --color-line: #263e38;
+  }
   --shadow-soft: 0 14px 36px rgb(11 116 105 / 0.08);
-  --font-sans: Vazirmatn, IRANSans, Tahoma, Arial, sans-serif;
+  --font-sans: "Inter", "Vazirmatn", "IRANSans", Tahoma, Arial, sans-serif;
 }
 
 @layer base {
@@ -24,13 +33,11 @@
     font-synthesis: none;
     text-rendering: optimizeLegibility;
   }
-
   body {
     min-width: 320px;
     min-height: 100vh;
     margin: 0;
   }
-
   a {
     text-decoration: none;
   }
@@ -39,5 +46,11 @@
 @layer components {
   .focus-ring {
     @apply focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600;
+  }
+  .bg-glass {
+    @apply bg-white/10 backdrop-blur-xl border border-white/20 rounded-lg shadow-sm;
+  }
+  .transition-default {
+    @apply transition-all duration-300 ease-in-out;
   }
 }

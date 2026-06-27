@@ -7,11 +7,12 @@ import signal
 import sys
 import time
 from dataclasses import asdict, dataclass
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 from typing import Any, Iterable
 
 from rokhdad_workers import __version__
-from rokhdad_workers.queue import QueueConsumer, QueueJob, connect_redis
+from rokhdad_workers.logging import configure_logging, get_logger
+from rokhdad_workers.queue import QueueConsumer, QueueJob, QueueResult, connect_redis
 
 
 @dataclass(frozen=True)
@@ -29,7 +30,7 @@ def build_status(service: str, status: str = "ok") -> WorkerStatus:
         service=service,
         version=__version__,
         status=status,
-        timestamp=datetime.now(UTC).isoformat(),
+        timestamp=datetime.now(timezone.utc).isoformat(),
         redis_configured=bool(os.getenv("REDIS_URL") or os.getenv("REDIS_HOST")),
         mongodb_configured=bool(os.getenv("MONGODB_URI") or os.getenv("MONGO_INITDB_ROOT_USERNAME")),
     )
@@ -54,8 +55,12 @@ def run_worker(service: str, argv: Iterable[str] | None = None) -> int:
     parser.add_argument("--simulate-failure", action="store_true", help="Raise a handler error after locking a job.")
     args = parser.parse_args(list(argv) if argv is not None else None)
 
+    configure_logging()
+    log = get_logger(f"worker.{service}")
+
     if args.smoke:
         emit_status(service)
+        log.info("worker.smoke", "worker smoke check", queue=args.queue)
         return 0
 
     if args.once:
@@ -67,6 +72,7 @@ def run_worker(service: str, argv: Iterable[str] | None = None) -> int:
 
             result = QueueConsumer(redis_client, args.queue, handler=build_handler(args.simulate_failure)).consume_once(timeout=max(args.timeout, 1))
             emit_status(service, result.status, result.to_dict())
+            log_queue_result(log, result)
             return 0 if result.status in {"processed", "empty", "retrying"} else 1
 
         emit_status(service, "idle")
@@ -82,22 +88,49 @@ def run_worker(service: str, argv: Iterable[str] | None = None) -> int:
     signal.signal(signal.SIGINT, handle_stop)
 
     emit_status(service, "started", {"queue": args.queue} if args.queue else None)
+    log.info("worker.started", "worker loop started", queue=args.queue)
 
     while not stopped:
         if args.queue:
             redis_client = connect_redis()
             if redis_client is None:
                 emit_status(service, "redis_unconfigured", {"queue": args.queue})
+                log.critical("worker.redis_unconfigured", "Redis is not configured", queue=args.queue)
                 return 2 if args.require_redis else 0
 
             result = QueueConsumer(redis_client, args.queue, handler=build_handler(args.simulate_failure)).consume_once(timeout=max(args.timeout, 1))
             emit_status(service, result.status, result.to_dict())
+            log_queue_result(log, result)
             continue
 
         time.sleep(max(args.interval, 1))
 
     emit_status(service, "stopped")
+    log.info("worker.stopped", "worker loop stopped", queue=args.queue)
     return 0
+
+
+# Map queue result statuses to the standard log levels from docs/LOGGING.md.
+_RESULT_LEVELS = {
+    "processed": "info",
+    "empty": "debug",
+    "retrying": "warning",
+    "locked": "warning",
+    "failed": "error",
+}
+
+
+def log_queue_result(log, result: QueueResult) -> None:
+    """Emit a structured log line for a queue consume result."""
+    level = _RESULT_LEVELS.get(result.status, "info")
+    getattr(log, level)(
+        f"queue.job.{result.status}",
+        f"queue job {result.status}",
+        correlation_id=result.job_id,
+        queue=result.queue,
+        job_type=result.job_type,
+        error=result.error,
+    )
 
 
 def main(argv: Iterable[str] | None = None) -> int:

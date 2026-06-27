@@ -90,7 +90,7 @@ watch(
     suggestionTimeout = setTimeout(async () => {
       try {
         const suggestions = await api.aiSuggestions(newVal.trim());
-        aiSuggestions.value = suggestions?.data || [];
+        aiSuggestions.value = suggestions?.suggestions || [];
       } catch (e) {
         console.error(e);
         aiSuggestions.value = [];
@@ -1682,10 +1682,15 @@ async function submitHermesChat() {
                   <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
               </button>
-            <ul v-if="!suggestionsLoading && aiSuggestions.length" class="absolute left-0 right-0 top-full mt-1 bg-white border border-gray-200 rounded shadow-lg z-10">
-  <li v-for="s in aiSuggestions" :key="s" class="px-3 py-2 hover:bg-gray-100 cursor-pointer" @click="aiQuery = s">{{ s }}</li>
-</ul>
-</div>
+              <ul v-if="!suggestionsLoading && aiSuggestions.length" class="absolute right-0 left-0 top-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-20 overflow-hidden">
+                <li
+                  v-for="s in aiSuggestions"
+                  :key="s"
+                  class="px-4 py-2.5 hover:bg-indigo-50 cursor-pointer text-sm text-right font-medium text-ink transition-colors"
+                  @click="aiQuery = s; aiSuggestions = []; submitAiSearch()"
+                >{{ s }}</li>
+              </ul>
+            </div>
           </form>
 
           <div v-if="aiSearchError" class="mt-4 rounded-xl bg-red-50 p-4 text-sm font-bold text-red-600">
