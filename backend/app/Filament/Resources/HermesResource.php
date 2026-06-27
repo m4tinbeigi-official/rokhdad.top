@@ -9,7 +9,9 @@ use Filament\Tables\Table;
 
 class HermesResource extends Resource
 {
-    protected static ?string $model = null; // No underlying Eloquent model
+    protected static ?string $modelLabel = 'پیام‌رسانی Hermes';
+    protected static ?string $pluralModelLabel = 'پیام‌رسانی Hermes';
+    protected static \UnitEnum|string|null $navigationGroup = 'سیستم';
 
     public static function form(Schema $schema): Schema
     {
@@ -32,7 +34,7 @@ class HermesResource extends Resource
 
     public static function getNavigationLabel(): string
     {
-        return 'Hermes';
+        return 'پیام‌رسانی Hermes';
     }
 
     public static function getNavigationIcon(): string

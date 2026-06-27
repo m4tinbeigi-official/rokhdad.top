@@ -106,6 +106,9 @@ const pageKind = computed(() => {
   if (currentPath.startsWith('/embed/events/')) {
     return 'event-embed'
   }
+  if (currentPath === '/hermes') {
+    return 'hermes'
+  }
   if (currentPath === '/categories') {
     return 'categories'
   }
@@ -741,6 +744,47 @@ function setJsonLd(payload) {
   }
   element.textContent = JSON.stringify(payload)
 }
+
+const hermesMessages = ref([])
+const hermesInput = ref('')
+const isHermesThinking = ref(false)
+const hermesError = ref(null)
+
+async function submitHermesChat() {
+  if (!hermesInput.value.trim() || isHermesThinking.value) return
+  
+  const userMsg = hermesInput.value.trim()
+  hermesMessages.value.push({ role: 'user', content: userMsg })
+  hermesInput.value = ''
+  isHermesThinking.value = true
+  hermesError.value = null
+  
+  try {
+    const token = window.localStorage.getItem('rokhdad_api_token')
+    if (!token) {
+       hermesError.value = 'برای استفاده از هرمس ابتدا وارد حساب کاربری شوید.'
+       isHermesThinking.value = false
+       return
+    }
+    
+    const res = await fetch(`${apiBaseUrl}/hermes-agent/chat`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ message: userMsg })
+    })
+    
+    if (!res.ok) throw new Error('مشکلی در ارتباط با هرمس به وجود آمد.')
+    const data = await res.json()
+    hermesMessages.value = data.messages.filter(m => m.role !== 'system')
+  } catch(e) {
+    hermesError.value = e.message || 'خطای ناشناخته در ارتباط با هرمس.'
+  } finally {
+    isHermesThinking.value = false
+  }
+}
 </script>
 
 <template>
@@ -765,6 +809,9 @@ function setJsonLd(payload) {
           </a>
           <a class="rounded-md px-3 py-2 hover:bg-brand-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-500" href="/dashboard/organizer">
             داشبورد برگزارکننده
+          </a>
+          <a class="rounded-md px-3 py-2 text-amber-600 hover:bg-amber-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-500" href="/hermes">
+            هرمس (هوش مصنوعی)
           </a>
         </nav>
         <button class="rounded-md bg-brand-700 px-4 py-2 text-sm font-bold text-white shadow-sm hover:bg-brand-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600">
@@ -1164,6 +1211,49 @@ function setJsonLd(payload) {
           </section>
         </section>
       </template>
+    </main>
+    <main v-else-if="pageKind === 'hermes'" class="mx-auto grid max-w-4xl gap-6 px-4 py-6 sm:px-6 lg:px-8">
+      <div class="rounded-xl border border-line bg-surface p-6 shadow-xl flex flex-col h-[80vh]">
+        <div class="border-b border-line pb-4 mb-4">
+          <h1 class="text-2xl font-black text-ink">هرمس (دستیار هوش مصنوعی)</h1>
+          <p class="text-sm text-muted mt-1">مدیریت خودکار و توسعه سیستم</p>
+        </div>
+        
+        <div class="flex-1 overflow-y-auto flex flex-col gap-4 mb-4 p-2">
+          <div v-for="(msg, idx) in hermesMessages" :key="idx" 
+               class="p-4 rounded-lg text-sm leading-7"
+               :class="msg.role === 'user' ? 'bg-brand-50 self-end text-brand-900 ml-8' : 'bg-canvas self-start text-ink mr-8 border border-line'">
+            <div class="font-bold text-xs mb-1 opacity-70">{{ msg.role === 'user' ? 'شما' : (msg.role === 'tool' ? 'ابزار سیستم' : 'هرمس') }}</div>
+            <pre class="whitespace-pre-wrap font-sans">{{ msg.content }}</pre>
+          </div>
+          <div v-if="hermesMessages.length === 0" class="text-center text-muted mt-10">
+            هنوز پیامی ارسال نشده است. چه کمکی از من ساخته است؟
+          </div>
+          <div v-if="isHermesThinking" class="p-4 rounded-lg bg-canvas self-start text-ink border border-line animate-pulse">
+            در حال پردازش...
+          </div>
+          <div v-if="hermesError" class="p-4 rounded-lg bg-red-50 text-red-700 self-start border border-red-200">
+            {{ hermesError }}
+          </div>
+        </div>
+
+        <form @submit.prevent="submitHermesChat" class="flex gap-2">
+          <textarea 
+            v-model="hermesInput" 
+            class="flex-1 rounded-lg border border-line bg-white px-4 py-3 text-sm outline-none resize-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
+            rows="2"
+            placeholder="درخواست خود را بنویسید (مثلاً: یک کلاس جدید بساز)..."
+            @keydown.enter.exact.prevent="submitHermesChat"
+          ></textarea>
+          <button 
+            type="submit" 
+            class="bg-brand-700 text-white font-bold px-6 py-3 rounded-lg hover:bg-brand-800 disabled:opacity-50"
+            :disabled="isHermesThinking || !hermesInput.trim()"
+          >
+            ارسال
+          </button>
+        </form>
+      </div>
     </main>
 
     <main v-else-if="pageKind === 'event-embed'" class="mx-auto grid min-h-screen max-w-2xl items-start px-3 py-3 sm:px-4 sm:py-4">

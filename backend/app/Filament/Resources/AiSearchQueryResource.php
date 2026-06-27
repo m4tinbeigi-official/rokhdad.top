@@ -20,18 +20,24 @@ class AiSearchQueryResource extends Resource
 
     // protected static ?string $navigationIcon = 'heroicon-o-magnifying-glass';
 
-    protected static ?string $navigationLabel = 'AI Query Logs';
+    protected static ?string $modelLabel = 'لاگ جستجوی هوشمند';
+    protected static ?string $pluralModelLabel = 'لاگ‌های جستجوی هوشمند';
+    protected static ?string $navigationLabel = 'لاگ‌های جستجوی هوشمند';
+    protected static \UnitEnum|string|null $navigationGroup = 'هوش مصنوعی';
 
     public static function form(Schema $schema): Schema
     {
         return $schema->components([
             TextInput::make('user_query')
+                ->label('عبارت جستجوی کاربر')
                 ->required()
                 ->maxLength(255),
             KeyValue::make('extracted_filters')
-                ->keyLabel('Filter')
-                ->valueLabel('Value'),
+                ->label('فیلترهای استخراج‌شده')
+                ->keyLabel('فیلتر')
+                ->valueLabel('مقدار'),
             TextInput::make('usage_count')
+                ->label('تعداد استفاده')
                 ->numeric()
                 ->minValue(1)
                 ->required(),
@@ -43,21 +49,26 @@ class AiSearchQueryResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('user_query')
+                    ->label('عبارت جستجو')
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('usage_count')
-                    ->label('Usage')
+                    ->label('تعداد استفاده')
                     ->badge()
                     ->sortable(),
                 TextColumn::make('created_at')
-                    ->dateTime('M d, Y H:i')
+                    ->label('تاریخ ایجاد')
+                    ->dateTime('Y-m-d H:i')
                     ->sortable(),
             ])
             ->filters([
                 Filter::make('created_between')
+                    ->label('تاریخ ثبت')
                     ->form([
-                        DatePicker::make('created_from'),
-                        DatePicker::make('created_until'),
+                        DatePicker::make('created_from')
+                            ->label('از تاریخ'),
+                        DatePicker::make('created_until')
+                            ->label('تا تاریخ'),
                     ])
                     ->query(fn ($query, $data) => $query
                         ->when($data['created_from'], fn ($q) => $q->whereDate('created_at', '>=', $data['created_from']))

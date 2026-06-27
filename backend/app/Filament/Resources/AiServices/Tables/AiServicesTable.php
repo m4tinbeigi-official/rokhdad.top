@@ -14,16 +14,21 @@ class AiServicesTable
         return $table
             ->columns([
                 \Filament\Tables\Columns\TextColumn::make('name')
+                    ->label('نام سرویس')
                     ->searchable()
                     ->sortable(),
                 \Filament\Tables\Columns\TextColumn::make('base_url')
+                    ->label('آدرس پایه')
                     ->searchable()
                     ->limit(30),
                 \Filament\Tables\Columns\TextColumn::make('model_name')
+                    ->label('نام مدل')
                     ->searchable(),
                 \Filament\Tables\Columns\ToggleColumn::make('is_active')
+                    ->label('فعال')
                     ->sortable(),
                 \Filament\Tables\Columns\TextColumn::make('created_at')
+                    ->label('تاریخ ایجاد')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -32,12 +37,12 @@ class AiServicesTable
                 //
             ])
             ->recordActions([
-                EditAction::make(),
+                EditAction::make()->label('ویرایش'),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                ]),
+                    DeleteBulkAction::make()->label('حذف انتخاب‌شده‌ها'),
+                ])->label('عملیات گروهی'),
             ]);
     }
 }

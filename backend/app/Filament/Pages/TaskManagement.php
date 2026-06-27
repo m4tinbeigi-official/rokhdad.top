@@ -14,8 +14,8 @@ class TaskManagement extends Page implements Tables\Contracts\HasTable
     use Tables\Concerns\InteractsWithTable;
 
     protected static ?string $navigationLabel = 'Task Management';
-    protected static ?string $navigationIcon = 'heroicon-o-collection';
-    protected static string $view = 'filament.pages.task-management'; // optional custom view
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-squares-2x2';
+    protected string $view = 'filament.pages.task-management'; // optional custom view
 
     public function getTitle(): string
     {

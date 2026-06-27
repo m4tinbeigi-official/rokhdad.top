@@ -83,7 +83,45 @@ class ManageHermes extends Page
             $result = app(HermesService::class)->getCodeSnippet($name);
             $this->chatResult = json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         } else {
-            $this->chatResult = 'دستور نامعتبر. لطفاً از قالب‌های بالا استفاده کنید.';
+            // Use full Agent loop for natural language
+            try {
+                $agent = app(\App\Services\HermesAgent::class);
+                
+                // Retrieve existing session messages or initialize
+                $messages = session()->get('hermes_chat_history', []);
+                if (empty($messages)) {
+                    $messages[] = [
+                        'role' => 'system',
+                        'content' => 'You are an autonomous AI coding assistant running inside a Laravel application. You have access to tools to read/write files and execute bash commands.'
+                    ];
+                }
+                
+                $messages[] = [
+                    'role' => 'user',
+                    'content' => $chat
+                ];
+                
+                $messages = $agent->chat($messages);
+                
+                session()->put('hermes_chat_history', $messages);
+                
+                // Get the last assistant message
+                $lastMsg = end($messages);
+                if ($lastMsg && $lastMsg['role'] === 'assistant') {
+                    $this->chatResult = $lastMsg['content'];
+                } else {
+                    $this->chatResult = 'No response or tool execution finished.';
+                }
+                
+                // Keep the prompt empty for the next message
+                $this->form->fill([
+                    'endpoint' => $data['endpoint'],
+                    'api_key' => $data['api_key'],
+                    'chat' => '',
+                ]);
+            } catch (\Exception $e) {
+                $this->chatResult = 'Error executing HermesAgent: ' . $e->getMessage();
+            }
         }
     }
 

@@ -18,6 +18,11 @@ class AiServiceResource extends Resource
 {
     protected static ?string $model = AiService::class;
 
+    protected static ?string $modelLabel = 'سرویس هوش مصنوعی';
+    protected static ?string $pluralModelLabel = 'سرویس‌های هوش مصنوعی';
+    protected static ?string $navigationLabel = 'سرویس‌های هوش مصنوعی';
+    protected static \UnitEnum|string|null $navigationGroup = 'هوش مصنوعی';
+
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
     public static function form(Schema $schema): Schema

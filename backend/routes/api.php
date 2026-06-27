@@ -140,6 +140,12 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
             Route::post('/trace', [HermesProxyController::class, 'trace'])->name('trace');
             Route::post('/snippet', [HermesProxyController::class, 'snippet'])->name('snippet');
         });
+
+        // Hermes Autonomous Agent
+        Route::prefix('hermes-agent')->name('hermes-agent.')->group(function () {
+            Route::post('/chat', [\App\Http\Controllers\HermesAgentController::class, 'chat'])->name('chat');
+            Route::post('/clear', [\App\Http\Controllers\HermesAgentController::class, 'clearSession'])->name('clear');
+        });
     });
 
 // Task management API (admin only)
