@@ -20,6 +20,11 @@ class EventSourceResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedServerStack;
 
+    protected static ?string $modelLabel = 'منبع رویداد';
+    protected static ?string $pluralModelLabel = 'منابع رویداد';
+    protected static ?string $navigationLabel = 'منابع رویداد';
+    protected static ?string $navigationGroup = 'تنظیمات سیستم';
+
     public static function form(Schema $schema): Schema
     {
         return EventSourceForm::configure($schema);

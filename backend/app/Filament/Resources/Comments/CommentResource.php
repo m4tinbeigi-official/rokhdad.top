@@ -19,7 +19,10 @@ class CommentResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedChatBubbleLeftRight;
 
-    protected static ?string $navigationLabel = 'Comment Moderation';
+    protected static ?string $modelLabel = 'نظر';
+    protected static ?string $pluralModelLabel = 'نظرات';
+    protected static ?string $navigationLabel = 'مدیریت نظرات';
+    protected static ?string $navigationGroup = 'تعاملات کاربر';
 
     public static function form(Schema $schema): Schema
     {
