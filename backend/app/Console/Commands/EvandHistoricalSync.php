@@ -9,7 +9,7 @@ use App\Models\City;
 use App\Models\Event;
 use App\Models\EventSourceAttribution;
 use App\Models\Organizer;
-use App\Services\CentralizedLoggingService;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class EvandHistoricalSync extends Command
@@ -20,7 +20,7 @@ class EvandHistoricalSync extends Command
     public function handle()
     {
         $this->info("Starting Evand Historical Sync...");
-        CentralizedLoggingService::logWorker('EvandHistoricalSync', 'Started');
+        Log::info('EvandHistoricalSync Started');
 
         $baseUrl = 'https://api.evand.com';
         
@@ -48,7 +48,7 @@ class EvandHistoricalSync extends Command
 
             if (! $response->successful()) {
                 $this->error("Failed to fetch organizations page {$orgPage}");
-                CentralizedLoggingService::logError("Evand API Error: Orgs page {$orgPage}");
+                Log::error("Evand API Error: Orgs page {$orgPage}");
                 break;
             }
 
@@ -90,7 +90,7 @@ class EvandHistoricalSync extends Command
             }
 
             // Log progress every page
-            CentralizedLoggingService::logWorker('EvandHistoricalSync', 'Progress', [
+            Log::info('EvandHistoricalSync Progress', [
                 'org_page' => $orgPage,
                 'total_org_pages' => $totalOrgPages,
                 'orgs_processed' => $totalOrgsProcessed,
@@ -105,7 +105,7 @@ class EvandHistoricalSync extends Command
         } while ($orgPage <= $totalOrgPages);
 
         $this->info("Completed! Processed {$totalOrgsProcessed} organizers and {$totalEventsProcessed} events.");
-        CentralizedLoggingService::logWorker('EvandHistoricalSync', 'Completed', [
+        Log::info('EvandHistoricalSync Completed', [
             'total_orgs' => $totalOrgsProcessed,
             'total_events' => $totalEventsProcessed,
         ]);

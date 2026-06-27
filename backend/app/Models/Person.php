@@ -41,4 +41,16 @@ class Person extends Model
     {
         return $this->belongsToMany(Event::class)->withPivot(['role_title', 'sort_order']);
     }
+
+    /**
+     * Get all events associated with this person, either directly as an instructor
+     * or indirectly through their linked organizers.
+     */
+    public function getAllEvents()
+    {
+        $directEvents = $this->events;
+        $organizerEvents = $this->organizers()->with('events')->get()->pluck('events')->flatten();
+        
+        return $directEvents->concat($organizerEvents)->unique('id')->sortByDesc('starts_at')->values();
+    }
 }

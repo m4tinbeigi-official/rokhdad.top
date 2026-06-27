@@ -13,3 +13,18 @@
 - `QUICK_LAUNCH.md`: Fast server bootstrap commands for the temporary landing page.
 - `LARAVEL_API.md`: Laravel API scaffold command and P3-001 status.
 - `FRONTEND.md`: Vue frontend scaffold and image build notes.
+
+## Feature & Reference Docs
+
+- `PROJECT_MAP.md`: Ground-truth scan of the repo — components, test coverage, and docs-vs-code gaps.
+- `API_ENDPOINTS.md`: Full route map (method, path, auth) for every API endpoint.
+- `DATA_MODEL.md`: MariaDB schema reference — tables, columns, and relationships by domain.
+- `AUTHENTICATION.md`: Email/password and phone OTP flows, Sanctum tokens, OTP security.
+- `PAYMENTS.md`: Payment gateways (ZarinPal, Zibal), payment flow, callback, and `payments` table.
+- `SETTLEMENTS.md`: Organizer settlement ledger, balances, payouts, and dashboard routes.
+- `WEBHOOKS.md`: Organizer webhook subscriptions, signed delivery, and event catalog.
+- `NOTIFICATIONS.md`: SMS (sms.ir) and email (Pakett) sending, notification logs.
+- `CAMPAIGNS.md`: Organizer email/SMS campaigns, audiences, and simulation.
+- `ADMIN_PANEL.md`: Filament admin panel, resources, widgets, and console commands.
+- `INGESTION_SOURCES.md`: External source connectors and the normalization/dedup/enrichment pipeline.
+- `MOBILE_APP.md`: Capacitor Android packaging of the Vue frontend.
