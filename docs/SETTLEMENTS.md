@@ -2,12 +2,11 @@
 
 Settlement tracks how much each organizer is owed from ticket sales and lets them request payouts. It is backed by a double-entry-style ledger (`SettlementLedger`) and exposed through organizer-only dashboard routes.
 
-> **⚠️ Status: dormant / not wired up (verified 2026-06-27).** This subsystem is implemented but **not active**:
-> - `routes/settlement-routes.php` is **never loaded** — `bootstrap/app.php` only registers `web.php` and `api.php`, and no service provider calls `loadRoutesFrom` for it. The endpoints below are therefore **unreachable** in the running app.
-> - **The ledger is never written to.** Nothing calls `recordPayment` / `recordPlatformFee` / `recordPayout`; `PaymentController` does not touch `SettlementLedger`. `SettlementService` and `SettlementLedger` are referenced only by the (unreachable) `SettlementDashboardController`.
-> - There are **no tests** covering settlement.
->
-> Treat this document as a description of the *intended* design. To activate it, the route file must be registered (e.g. add `then: function () { Route::middleware('api')->prefix('api')->group(base_path('routes/settlement-routes.php')); }` to `withRouting` in `bootstrap/app.php`) **and** the payment-success path must call the ledger recorders. Because `request-payout` moves money, wire and review it deliberately before exposing it.
+> **✅ Status: active (verified 2026-06-27).** This subsystem is fully wired:
+> - `routes/settlement-routes.php` **is loaded** — `bootstrap/app.php` registers it in the `withRouting(then: ...)` callback under the `api` middleware and `api` prefix, so the endpoints below are reachable at `/api/organizer/settlement/*`.
+> - **The ledger is written on every paid payment.** `PaymentController::callback()` calls `SettlementService::recordSuccessfulPayment()` (gross credit + 10% platform-fee debit) inside a DB transaction when a gateway verifies a payment as paid.
+> - **Payouts move money deliberately.** `request-payout` validates the requested amount against the available balance and creates a `pending` `Payout`; an admin approval calls `Payout::markCompleted()` (idempotent), which records the payout debit. `Payout::reject()` closes the request. Both completion and rejection also write an audit-log entry (see [`ADMIN_PANEL.md`](ADMIN_PANEL.md)).
+> - Coverage: `tests/Feature/SettlementLedgerTest.php` (fee math, paid-callback ledger entries, pending-payout balance, idempotent payout completion, monthly statement).
 
 ## Settlement Ledger
 

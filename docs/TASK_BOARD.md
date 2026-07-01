@@ -112,14 +112,14 @@ The project is API-first, GitHub-first, and server-only at runtime. The local ma
 | P5-004 | 5 | Implement roles and permissions | DONE | P5-001 | RBAC tables, models, and user permission helpers | RBAC migration/model tests and server migration/test | M | MUST |
 | P6-001 | 6 | Install Filament admin foundation | DONE | P3-001, P5-004 | Filament admin panel, assets, provider, and admin-role access gate | Admin login/access feature tests and server smoke test | M | MUST |
 | P6-002 | 6 | Add admin user management | DONE | P6-001, P5-004 | Filament User resource with role assignment and guarded password edits | User resource route and CRUD feature tests | M | MUST |
-| P6-003 | 6 | Add audit log viewer | BLOCKED | P6-001, P31-004 | Audit resource | Admin review | S | SHOULD |
+| P6-003 | 6 | Add audit log viewer | DONE | P6-001, P31-004 | Audit resource | Admin review | S | SHOULD |
 | P7-001 | 7 | Create categories and cities model | DONE | P4-001 | Category/city migrations, models, factories, and API contract | Migration/model tests and server migration/test | M | MUST |
 | P7-002 | 7 | Create organizer and person model | DONE | P7-001 | Organizer/person migrations, models, factories, relationships, and API contract | Relation/model tests and server migration/test | M | MUST |
 | P7-003 | 7 | Create canonical event model | DONE | P7-001, P7-002 | Event migration, model, factory, relationships, and API contract | Migration/relation tests and server migration/test | L | MUST |
 | P7-004 | 7 | Create source attribution model | DONE | P7-003 | Event source attribution migration, model, factory, relationships, and API contract | Relation/model tests and server migration/test | M | MUST |
 | P8-001 | 8 | Scaffold Python worker package | DONE | P2-001 | Python package, worker entrypoints, worker Dockerfile, and worker runbook | Unit smoke tests and server container smoke test | M | MUST |
 | P8-002 | 8 | Add worker queue consumer contract | DONE | P8-001, P4-003 | Redis queue message contract, consumer loop, and CLI queue flags | Unit queue tests and server Redis job smoke test | M | MUST |
-| P8-003 | 8 | Add worker logging standard | BLOCKED | P8-001, P31-001 | Structured logs | Log sample review | S | MUST |
+| P8-003 | 8 | Add worker logging standard | DONE | P8-001, P31-001 | Structured logs | Log sample review | S | MUST |
 | P9-001 | 9 | Create event source registry | DONE | P7-004 | Event source migration, model, Filament resource, and API contract | Model/relation tests and Filament CRUD tests | M | MUST |
 | P9-002 | 9 | Add API key rotation model | DONE | P9-001 | Event source API key migration, encrypted model, issue/rotate/revoke helpers | Key storage and rotation feature tests | M | MUST |
 | P9-003 | 9 | Add source health tracking | DONE | P9-001 | Event source health fields, model health helpers, and admin visibility | Simulated success/failure tests | S | SHOULD |
@@ -186,15 +186,15 @@ The project is API-first, GitHub-first, and server-only at runtime. The local ma
 | P28-003 | 28 | Add attendee import/export | DONE | P19-002, P27-001 | CSV import/export | File tests | M | SHOULD |
 | P29-001 | 29 | Add organizer analytics dashboard | DONE | P27-001, P19-002 | Analytics UI/API | Data accuracy tests | L | SHOULD |
 | P29-002 | 29 | Add campaign manager foundation | DONE | P24-001, P24-002 | Campaign workflow | Send simulation | L | COULD |
-| P30-001 | 30 | Add settlement ledger model | PENDING | P20-004 | Ledger tables | Accounting tests | L | SHOULD |
-| P30-002 | 30 | Add organizer settlement dashboard | PENDING | P30-001, P27-001 | Settlement UI | Admin review | L | SHOULD |
-| P31-001 | 31 | Add centralized logging plan | PENDING | P2-001 | Logging services | Log query test | M | MUST |
-| P31-002 | 31 | Add backup and restore workflow | PENDING | P4-001, P4-002, P2-004 | Backup scripts/runbook | Restore drill | L | MUST |
-| P31-003 | 31 | Add rollback deployment workflow | PENDING | P1-004, P2-001 | Rollback runbook | Rollback drill | M | MUST |
-| P31-004 | 31 | Add security hardening baseline | PENDING | P5-004, P2-002 | Hardening checklist | Security review | L | MUST |
-| P32-001 | 32 | Define replay/video commerce scope | PENDING | MVP complete | Scope document | Product review | M | LATER |
-| P32-002 | 32 | Define webinar provider abstraction | PENDING | MVP complete | Provider contract | Architecture review | M | LATER |
-| P32-003 | 32 | Define advanced AI matching scope | PENDING | MVP complete | Matching design | Product review | M | LATER |
+| P30-001 | 30 | Add settlement ledger model | DONE | P20-004 | Ledger tables | Accounting tests | L | SHOULD |
+| P30-002 | 30 | Add organizer settlement dashboard | DONE | P30-001, P27-001 | Settlement UI | Admin review | L | SHOULD |
+| P31-001 | 31 | Add centralized logging plan | DONE | P2-001 | Logging services | Log query test | M | MUST |
+| P31-002 | 31 | Add backup and restore workflow | DONE | P4-001, P4-002, P2-004 | Backup scripts/runbook | Restore drill | L | MUST |
+| P31-003 | 31 | Add rollback deployment workflow | DONE | P1-004, P2-001 | Rollback runbook | Rollback drill | M | MUST |
+| P31-004 | 31 | Add security hardening baseline | DONE | P5-004, P2-002 | Hardening checklist | Security review | L | MUST |
+| P32-001 | 32 | Define replay/video commerce scope | DONE | MVP complete | Scope document | Product review | M | LATER |
+| P32-002 | 32 | Define webinar provider abstraction | DONE | MVP complete | Provider contract | Architecture review | M | LATER |
+| P32-003 | 32 | Define advanced AI matching scope | DONE | MVP complete | Matching design | Product review | M | LATER |
 
 ## 7. Phase-by-Phase Task Breakdown
 
@@ -563,21 +563,39 @@ Completed:
 - P28-003
 - P29-001
 - P29-002
+- P30-001
+- P30-002
+- P31-001
+- P31-002
+- P31-003
+- P31-004
+- P6-003
+- P8-003
+- P32-001
+- P32-002
+- P32-003
 
 In Progress:
 
-- None yet
+- None.
 
 Blocked:
 
-- Local Docker/build work is blocked by low free disk space on this Mac.
-- P6-003 is blocked until P31-004 provides the audit log data source.
-- P8-003 is blocked until P31-001 provides the structured logging standard.
+- None. (Prior blockers cleared: P31-004 unblocked P6-003; P31-001 unblocked P8-003.)
 
 Next Recommended Task:
 
-- P30-001
+- All planned tasks (P0–P32) are DONE. Remaining work is operational execution
+  on the server (DNS/SSL cutover, real backup/rollback drills, security-hardening
+  checklist run) and, when the owner schedules phase 2, turning the P32 scope docs
+  into implementation tasks.
 
 ## 15. Next Recommended Step
 
-Next implementation can continue with P30-001 for settlement ledger model. P6-003 and P8-003 remain blocked by their upstream dependencies.
+All board tasks through Phase 32 are marked DONE. P30 (settlement) and P31
+(logging/backup/rollback/hardening) were verified against the codebase on
+2026-06-27; P6-003 (audit log viewer) and P8-003 (worker structured logging) were
+implemented in this pass; P32-001/002/003 were delivered as scope documents under
+`docs/PHASE2_*.md`. Note that several deliverables (backup/restore drill, rollback
+drill, security-hardening checklist) are documented and scripted but still need a
+real run on the production server to be considered operationally proven.

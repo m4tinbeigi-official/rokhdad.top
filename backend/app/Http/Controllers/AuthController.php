@@ -28,10 +28,10 @@ class AuthController extends Controller
             ->where('used', false)
             ->update(['used' => true]);
 
-        $code = (string) random_int(100000, 999999);
+        $code = (string) random_int(10000000, 99999999);
         $otp = OtpCode::query()->create([
             'phone' => $phone,
-            'code' => substr($code, 0, 2).'****',
+            'code' => substr($code, 0, 2).'******',
             'code_hash' => Hash::make($code),
             'purpose' => $purpose,
             'used' => false,
@@ -57,7 +57,7 @@ class AuthController extends Controller
         $data = $request->validate([
             'phone_e164' => ['required', 'string', 'max:20', 'regex:/^\+[1-9]\d{7,14}$/'],
             'purpose' => ['nullable', 'string', 'in:login,verify'],
-            'code' => ['required', 'string', 'digits:6'],
+            'code' => ['required', 'string', 'digits:8'],
         ]);
 
         $purpose = $data['purpose'] ?? 'verify';

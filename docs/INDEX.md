@@ -9,6 +9,7 @@
 - `DOCKER_INFRASTRUCTURE.md`: Docker Compose services, networks, and volumes.
 - `MIGRATIONS_AND_SEEDS.md`: Production migration, rollback, and seed policy.
 - `WORKERS.md`: Python worker package, image build, and smoke commands.
+- `LOGGING.md`: Centralized logging standard — JSON envelope, levels, correlation IDs, retention across backend/workers/nginx.
 - `GITHUB_WORKFLOW.md`: GitHub repo, branch, commit, and PR workflow.
 - `QUICK_LAUNCH.md`: Fast server bootstrap commands for the temporary landing page.
 - `LARAVEL_API.md`: Laravel API scaffold command and P3-001 status.
@@ -29,3 +30,9 @@
 - `GOOGLE_INTEGRATION.md`: Google Analytics and Search Console OAuth flow, DB schemas, cron-scheduler, and admin charts.
 - `INGESTION_SOURCES.md`: External source connectors and the normalization/dedup/enrichment pipeline.
 - `MOBILE_APP.md`: Capacitor Android packaging of the Vue frontend.
+
+## Phase 2 Scope Docs (not scheduled)
+
+- `PHASE2_REPLAY_VIDEO_COMMERCE.md`: Replay & digital video product sales (P32-001).
+- `PHASE2_WEBINAR_PROVIDERS.md`: Provider-agnostic live webinar contract (P32-002).
+- `PHASE2_AI_MATCHING.md`: Advanced AI event matching & recommendations (P32-003).

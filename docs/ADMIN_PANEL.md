@@ -94,6 +94,8 @@ structure (`Pages/`, `Schemas/` for forms, `Tables/` for list views).
 |---|---|
 | `Hermes` (custom page) | Configure the Hermes endpoint/API key and run search/trace/snippet queries. Admin-only, and only when Hermes is enabled. |
 | `HermesErrors` | View/clear Hermes request failures logged to `hermes_errors`. Admin-only, read-only. |
+| `RequestLogs` | Per outbound source HTTP request log (status, proxy, timing). Read-only. |
+| `AuditLogs` | Durable "who did what" trail — authentication and money-movement events. Read-only (no create/edit/delete). |
 
 > **Hermes is dev/admin tooling, gated by `HERMES_ENABLED`.** Hermes is a client
 > to an external code knowledge-graph server — unrelated to the event domain. It
@@ -116,6 +118,16 @@ structure (`Pages/`, `Schemas/` for forms, `Tables/` for list views).
 >   in the ledger (inside a DB transaction) when a payment verifies as paid.
 > - Approving a `Payout` in Filament records the payout debit via `Payout::markCompleted()`
 >   (idempotent). Coverage: `tests/Feature/SettlementLedgerTest.php`.
+
+> **Audit log (P6-003).** `App\Models\AuditLog` records a durable "who did what"
+> trail in the `audit_logs` table, independent of rolling stdout logs (see
+> [`LOGGING.md`](LOGGING.md)). Captured automatically today:
+> - `auth.login` / `auth.logout` — via Laravel auth events wired in `AppServiceProvider::boot()`.
+> - `payout.completed` / `payout.rejected` — recorded inside `Payout::markCompleted()`/`reject()`.
+>
+> Use `AuditLog::record($action, $description, $subject, $properties)` to capture
+> additional sensitive actions. The `AuditLogs` Filament resource is **read-only**
+> (`canCreate`/`canEdit`/`canDelete` all false). Coverage: `tests/Feature/AuditLogTest.php`.
 
 > **Note on JSON fields.** Editable JSON-ish fields are exposed as `KeyValue`
 > inputs (e.g. `target_audience`, `settings`, `metadata`, `subscribed_events`).

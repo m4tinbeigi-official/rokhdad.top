@@ -48,6 +48,13 @@ class Payout extends Model
                 'processed_at' => now(),
             ]);
         });
+
+        AuditLog::record(
+            action: 'payout.completed',
+            description: 'تسویه برگزارکننده تکمیل شد',
+            subject: $this,
+            properties: ['organizer_id' => $this->organizer_id, 'amount' => $this->amount],
+        );
     }
 
     public function reject(?string $reason = null): void
@@ -57,5 +64,12 @@ class Payout extends Model
             'notes' => $reason ?? $this->notes,
             'processed_at' => now(),
         ]);
+
+        AuditLog::record(
+            action: 'payout.rejected',
+            description: 'درخواست تسویه رد شد',
+            subject: $this,
+            properties: ['organizer_id' => $this->organizer_id, 'amount' => $this->amount, 'reason' => $reason],
+        );
     }
 }
